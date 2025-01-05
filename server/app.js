@@ -1,41 +1,69 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+"use strict";
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+require("dotenv").config();
 
-var app = express();
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const compression = require("compression");
+const helmet = require("helmet");
+const cors = require("cors");
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+const app = express();
 
-app.use(logger('dev'));
+const swaggerUI = require("swagger-ui-express");
+const swaggerDocument = require("./configs/swagger.config");
+
+app.use(helmet());
+app.use(compression());
+
+// app.use(
+//   cors({
+//     origin: `http://localhost:${process.env.CLIENT_PORT}`,
+//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//     credentials: true, // Allow cookies to be sent
+//   })
+// );
+
+if (process.env.NODE_ENV === "production") {
+  app.use(logger("combined"));
+} else {
+  app.use(logger("dev"));
+}
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use("/", require("./routes"));
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
+if (process.env.NODE_ENV !== "production") {
+  app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+}
+
+app.use((req, res, next) => {
+  const error = new Error("Not Found");
+  error.status = 404;
+  next(error);
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+app.use((error, req, res, next) => {
+  const statusCode = error.status || 500;
+  const response = {
+    status: "error",
+    code: statusCode,
+    message: error.message || "Internal Error",
+  };
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  if (process.env.NODE_ENV === "development") {
+    response.stack = error.stack;
+  }
+
+  console.error(error.stack);
+
+  return res.status(statusCode).json(response);
 });
 
 module.exports = app;
