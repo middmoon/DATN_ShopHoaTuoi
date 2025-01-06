@@ -6,17 +6,16 @@
 "use strict";
 
 require("dotenv").config();
-require("../configs/env.validation"); // Xác nhận biến môi trường
 
 const app = require("../app");
 const debug = require("debug")("server:server");
 const http = require("http");
-const sequelize = require("../configs/sequelize.config"); // Kết nối Sequelize
+const db = require("../models"); // Kết nối Sequelize
 
 /**
  * Get port from environment and store in Express.
  */
-const port = normalizePort(process.env.PORT || "3000");
+const port = normalizePort(process.env.SERVER_PORT || "3000");
 app.set("port", port);
 
 /**
@@ -29,12 +28,27 @@ const server = http.createServer(app);
  */
 (async () => {
   try {
-    await sequelize.authenticate();
-    console.log("✅ Database connected successfully!");
+    await db.sequelize
+      .authenticate()
+      .then(() => {
+        if (process.env.NODE_ENV !== "production") {
+          const { host, port, database } = db.sequelize.config;
 
-    server.listen(port);
-    server.on("error", onError);
-    server.on("listening", onListening);
+          console.log(`Connection established successfully.`);
+          console.log(`Host: ${host}`);
+          console.log(`Port: ${port}`);
+          console.log(`Database: ${database}`);
+        }
+      })
+      .then(() => {
+        console.log("✅ Database connected successfully!");
+      })
+      .then(() => {
+        server.listen(port);
+        console.log(`🚀 Starting server in ${process.env.NODE_ENV} mode`);
+        server.on("error", onError);
+        server.on("listening", onListening);
+      });
   } catch (error) {
     console.error("❌ Unable to connect to the database:", error);
     process.exit(1); // Dừng server nếu không thể kết nối database

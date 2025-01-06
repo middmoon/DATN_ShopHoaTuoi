@@ -13,7 +13,7 @@ const cors = require("cors");
 const app = express();
 
 const swaggerUI = require("swagger-ui-express");
-const swaggerDocument = require("./configs/swagger.config");
+const swaggerDocument = require("./config/swagger.config");
 
 app.use(helmet());
 app.use(compression());

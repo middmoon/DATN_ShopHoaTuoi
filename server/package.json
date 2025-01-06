@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "init_db": "node utils/db/db.init.js",
+    "reset_db": "node utils/db/db.reset.js",
+    "check_db": "node utils/db/db.check.js",
+    "sync_db": "node utils/db/db.sync.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -17,6 +21,7 @@
     "email-validator": "^2.0.4",
     "express": "~4.16.1",
     "express-async-handler": "^1.2.0",
+    "helmet": "^8.0.0",
     "http-errors": "~1.6.3",
     "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
