@@ -2,7 +2,7 @@
 
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class Material extends Model {
+  class User extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -10,50 +10,51 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Material.hasMany(models.MeterialImage, { foreignKey: "material_id" });
-
-      Material.belongsTo(models.MaterialCategory, { foreignKey: "metetial_category_id" });
-
-      Material.belongsToMany(models.Product, {
-        through: models.ProductMaterial,
-        foreignKey: "material_id",
-        otherKey: "product_id",
+      User.belongsToMany(models.Role, {
+        through: models.UserRole,
+        foreignKey: "user_id",
+        otherKey: "role_id",
       });
     }
   }
 
-  Material.init(
+  User.init(
     {
       _id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
+      username: {
+        type: DataTypes.STRING,
+        unique: true,
+      },
+      password: {
+        type: DataTypes.STRING,
+        required: true,
+      },
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+        required: true,
+      },
+      phone: {
+        type: DataTypes.STRING,
+      },
       name: {
         type: DataTypes.STRING,
-      },
-      description: {
-        type: DataTypes.TEXT,
-      },
-      unit: {
-        type: DataTypes.STRING,
-      },
-      stock_quantity: {
-        type: DataTypes.INTEGER.UNSIGNED,
-      },
-      metetial_category_id: {
-        type: DataTypes.INTEGER,
+        required: true,
       },
     },
     {
       sequelize,
-      modelName: "Material",
-      tableName: "materials",
+      modelName: "User",
+      tableName: "users",
       timestamps: true,
       charset: "utf8",
       collate: "utf8_general_ci",
     }
   );
 
-  return Material;
+  return User;
 };

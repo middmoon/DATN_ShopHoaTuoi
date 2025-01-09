@@ -15,6 +15,8 @@ const app = express();
 const swaggerUI = require("swagger-ui-express");
 const swaggerDocument = require("./config/swagger.config");
 
+app.set("view engine", "ejs");
+
 app.use(helmet());
 app.use(compression());
 

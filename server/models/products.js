@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       Product.belongsTo(models.ProductCategory, { foreignKey: "product_category_id" });
 
       Product.belongsToMany(models.Material, {
-        through: "product_materials",
+        through: models.ProductMaterial,
         foreignKey: "product_id",
         otherKey: "material_id",
       });
@@ -39,16 +39,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
       },
       wholesale_price: {
-        type: DataTypes.INTEGER.UNSINGED,
+        type: DataTypes.INTEGER.UNSIGNED,
       },
       retail_price: {
-        type: DataTypes.INTEGER.UNSINGED,
+        type: DataTypes.INTEGER.UNSIGNED,
       },
       status: {
         type: DataTypes.ENUM("Còn hàng", "Hết hàng", "Ngưng kinh doanh"),
       },
       stock_quantity: {
-        type: DataTypes.INTEGER.UNSINGED,
+        type: DataTypes.INTEGER.UNSIGNED,
       },
       product_category_id: {
         type: DataTypes.INTEGER,

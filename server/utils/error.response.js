@@ -30,4 +30,11 @@ class FORBIDDEN extends ErrorResponse {
   }
 }
 
-module.exports = { BAD_REQUEST, UNAUTHORIZED, FORBIDDEN };
+class NOTFOUND extends ErrorResponse {
+  constructor(message = ReasonPhrases.NOT_FOUND) {
+    super(message);
+    this.status = StatusCodes.NOT_FOUND;
+  }
+}
+
+module.exports = { BAD_REQUEST, UNAUTHORIZED, FORBIDDEN, NOTFOUND };
