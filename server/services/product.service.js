@@ -1,6 +1,7 @@
 "use strict";
 
 const { sequelize, Product } = require("../models");
+const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 
 class ProductService {
   static getProducts = async () => {
@@ -10,6 +11,20 @@ class ProductService {
 
   static getProduct = async (id) => {
     const product = await Product.findByPk(id);
+    return product;
+  };
+
+  static getProductByName = async (name) => {
+    const product = await Product.findOne({
+      where: { name },
+    });
+    return product;
+  };
+
+  static getProductByCategory = async (category) => {
+    const product = await Product.findOne({
+      where: { category },
+    });
     return product;
   };
 
@@ -29,6 +44,12 @@ class ProductService {
     const deletedProduct = await Product.destroy({ where: { id } });
     return deletedProduct;
   };
+
+  static addProductImage = async (id, image) => {};
+
+  static updateProductImage = async (id, image) => {};
+
+  static deleteProductImage = async (id, image) => {};
 }
 
 module.exports = ProductService;

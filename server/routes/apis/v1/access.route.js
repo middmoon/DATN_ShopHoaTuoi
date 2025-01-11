@@ -6,10 +6,14 @@ const asyncHandler = require("express-async-handler");
 
 const AccessController = require("../../../controllers/access.controller");
 
-router.post("/register", asyncHandler(AccessController.registerUser));
+const { verifyToken } = require("../../../middlewares/auth.middleware");
 
-router.post("/login", asyncHandler(AccessController.loginUser));
+router
+  .post("/register", asyncHandler(AccessController.registerUser))
 
-router.delete("/logout", asyncHandler(AccessController.logoutUser));
+  .post("/login", asyncHandler(AccessController.loginUser))
+
+  .use(verifyToken)
+  .delete("/logout", asyncHandler(AccessController.logoutUser));
 
 module.exports = router;

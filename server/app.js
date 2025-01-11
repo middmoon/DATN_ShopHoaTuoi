@@ -43,6 +43,8 @@ app.use("/", require("./routes"));
 
 if (process.env.NODE_ENV !== "production") {
   app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+
+  // app.use("/test", require("./test/apis/v1"));
 }
 
 app.use((req, res, next) => {

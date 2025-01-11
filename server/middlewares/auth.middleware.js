@@ -4,7 +4,7 @@ require("dotenv").config();
 
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
-const { UNAUTHORIZED } = require("../utils/error.response");
+const { UNAUTHORIZED, FORBIDDEN } = require("../utils/error.response");
 
 const { User, Role } = require("../models");
 
@@ -30,29 +30,24 @@ const checkRole = async (req, res, next, roleName) => {
   const userId = req._id;
 
   if (!userId) {
-    return res.status(401).json({ message: "User ID is required." });
+    throw new FORBIDDEN("User ID is required.");
   }
 
   const foundUser = await User.findOne({
     where: { _id: userId },
     include: {
       model: Role,
-      as: "roles",
       where: { name: roleName },
       attributes: ["name"],
     },
     attributes: ["_id"],
   });
 
-  if (foundUser && foundUser.roles.length > 0) {
+  if (foundUser && foundUser.Roles) {
     next();
   } else {
     return next(new UNAUTHORIZED("Insufficient privileges"));
   }
-};
-
-const verifyCustomer = (req, res, next) => {
-  return checkRole(req, res, next, "customer");
 };
 
 const verifyAdmin = (req, res, next) => {
@@ -65,6 +60,10 @@ const verifyOwner = (req, res, next) => {
 
 const verifyEmployee = (req, res, next) => {
   return checkRole(req, res, next, "employee");
+};
+
+const verifyCustomer = (req, res, next) => {
+  return checkRole(req, res, next, "customer");
 };
 
 module.exports = {
