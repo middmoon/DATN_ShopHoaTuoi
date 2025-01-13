@@ -3,6 +3,8 @@
 const { sequelize, Product } = require("../models");
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 
+const cloudinary = require("../config/cloudiary.config");
+
 class ProductService {
   static getProducts = async () => {
     const products = await Product.findAll();
