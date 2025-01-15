@@ -12,10 +12,6 @@ router
 
   .get("/search", asyncHandler(AddressController.searchPlace))
 
-  // .get("/search", (req, res) => {
-  //   res.send(req.query);
-  // })
-
   .get("/", (req, res) => {
     res.send("TEST API V1 FOR ADDRESS");
   });

@@ -1,18 +1,18 @@
 "use strict";
 
-const AccessService = require("../services/access.service");
+const AuthService = require("../services/auth.service");
 const { OK, CREATED } = require("../utils/success.response");
 
-class AccessController {
+class AuthController {
   static registerUser = async (req, res) => {
     new CREATED({
       message: "User created successfully",
-      data: await AccessService.registerUser(req.body, req.body.role),
+      data: await AuthService.registerUser(req.body, req.body.role),
     }).send(res);
   };
 
   static loginUser = async (req, res) => {
-    const { accessToken, refreshToken } = await AccessService.loginUser(req.body);
+    const { accessToken, refreshToken } = await AuthService.loginUser(req.body);
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
@@ -47,4 +47,4 @@ class AccessController {
   };
 }
 
-module.exports = AccessController;
+module.exports = AuthController;

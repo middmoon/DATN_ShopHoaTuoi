@@ -21,7 +21,7 @@ const { createTokenPair } = require("../utils/token");
   name: "customer",
  */
 
-class AccessService {
+class AuthService {
   static registerUser = async ({ email, password }, role = "customer") => {
     if (!emailValidator.validate(email)) {
       throw new BAD_REQUEST("Email is not valid");
@@ -126,4 +126,4 @@ class AccessService {
   // async fogotPassword(user) {}
 }
 
-module.exports = AccessService;
+module.exports = AuthService;

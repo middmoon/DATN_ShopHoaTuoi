@@ -10,7 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Material.hasMany(models.MeterialImage, { foreignKey: "material_id" });
+      Material.hasMany(models.MeterialImage, {
+        foreignKey: "material_id",
+      });
 
       Material.belongsTo(models.MaterialCategory, { foreignKey: "metetial_category_id" });
 
@@ -18,6 +20,12 @@ module.exports = (sequelize, DataTypes) => {
         through: models.ProductMaterial,
         foreignKey: "material_id",
         otherKey: "product_id",
+      });
+
+      Material.belongsToMany(models.MaterialAttribute, {
+        through: models.MaterialAttributeMapping,
+        foreignKey: "material_id",
+        otherKey: "material_attribute_id",
       });
     }
   }

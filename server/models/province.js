@@ -13,9 +13,12 @@ module.exports = (sequelize, DataTypes) => {
       Province.belongsTo(models.AdministrativeRegion, {
         foreignKey: "administrative_region_id",
       });
+
       Province.belongsTo(models.AdministrativeUnit, {
         foreignKey: "administrative_unit_id",
       });
+
+      Province.hasMany(models.Order, { foreignKey: "province_code" });
     }
   }
 

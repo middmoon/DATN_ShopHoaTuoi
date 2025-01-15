@@ -10,9 +10,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      District.belongsTo(models.Province, { foreignKey: "province_code" });
+      District.belongsTo(models.Province, {
+        foreignKey: "province_code",
+      });
+
       District.belongsTo(models.AdministrativeUnit, {
         foreignKey: "administrative_unit_id",
+      });
+
+      District.hasMany(models.Order, {
+        foreignKey: "district_code",
       });
     }
   }

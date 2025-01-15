@@ -10,10 +10,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Ward.belongsTo(models.District, { foreignKey: "district_code" });
+      Ward.belongsTo(models.District, {
+        foreignKey: "district_code",
+      });
 
       Ward.belongsTo(models.AdministrativeUnit, {
         foreignKey: "administrative_unit_id",
+      });
+
+      Ward.hasMany(models.Order, {
+        foreignKey: "ward_code",
       });
     }
   }

@@ -10,7 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Product.hasMany(models.ProductImage, { foreignKey: "product_id" });
+      Product.hasMany(models.ProductImage, {
+        foreignKey: "product_id",
+      });
 
       Product.belongsTo(models.ProductCategory, { foreignKey: "product_category_id" });
 
@@ -18,6 +20,12 @@ module.exports = (sequelize, DataTypes) => {
         through: models.ProductMaterial,
         foreignKey: "product_id",
         otherKey: "material_id",
+      });
+
+      Product.belongsToMany(models.Order, {
+        through: models.OrderProduct,
+        foreignKey: "product_id",
+        otherKey: "order_id",
       });
     }
   }
@@ -46,6 +54,9 @@ module.exports = (sequelize, DataTypes) => {
       },
       status: {
         type: DataTypes.ENUM("Còn hàng", "Hết hàng", "Ngưng kinh doanh"),
+      },
+      is_featured: {
+        type: DataTypes.BOOLEAN,
       },
       stock_quantity: {
         type: DataTypes.INTEGER.UNSIGNED,

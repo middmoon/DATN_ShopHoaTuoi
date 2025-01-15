@@ -79,7 +79,6 @@ class AddressService {
       // const place = [...provinces, ...districts];
       return { provinces, districts, wards };
     } catch (error) {
-      console.error("Error while searching:", error);
       throw new Error("Internal server error");
     }
   }

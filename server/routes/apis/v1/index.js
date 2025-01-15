@@ -4,7 +4,7 @@ const express = require("express");
 const { route } = require("./admin.route");
 const router = express.Router();
 
-router.use("/access", require("./access.route"));
+router.use("/auth", require("./auth.route"));
 router.use("/address", require("./address.route"));
 router.use("/product", require("./product.route"));
 router.use("/customer", require("./customer.route"));

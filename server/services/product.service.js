@@ -11,24 +11,28 @@ class ProductService {
     return products;
   };
 
-  static getProduct = async (id) => {
+  static getProductById = async (id) => {
     const product = await Product.findByPk(id);
     return product;
   };
 
-  static getProductByName = async (name) => {
+  static getProductsByName = async (name) => {
     const product = await Product.findOne({
       where: { name },
     });
     return product;
   };
 
-  static getProductByCategory = async (category) => {
+  static getProductsByCategory = async (category) => {
     const product = await Product.findOne({
       where: { category },
     });
     return product;
   };
+
+  static getProductsByAttribute = async (id, attributes) => {};
+
+  static getOutOfStockProducts = async (id) => {};
 
   static createProduct = async (product) => {
     const newProduct = await Product.create(product);
@@ -52,6 +56,8 @@ class ProductService {
   static updateProductImage = async (id, image) => {};
 
   static deleteProductImage = async (id, image) => {};
+
+  static updateProductStock = async (id, quantity) => {};
 }
 
 module.exports = ProductService;

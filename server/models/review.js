@@ -2,7 +2,7 @@
 
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Review extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -10,59 +10,60 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      User.belongsToMany(models.Role, {
-        through: models.UserRole,
-        foreignKey: "user_id",
-        otherKey: "role_id",
+      // Order.hasMany(models.MeterialImage, { foreignKey: "material_id" });
+      Review.belongsTo(models.Product, {
+        foreignKey: "product_id",
       });
 
-      User.hasMany(models.Order, {
-        foreignKey: "user_id",
+      Review.belongsTo(models.Review, {
+        foreignKey: "order_id",
       });
 
-      User.hasMany(models.Review, {
+      Review.belongsTo(models.User, {
         foreignKey: "user_id",
       });
     }
   }
 
-  User.init(
+  Review.init(
     {
       _id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      username: {
+      comment: {
         type: DataTypes.STRING,
-        unique: true,
+        allowNull: false,
       },
-      password: {
-        type: DataTypes.STRING,
-        required: true,
-      },
-      email: {
-        type: DataTypes.STRING,
-        unique: true,
-        required: true,
-      },
-      phone: {
+      reply: {
         type: DataTypes.STRING,
       },
-      name: {
-        type: DataTypes.STRING,
-        required: true,
+      rating_point: {
+        type: DataTypes.INTEGER,
+      },
+      order_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      product_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
       },
     },
     {
       sequelize,
-      modelName: "User",
-      tableName: "users",
+      modelName: "Review",
+      tableName: "orders",
       timestamps: true,
       charset: "utf8",
       collate: "utf8_general_ci",
     }
   );
 
-  return User;
+  return Review;
 };
