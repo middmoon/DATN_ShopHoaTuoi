@@ -18,14 +18,15 @@ class AuthController {
       httpOnly: true,
       secure: false,
       sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000,
+      // maxAge: 10 * 1000,
+      // maxAge: 24 * 60 * 60 * 1000,
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      // maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     new OK({
@@ -38,11 +39,29 @@ class AuthController {
   };
 
   static logoutUser = async (req, res) => {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken", { httpOnly: true, secure: true, sameSite: "strict" });
+    res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "strict" });
     new OK({
       message: "Logout successfully",
       data: {},
+    }).send(res);
+  };
+
+  static refreshToken = async (req, res) => {
+    const accessToken = await AuthService.refreshToken();
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      // maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    new OK({
+      message: "Refresh token successfully",
+      data: {
+        accessToken,
+      },
     }).send(res);
   };
 }

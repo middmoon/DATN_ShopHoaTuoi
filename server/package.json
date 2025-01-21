@@ -10,6 +10,7 @@
     "sync_db": "node utils/db/db.sync.js"
   },
   "dependencies": {
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.5.1",
     "compression": "^1.7.5",

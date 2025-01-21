@@ -1,63 +1,96 @@
 "use strict";
 
-const { sequelize, Product } = require("../models");
+const { sequelize, Product, ProductImage } = require("../models");
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 
 const cloudinary = require("../config/cloudiary.config");
 
 class ProductService {
-  static getProducts = async () => {
-    const products = await Product.findAll();
-    return products;
-  };
+  static createProduct = async (payload) => {
+    const newProduct = await Product.create(payload);
 
-  static getProductById = async (id) => {
-    const product = await Product.findByPk(id);
-    return product;
-  };
+    if (!newProduct) {
+      throw BAD_REQUEST("Can not create product");
+    }
 
-  static getProductsByName = async (name) => {
-    const product = await Product.findOne({
-      where: { name },
-    });
-    return product;
-  };
-
-  static getProductsByCategory = async (category) => {
-    const product = await Product.findOne({
-      where: { category },
-    });
-    return product;
-  };
-
-  static getProductsByAttribute = async (id, attributes) => {};
-
-  static getOutOfStockProducts = async (id) => {};
-
-  static createProduct = async (product) => {
-    const newProduct = await Product.create(product);
     return newProduct;
   };
 
-  static updateProduct = async (id, product) => {
-    const updatedProduct = await Product.update(product, {
-      where: { id },
+  static deleteProduct = async (productId) => {
+    const deletedProduct = await Product.destroy({ where: { productId } });
+    return deletedProduct;
+  };
+
+  static updateProduct = async (productId, payload) => {
+    const updatedProduct = await Product.update(payload, {
+      where: { productId },
     });
     return updatedProduct;
   };
 
-  static deleteProduct = async (id) => {
-    const deletedProduct = await Product.destroy({ where: { id } });
-    return deletedProduct;
+  static getProducts = async (conditions) => {
+    const products = await Product.findAll(conditions);
+    return products;
   };
 
-  static addProductImage = async (id, image) => {};
+  static getProductById = async (conditions) => {
+    const product = await Product.findByPk(productId);
+    return product;
+  };
 
-  static updateProductImage = async (id, image) => {};
+  // Product Image
+  // Avatar
+  static updateProductAvatar = async (productId, imageId, option) => {
+    // option: true, false
+    const [count, updatedImage] = await ProductImage.update(
+      { is_validated: option },
+      {
+        where: {
+          product_id: productId,
+          _id: imageId,
+        },
+        returning: true,
+      }
+    );
 
-  static deleteProductImage = async (id, image) => {};
+    if (count === 0) {
+      throw new NOTFOUND("Can not update product avatar");
+    }
 
-  static updateProductStock = async (id, quantity) => {};
+    return updatedImage;
+  };
+
+  // Images
+  static addProductImages = async (productId, imageFiles) => {
+    const uploadedImages = [];
+    const uploadPromises = imageFiles.map(async (imageFile) => {
+      try {
+        const result = await cloudinary.uploader.upload(imageFile.path, {
+          folder: "product_images",
+          use_filename: true,
+          unique_filename: false,
+        });
+
+        const uploadedImage = await ProductImage.create({
+          product_id: productId,
+          img_url: result.url,
+        });
+
+        uploadedImages.push(result.url);
+        return uploadedImage;
+      } catch (error) {
+        throw new BAD_REQUEST(`Error: Can not upload image or save to the database`);
+      }
+    });
+
+    await Promise.all(uploadPromises);
+
+    return { uploadedImages };
+  };
+
+  static updateProductImages = async (id, image) => {};
+
+  static deleteProductImages = async (id, image) => {};
 }
 
 module.exports = ProductService;

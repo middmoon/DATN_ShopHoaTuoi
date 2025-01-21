@@ -57,6 +57,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       is_featured: {
         type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
       stock_quantity: {
         type: DataTypes.INTEGER.UNSIGNED,
@@ -64,6 +65,13 @@ module.exports = (sequelize, DataTypes) => {
       product_category_id: {
         type: DataTypes.INTEGER,
       },
+      is_public: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      // avatar: {
+      //   type: DataTypes.STRING,
+      // },
     },
     {
       sequelize,

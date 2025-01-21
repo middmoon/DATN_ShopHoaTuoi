@@ -6,9 +6,8 @@ const { BAD_REQUEST, FORBIDDEN, NOTFOUND } = require("../utils/error.response");
 const { sequelize, User, UserRole, Role } = require("../models");
 const bcrypt = require("bcrypt");
 const emailValidator = require("email-validator");
-const jwt = require("jsonwebtoken");
 const { getInfoData } = require("../utils");
-const { createTokenPair } = require("../utils/token");
+const { createToken, createTokenPair } = require("../utils/token");
 
 /**
  * // id: 1
@@ -109,20 +108,14 @@ class AuthService {
     }
   };
 
-  static getUser = async (userId) => {
-    const user = await User.findByPk(userId);
+  static refreshToken = async () => {
+    const { accessToken } = createTokenPair();
 
-    if (!user) {
-      throw new NOTFOUND("User not found");
-    }
-
-    return user;
+    return accessToken;
   };
 
   //extend
-
   // async resetPassword(user) {}
-
   // async fogotPassword(user) {}
 }
 

@@ -24,11 +24,16 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
       },
-      desription: {
+      description: {
         type: DataTypes.TEXT,
       },
       img_url: {
         type: DataTypes.STRING,
+      },
+      priority: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
       },
     },
     {
