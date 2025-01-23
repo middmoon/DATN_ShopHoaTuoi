@@ -1,56 +1,59 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Overview } from "../components/overview";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
+import { PageHeader } from "@/components/page-header";
 
-export default function Home() {
+export default function Page() {
+  const breadcrumbItems = [{ label: "Dashboard", href: "/" }];
+
   return (
-    <div className="space-y-4">
-      <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Orders</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">+180.1% from last month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+12,234</div>
-            <p className="text-xs text-muted-foreground">+19% from last month</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Now</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+573</div>
-            <p className="text-xs text-muted-foreground">+201 since last hour</p>
-          </CardContent>
-        </Card>
-      </div>
-      <Card className="col-span-4">
-        <CardHeader>
-          <CardTitle>Overview</CardTitle>
-        </CardHeader>
-        <CardContent className="pl-2">
-          <Overview />
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      <PageHeader items={breadcrumbItems}></PageHeader>
+
+      {/* <header className="flex h-16 shrink-0 items-center gap-2 sticky top-0 z-10 bg-white shadow-md">
+        <div className="flex items-center gap-2 px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </div>
+      </header> */}
+    </>
+
+    // <SidebarProvider>
+    //   <header className="flex h-16 shrink-0 items-center gap-2 sticky top-0 z-10 bg-white shadow-md">
+    //     <div className="flex items-center gap-2 px-4">
+    //       <SidebarTrigger className="-ml-1" />
+    //       <Separator orientation="vertical" className="mr-2 h-4" />
+    //       <Breadcrumb>
+    //         <BreadcrumbList>
+    //           <BreadcrumbItem className="hidden md:block">
+    //             <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
+    //           </BreadcrumbItem>
+    //         </BreadcrumbList>
+    //       </Breadcrumb>
+    //     </div>
+    //   </header>
+
+    //   <div className="flex min-h-[100vh] flex-col p-6">
+    //     <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
+    //     <p>Here is some content for the homepage.</p>
+    //     Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat, quia. Rem, deserunt. Quae mollitia aperiam voluptatum autem omnis beatae
+    //     quibusdam reiciendis? Corporis iste eum nostrum dolor aliquam, nisi repudiandae quam.
+    //   </div>
+
+    // </SidebarProvider>
+
+    // <div className="flex min-h-[100vh] flex-col p-6">
+    //   <h1 className="text-2xl font-bold">Welcome to the Dashboard</h1>
+    //   <p>Here is some content for the homepage.</p>
+    //   Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fugiat, quia. Rem, deserunt. Quae mollitia aperiam voluptatum autem omnis beatae
+    //   quibusdam reiciendis? Corporis iste eum nostrum dolor aliquam, nisi repudiandae quam.
+    // </div>
   );
 }

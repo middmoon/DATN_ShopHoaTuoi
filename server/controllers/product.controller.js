@@ -7,6 +7,8 @@ const ProductService = require("../services/product.service");
 
 class ProductController {
   static createProduct = async (req, res) => {
+    console.log(req.body);
+
     new CREATED({
       message: "Product created successfully",
       data: {

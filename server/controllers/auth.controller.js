@@ -18,15 +18,14 @@ class AuthController {
       httpOnly: true,
       secure: false,
       sameSite: "strict",
-      // maxAge: 10 * 1000,
-      // maxAge: 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
       sameSite: "strict",
-      // maxAge: 7 * 24 * 60 * 60 * 1000,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     new OK({

@@ -28,13 +28,15 @@ class ProductService {
     return updatedProduct;
   };
 
-  static getProducts = async (conditions) => {
-    const products = await Product.findAll(conditions);
+  static getProducts = async () => {
+    const products = await Product.findAll({
+      include: [ProductImage],
+    });
     return products;
   };
 
-  static getProductById = async (conditions) => {
-    const product = await Product.findByPk(productId);
+  static getProductById = async (productId, conditions) => {
+    const product = await Product.findByPk(productId, conditions);
     return product;
   };
 

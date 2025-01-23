@@ -1,29 +1,38 @@
-import type { Metadata } from "next";
+import "../app/globals.css";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import { Header } from "../components/header";
-import { Sidebar } from "../components/sidebar";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "Flower Shop Admin",
-  description: "Admin dashboard for managing your flower shop",
-};
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="flex h-screen bg-gray-100">
-          <Sidebar />
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <Header />
-            <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
-              <div className="container mx-auto px-6 py-8">{children}</div>
-            </main>
-          </div>
-        </div>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            {/* <header className="flex h-16 shrink-0 items-center gap-2 sticky top-0 z-10 bg-white shadow-md">
+              <div className="flex items-center gap-2 px-4">
+                <SidebarTrigger className="-ml-1" />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem className="hidden md:block">
+                      <BreadcrumbLink href="#">Building Your Application</BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator className="hidden md:block" />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+            </header> */}
+            <div className="flex flex-1 flex-col gap-4 p-0 pt-0">{children}</div>
+          </SidebarInset>
+        </SidebarProvider>
       </body>
     </html>
   );
