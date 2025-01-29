@@ -108,6 +108,31 @@ class AuthService {
     }
   };
 
+  static getRole = async (userId) => {
+    const foundUser = await User.findOne({
+      where: { _id: userId },
+      include: {
+        model: Role,
+        attributes: ["name"],
+        through: {
+          attributes: [],
+        },
+      },
+    });
+
+    if (!foundUser || !foundUser.Roles) {
+      throw new FORBIDDEN("Insufficient privileges");
+    }
+
+    const userRoles = foundUser.Roles.map((role) => role.name);
+
+    if (!userRoles) {
+      throw new FORBIDDEN("Insufficient privileges");
+    }
+
+    return userRoles;
+  };
+
   static refreshToken = async () => {
     const { accessToken } = createTokenPair();
 

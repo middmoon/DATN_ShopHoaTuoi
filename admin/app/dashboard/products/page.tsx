@@ -3,14 +3,10 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 
 import axios from "axios";
@@ -30,8 +26,7 @@ const initialProducts: Product[] = [
 ];
 
 export default function ProductsPage() {
-  const breadcrumbItems = [{ label: "Dashboard", href: "/" }, { label: "Products" }];
-  const { toast } = useToast();
+  const breadcrumbItems = [{ label: "Dashboard", href: "/dashboard" }, { label: "Sản phẩm" }];
 
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -49,27 +44,24 @@ export default function ProductsPage() {
     try {
       const response = await axios.post("http://localhost:3000/api/v1/product", newProduct);
 
-      console.log(response.data);
+      console.log(response);
 
-      toast({
-        title: "Sản phẩm đã được thêm thành công",
-        duration: 4000,
-        variant: "success",
-      });
+      if (response.status === 201) {
+        toast.message("Sản phẩm đã được thêm thành công", {
+          duration: 4000,
+          action: {
+            label: "Xem sản phẩm",
+            onClick: () => console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+          },
+        });
+      }
 
       setIsAddDialogOpen(false);
-      // Optionally, update the products list here
-      // setProducts([...products, response.data]);
     } catch (error) {
-      toast({
-        title: "Có lỗi xảy ra, vui lòng thử lại!",
+      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
         duration: 4000,
       });
     }
-  };
-
-  const handleUpdateProduct = (id: number, field: keyof Product, value: string | number) => {
-    setProducts(products.map((product) => (product.id === id ? { ...product, [field]: value } : product)));
   };
 
   return (
@@ -127,6 +119,8 @@ export default function ProductsPage() {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Product List */}
         <Table>
           <TableHeader>
             <TableRow>

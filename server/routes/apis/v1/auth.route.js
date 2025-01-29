@@ -6,7 +6,7 @@ const asyncHandler = require("express-async-handler");
 
 const AuthController = require("../../../controllers/auth.controller");
 
-const { verifyAccessToken } = require("../../../middlewares/auth.middleware");
+const { verifyToken } = require("../../../middlewares/auth.middleware");
 
 router
   .post("/register", asyncHandler(AuthController.registerUser))
@@ -15,6 +15,8 @@ router
 
   .post("/refresh-token", asyncHandler(AuthController.refreshToken))
 
-  .post("/logout", asyncHandler(AuthController.logoutUser));
+  .post("/logout", verifyToken, asyncHandler(AuthController.logoutUser))
+
+  .get("/get-role", verifyToken, asyncHandler(AuthController.getRole));
 
 module.exports = router;

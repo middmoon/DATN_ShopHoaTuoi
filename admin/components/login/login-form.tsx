@@ -20,15 +20,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const router = useRouter();
-    const [error, setError] = useState("");
-
     try {
       const response = await axios.post(
         "http://localhost:3000/api/v1/auth/login",
         {
-          option, // Thay thế bằng giá trị cụ thể của bạn
-          password, // Thay thế bằng giá trị cụ thể của bạn
+          option,
+          password,
         },
         {
           headers: { "Content-Type": "application/json" },
@@ -59,7 +56,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">QUẢN LÝ SHOP HOA</CardTitle>
-          {/* <CardDescription>Enter your email below to login to your account</CardDescription> */}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin}>
@@ -84,12 +80,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 Login with Google
               </Button> */}
             </div>
-            {/* <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <a href="#" className="underline underline-offset-4">
-                Sign up
-              </a>
-            </div> */}
           </form>
         </CardContent>
       </Card>

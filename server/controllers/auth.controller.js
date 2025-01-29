@@ -46,6 +46,13 @@ class AuthController {
     }).send(res);
   };
 
+  static getRole = async (req, res) => {
+    new OK({
+      message: "Check role successfully",
+      data: await AuthService.getRole(req._id),
+    }).send(res);
+  };
+
   static refreshToken = async (req, res) => {
     const accessToken = await AuthService.refreshToken();
 

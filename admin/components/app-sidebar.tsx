@@ -27,42 +27,58 @@ const data = {
   navMain: [
     {
       title: "Đơn hàng",
-      url: "/orders",
+      url: "/dashboard/orders",
       icon: SquareTerminal,
       isActive: true,
-    },
-    {
-      title: "Sản phẩm / Tồn kho",
-      url: "/products",
-      icon: Bot,
-    },
-    {
-      title: "Doanh thu",
-      url: "/imcome",
-      icon: BookOpen,
-    },
-    {
-      title: "Danh mục sản phẩm",
-      url: "#",
-      icon: Settings2,
       items: [
         {
-          title: "General",
+          title: "Tất cả đơn hàng",
           url: "#",
         },
         {
-          title: "Team",
+          title: "Đang chờ xử lý",
           url: "#",
         },
         {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
+          title: "Đơn hoàn thành",
           url: "#",
         },
       ],
+    },
+    {
+      title: "Sản phẩm",
+      url: "/dashboard/products",
+      icon: Bot,
+      items: [
+        {
+          title: "Tất cả sản phẩm",
+          url: "#",
+        },
+        {
+          title: "Danh mục sản phẩm",
+          url: "/dashboard/products/category",
+        },
+      ],
+    },
+    {
+      title: "Kho hàng",
+      url: "/dashboard/inventory",
+      icon: Settings2,
+      items: [
+        {
+          title: "Nguyên liệu tòn kho",
+          url: "#",
+        },
+        {
+          title: "Danh mục kho hàng",
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Doanh thu",
+      url: "/dashboard/imcome",
+      icon: BookOpen,
     },
   ],
   navSecondary: [
@@ -96,6 +112,8 @@ const data = {
   ],
 };
 
+const pendingOrdersCount = 3;
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="inset" {...props}>
@@ -120,7 +138,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* Content */}
       <SidebarContent>
         {/* Quản lý cửa hàng */}
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain} pendingOrdersCount={pendingOrdersCount} />
         {/* Quản lý hệ thống */}
         {/* <NavProjects projects={data.projects} /> */}
 
