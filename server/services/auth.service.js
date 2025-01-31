@@ -1,6 +1,6 @@
 "use strict";
 
-const { CRETED, OK } = require("../utils/success.response");
+const { CREATED, OK } = require("../utils/success.response");
 const { BAD_REQUEST, FORBIDDEN, NOTFOUND } = require("../utils/error.response");
 
 const { sequelize, User, UserRole, Role } = require("../models");

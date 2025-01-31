@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import axios from "axios";
+import { api } from "@/utils/api";
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
   const router = useRouter();
@@ -21,8 +21,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/auth/login",
+      const response = await api.post(
+        "/auth/login",
         {
           option,
           password,
@@ -35,14 +35,6 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
       if (response.status === 200) {
         router.push("/");
-
-        // Nếu cần kiểm tra quyền hạn:
-        // const role = response.data.role;
-        // if (role === "admin") {
-        //   router.push("/admin/dashboard");
-        // } else {
-        //   setError("Bạn không có quyền truy cập.");
-        // }
       } else {
         setError("Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.");
       }

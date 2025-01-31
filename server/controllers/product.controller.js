@@ -12,7 +12,6 @@ class ProductController {
     new CREATED({
       message: "Product created successfully",
       data: {
-        cookie: req.cookies,
         payload: req.body,
       },
     }).send(res);

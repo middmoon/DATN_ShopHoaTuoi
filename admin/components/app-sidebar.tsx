@@ -56,7 +56,7 @@ const data = {
         },
         {
           title: "Danh mục sản phẩm",
-          url: "/dashboard/products/category",
+          url: "/dashboard/products/categories",
         },
       ],
     },

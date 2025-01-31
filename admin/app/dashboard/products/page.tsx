@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
 
 import axios from "axios";
+import { api } from "@/utils/api";
 
 type Product = {
   id: number;
@@ -42,7 +43,7 @@ export default function ProductsPage() {
     };
 
     try {
-      const response = await axios.post("http://localhost:3000/api/v1/product", newProduct);
+      const response = await api.post("/product", newProduct);
 
       console.log(response);
 
