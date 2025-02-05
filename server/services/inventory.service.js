@@ -6,6 +6,41 @@ const { BAD_REQUEST, FORBIDDEN, NOTFOUND } = require("../utils/error.response");
 const { Material, MaterialAttributeMapping, MaterialAttribute, MeterialImage, MaterialCategory } = require("../models");
 
 class InventoryService {
+  //#region Material Category
+  // Material Category
+  static addMaterialCategory = async (payload) => {
+    const newMaterialCategory = await MaterialCategory.create(payload);
+
+    if (!newMaterialCategory) {
+      throw BAD_REQUEST("Can not create material category");
+    }
+
+    return newMaterialCategory;
+  };
+
+  static deleteMaterialCategory = async (materialCategoryId) => {
+    const deletedMaterialCategory = await MaterialCategory.destroy({ where: { _id: materialCategoryId } });
+    return deletedMaterialCategory;
+  };
+
+  static updateMaterialCategory = async (materialCategoryId, payload) => {
+    const updatedMaterialCategory = await MaterialCategory.update(payload, {
+      where: { _id: materialCategoryId },
+    });
+    return updatedMaterialCategory;
+  };
+
+  static getMaterialCategories = async () => {
+    const categories = await MaterialCategory.findAll();
+    return categories;
+  };
+
+  static getMaterialCategoryById = async (materialCategoryId, conditions) => {
+    const materialCategory = await MaterialCategory.findByPk(materialCategoryId, conditions);
+    return materialCategory;
+  };
+  //#endregion
+
   //#region Material
   static addMaterial = async (payload) => {
     const newMaterial = await Material.create(payload);
@@ -159,41 +194,6 @@ class InventoryService {
       where: { material_id: materialId },
     });
     return attributeMapping;
-  };
-  //#endregion
-
-  //#region Material Category
-  // Material Category
-  static addMaterialCategory = async (payload) => {
-    const newMaterialCategory = await MaterialCategory.create(payload);
-
-    if (!newMaterialCategory) {
-      throw BAD_REQUEST("Can not create material category");
-    }
-
-    return newMaterialCategory;
-  };
-
-  static deleteMaterialCategory = async (materialCategoryId) => {
-    const deletedMaterialCategory = await MaterialCategory.destroy({ where: { _id: materialCategoryId } });
-    return deletedMaterialCategory;
-  };
-
-  static updateMaterialCategory = async (materialCategoryId, payload) => {
-    const updatedMaterialCategory = await MaterialCategory.update(payload, {
-      where: { _id: materialCategoryId },
-    });
-    return updatedMaterialCategory;
-  };
-
-  static getMaterialCategories = async () => {
-    const categories = await MaterialCategory.findAll();
-    return categories;
-  };
-
-  static getMaterialCategoryById = async (materialCategoryId, conditions) => {
-    const materialCategory = await MaterialCategory.findByPk(materialCategoryId, conditions);
-    return materialCategory;
   };
   //#endregion
 }

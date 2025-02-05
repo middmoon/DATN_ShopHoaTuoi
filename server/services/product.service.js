@@ -1,25 +1,110 @@
 "use strict";
 
-const { sequelize, Product, ProductImage } = require("../models");
+const { sequelize, Product, ProductImage, ProductCategory, ProductCategoryMapping } = require("../models");
+const { Op } = require("sequelize");
+
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 
-const cloudinary = require("../config/cloudiary.config");
+const cloudinary = require("../config/cloudinary.config");
+
+console.log(Product);
 
 class ProductService {
   static createProduct = async (payload) => {
-    const newProduct = await Product.create(payload);
+    const { categories, ...product } = payload;
 
-    if (!newProduct) {
-      throw BAD_REQUEST("Can not create product");
+    if (Array.isArray(categories) && categories.length > 0) {
+      const foundCategories = await ProductCategory.findAll({
+        where: {
+          _id: {
+            [Op.in]: categories.map((category) => category._id),
+          },
+        },
+        attributes: ["_id"],
+      });
+
+      if (!foundCategories || foundCategories.length === 0) {
+        throw new BAD_REQUEST("Can not find product category");
+      }
+
+      const foundCategoryIds = foundCategories.map((category) => category._id);
+
+      const diff = categories.filter((category) => !foundCategoryIds.includes(category._id));
+
+      if (diff.length > 0) {
+        throw new BAD_REQUEST(`Can not find product category: ${diff.map((cat) => cat._id + " - " + cat.name).join(", ")}`);
+      }
     }
 
-    return newProduct;
+    try {
+      const result = await sequelize.transaction(async (t) => {
+        const newProduct = await Product.create(product, { transaction: t });
+
+        if (!newProduct) {
+          throw new BAD_REQUEST("Can not create product");
+        }
+
+        let newProductCategories = [];
+        //#region method 1
+        if (categories.length > 0) {
+          newProductCategories = await ProductCategoryMapping.bulkCreate(
+            categories.map((category) => {
+              return {
+                product_id: newProduct._id,
+                product_category_id: category._id,
+              };
+            }),
+            { transaction: t, returning: true }
+          );
+
+          if (!newProductCategories || newProductCategories.length === 0 || newProductCategories.length != categories.length) {
+            throw new BAD_REQUEST("Can not create product category");
+          }
+        }
+
+        return { product: newProduct, categories: newProductCategories };
+
+        //#endregion
+
+        //#region method 2
+        // if (!categories.length || categories.length === 0) {
+        //   for (const category of categories) {
+        //     const productCategory = await ProductCategory.findByPk({
+        //       where: { _id: category },
+        //       transaction: t,
+        //     });
+
+        //     if (!productCategory) {
+        //       throw BAD_REQUEST(`Can not find product category ${category.name} with id ${category._id}`);
+        //     }
+
+        //     const newProductCategory = await ProductCategory.create(
+        //       {
+        //         product_id: newProduct._id,
+        //         parent_id: productCategory._id,
+        //       },
+        //       { transaction: t }
+        //     );
+
+        //     if (!newProductCategory) {
+        //       throw BAD_REQUEST("Can not create product category");
+        //     }
+        //   }
+        // }
+
+        //#endregion
+      });
+
+      return result;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  static deleteProduct = async (productId) => {
-    const deletedProduct = await Product.destroy({ where: { productId } });
-    return deletedProduct;
-  };
+  // static deleteProduct = async (productId) => {
+  //   const deletedProduct = await Product.destroy({ where: { productId } });
+  //   return deletedProduct;
+  // };
 
   static updateProduct = async (productId, payload) => {
     const updatedProduct = await Product.update(payload, {
@@ -30,7 +115,19 @@ class ProductService {
 
   static getProducts = async () => {
     const products = await Product.findAll({
-      include: [ProductImage],
+      include: [
+        {
+          model: ProductCategory,
+          attributes: ["_id", "name"],
+          through: {
+            attributes: [],
+          },
+        },
+        {
+          model: ProductImage,
+          attributes: ["img_url"],
+        },
+      ],
     });
     return products;
   };
@@ -38,6 +135,32 @@ class ProductService {
   static getProductById = async (productId, conditions) => {
     const product = await Product.findByPk(productId, conditions);
     return product;
+  };
+
+  // Product Category
+  static addCategory = async (productId, categoryId) => {
+    const newCategory = await ProductCategoryMapping.create({
+      product_id: productId,
+      product_category_id: categoryId,
+    });
+
+    if (!newCategory) {
+      throw BAD_REQUEST("Can not create product category");
+    }
+
+    return newCategory;
+  };
+
+  static deleteCategory = async (productId, categoryId) => {
+    const deletedCategory = await ProductCategoryMapping.destroy({
+      where: { product_id: productId, product_category_id: categoryId },
+    });
+
+    if (!deletedCategory) {
+      throw BAD_REQUEST("Can not delete product category");
+    }
+
+    return deletedCategory;
   };
 
   // Product Image
@@ -90,9 +213,9 @@ class ProductService {
     return { uploadedImages };
   };
 
-  static updateProductImages = async (id, image) => {};
+  // static updateProductImages = async (id, image) => {};
 
-  static deleteProductImages = async (id, image) => {};
+  // static deleteProductImages = async (id, image) => {};
 }
 
 module.exports = ProductService;

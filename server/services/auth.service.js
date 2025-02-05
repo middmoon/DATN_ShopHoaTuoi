@@ -34,45 +34,63 @@ class AuthService {
     if (foundUser) {
       throw new BAD_REQUEST("Error: Account already registered");
     }
-    const t = await sequelize.transaction();
+
     try {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
-      const newUser = await User.create(
-        {
-          email,
-          password: hashedPassword,
-        },
-        { transaction: t }
-      );
-      if (!newUser) {
-        throw new BAD_REQUEST("Can not create user");
-      }
-      const userRole = await Role.findOne({ where: { name: role } });
-      if (!userRole) {
-        throw new BAD_REQUEST("Can not find role for user");
-      }
-      const newRole = await UserRole.create(
-        {
-          user_id: newUser._id,
-          role_id: userRole._id,
-        },
-        { transaction: t }
-      );
-      if (!newRole) {
-        throw new BAD_REQUEST("Can not add role");
-      }
-      await t.commit();
-      return {
-        user: getInfoData({
-          fields: ["_id"],
-          object: newUser,
-        }),
-      };
+
+      const result = await sequelize.transaction(async (t) => {
+        const newUser = await User.create({ email, password: hashedPassword }, { transaction: t });
+        if (!newUser) {
+          throw new BAD_REQUEST("Cannot create user");
+        }
+
+        const userRole = await Role.findOne({ where: { name: role }, transaction: t });
+        if (!userRole) {
+          throw new BAD_REQUEST("Cannot find role for user");
+        }
+
+        const newRole = await UserRole.create({ user_id: newUser._id, role_id: userRole._id }, { transaction: t });
+
+        if (!newRole) {
+          throw new BAD_REQUEST("Cannot add role");
+        }
+
+        return {
+          user: getInfoData({ fields: ["_id"], object: newUser }),
+        };
+      });
+
+      return result;
     } catch (error) {
-      await t.rollback();
       throw error;
     }
+
+    // return sequelize.transaction(async (t) => {
+    //   const salt = await bcrypt.genSalt(10);
+    //   const hashedPassword = await bcrypt.hash(password, salt);
+
+    //   const newUser = await User.create({ email, password: hashedPassword }, { transaction: t });
+
+    //   if (!newUser) {
+    //     throw new BAD_REQUEST("Cannot create user");
+    //   }
+
+    //   const userRole = await Role.findOne({ where: { name: role }, transaction: t });
+    //   if (!userRole) {
+    //     throw new BAD_REQUEST("Cannot find role for user");
+    //   }
+
+    //   const newRole = await UserRole.create({ user_id: newUser._id, role_id: userRole._id }, { transaction: t });
+
+    //   if (!newRole) {
+    //     throw new BAD_REQUEST("Cannot add role");
+    //   }
+
+    //   return {
+    //     user: getInfoData({ fields: ["_id"], object: newUser }),
+    //   };
+    // });
   };
 
   static loginUser = async ({ option, password }) => {

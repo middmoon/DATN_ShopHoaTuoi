@@ -5,21 +5,14 @@ const { BAD_REQUEST } = require("../utils/error.response");
 
 const ProductService = require("../services/product.service");
 
+const { Product } = require("../models");
+
 class ProductController {
   static createProduct = async (req, res) => {
-    console.log(req.body);
-
     new CREATED({
       message: "Product created successfully",
-      data: {
-        payload: req.body,
-      },
+      data: await ProductService.createProduct(req.body),
     }).send(res);
-
-    // new CREATED({
-    //   message: "Product created successfully",
-    //   data: await ProductService.createProduct(req.body),
-    // }).send(res);
   };
 
   static deleteProduct = async (req, res) => {
@@ -61,23 +54,15 @@ class ProductController {
       message: "Product image added successfully",
       data: await ProductService.addProductImages(req.params.productId, req.files),
     }).send(res);
-
-    // new OK({
-    //   message: "Product image added successfully",
-    //   data: {
-    //     productId: req.params.productId,
-    //     uploadedImages: req.files,
-    //   },
-    // }).send(res);
   };
 
-  static updateProductImage = async (req, res) => {
-    const product = await ProductService.updateProductImage(req.params.productId, req.body);
-    new OK({
-      message: "Product image updated successfully",
-      data: product,
-    }).send(res);
-  };
+  // static updateProductImage = async (req, res) => {
+  //   const product = await ProductService.updateProductImage(req.params.productId, req.body);
+  //   new OK({
+  //     message: "Product image updated successfully",
+  //     data: product,
+  //   }).send(res);
+  // };
 
   static deleteProductImage = async (req, res) => {
     const product = await ProductService.deleteProductImage(req.params.productId, req.body);

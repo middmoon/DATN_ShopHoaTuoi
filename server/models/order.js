@@ -13,19 +13,15 @@ module.exports = (sequelize, DataTypes) => {
       Order.belongsTo(models.District, {
         foreignKey: "district_code",
       });
-
       Order.belongsTo(models.Province, {
         foreignKey: "province_code",
       });
-
       Order.belongsTo(models.Ward, {
         foreignKey: "ward_code",
       });
-
       Order.belongsTo(models.User, {
         foreignKey: "user_id",
       });
-
       Order.belongsToMany(models.Product, {
         through: models.OrderProduct,
         foreignKey: "order_id",
@@ -42,14 +38,14 @@ module.exports = (sequelize, DataTypes) => {
         autoIncrement: true,
       },
       total_price: {
-        type: DataTypes.BIGINT.UNSIGNED,
-        allowNull: false,
+        type: DataTypes.INTEGER.UNSIGNED,
       },
       note: {
         type: DataTypes.TEXT,
       },
       status: {
         type: DataTypes.ENUM("Chờ xác nhận", "Đang xử lý", "Hoàn thành", "Đơn bị hủy"),
+        defaultValue: "Chờ xác nhận",
       },
       delivery_day: {
         type: DataTypes.DATE,
@@ -73,11 +69,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(20),
         allowNull: true,
       },
+      some: {
+        type: DataTypes.STRING,
+      },
     },
     {
       sequelize,
       modelName: "Order",
-      tableName: "orders",
+      // tableName: "orders",
       timestamps: true,
       charset: "utf8",
       collate: "utf8_general_ci",

@@ -1,5 +1,7 @@
 "use strict";
 
+const { User } = require("../models");
+
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const { UNAUTHORIZED } = require("./error.response");

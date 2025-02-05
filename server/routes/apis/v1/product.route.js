@@ -19,7 +19,7 @@ router
 
   .post("/:productId/images", upload.array("images"), asyncHandler(ProductController.addProductImage))
 
-  .put("/:productId/avatar", upload.single("avatar"), asyncHandler(ProductController.updateProductImage))
+  // .put("/:productId/avatar", upload.single("avatar"), asyncHandler(ProductController.updateProductImage))
 
   .patch("/:productId", asyncHandler(ProductController.updateProduct));
 

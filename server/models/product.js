@@ -1,6 +1,8 @@
 "use strict";
 
-const { Model } = require("sequelize");
+const slugify = require("slugify");
+
+const { Model, Op } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Product extends Model {
     /**
@@ -14,7 +16,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "product_id",
       });
 
-      Product.belongsTo(models.ProductCategory, { foreignKey: "product_category_id" });
+      Product.belongsToMany(models.ProductCategory, {
+        through: models.ProductCategoryMapping,
+        foreignKey: "product_id",
+        otherKey: "product_category_id",
+      });
 
       Product.belongsToMany(models.Material, {
         through: models.ProductMaterial,
@@ -54,6 +60,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       status: {
         type: DataTypes.ENUM("Còn hàng", "Hết hàng", "Ngưng kinh doanh"),
+        defaultValue: "Còn hàng",
+      },
+      slug: {
+        type: DataTypes.STRING,
+        unique: true,
       },
       is_featured: {
         type: DataTypes.BOOLEAN,
@@ -69,9 +80,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
-      // avatar: {
-      //   type: DataTypes.STRING,
-      // },
     },
     {
       sequelize,
@@ -82,6 +90,30 @@ module.exports = (sequelize, DataTypes) => {
       collate: "utf8_general_ci",
     }
   );
+
+  Product.afterCreate(async (product) => {
+    product.slug = slugify(product.name + " " + product._id, {
+      replacement: "-",
+      remove: undefined,
+      lower: false,
+      strict: false,
+      locale: "vi",
+      trim: true,
+    });
+  });
+
+  Product.afterUpdate(async (product) => {
+    if (product.changed("name") && product.previous("name") !== product.name) {
+      product.slug = slugify(product.name + product._id, {
+        replacement: "-",
+        remove: undefined,
+        lower: false,
+        strict: false,
+        locale: "vi",
+        trim: true,
+      });
+    }
+  });
 
   return Product;
 };
