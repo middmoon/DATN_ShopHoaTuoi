@@ -1,0 +1,7 @@
+.swiper-pagination-bullet {
+  background-color: #ff5733; /* Màu sắc của dấu chấm */
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #4caf50; /* Màu sắc của dấu chấm khi được kích hoạt */
+}
