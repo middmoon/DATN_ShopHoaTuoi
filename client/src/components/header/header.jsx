@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "../header/header.css";
 
-import Navbar from "./Nav/navbar";
-import HeaderIn4 from "./Nav/headerin4";
+import HeaderIn4 from "../header/Nav/headerin4";
+import Navbar from "../header/Nav/navbar";
 import HeroSection from "../header/HeroSection/HeroSection";
 
 export default function Header() {

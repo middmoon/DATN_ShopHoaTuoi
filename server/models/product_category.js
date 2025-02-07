@@ -10,7 +10,16 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      ProductCategory.hasMany(models.Product, { foreignKey: "product_category_id" });
+
+      ProductCategory.hasMany(models.ProductCategory, { foreignKey: "parent_id" });
+
+      ProductCategory.belongsTo(models.ProductCategory, { foreignKey: "parent_id" });
+
+      ProductCategory.belongsToMany(models.Product, {
+        through: models.ProductCategoryMapping,
+        foreignKey: "product_category_id",
+        otherKey: "product_id",
+      });
     }
   }
 
@@ -24,11 +33,22 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
       },
-      desription: {
+      description: {
         type: DataTypes.TEXT,
       },
       img_url: {
         type: DataTypes.STRING,
+      },
+      priority: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+      },
+      parent_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        onDelete: "SET NULL",
+        onUpdate: "CASCADE",
       },
     },
     {

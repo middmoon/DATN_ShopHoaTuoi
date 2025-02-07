@@ -14,7 +14,7 @@ export default function HeaderIn4() {
           <a>PETACILIOUS</a>
         </div>
 
-        <div className="flex-1 font-font2 bg-color-custom-4 text-sm text-color-custom-2 text-right">
+        <div className="flex-1 font-font2 text-sm text-color-custom-2 text-right">
           <p className="text-xs sm:text-sm">0123 456 789</p>
         </div>
       </div>

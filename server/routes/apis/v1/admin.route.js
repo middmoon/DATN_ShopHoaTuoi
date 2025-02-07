@@ -3,11 +3,10 @@
 const express = require("express");
 const router = express.Router();
 const asyncHandler = require("express-async-handler");
-const { verifyToken, verifyAdmin } = require("../../../middlewares/auth.middleware");
+const { checkRole } = require("../../../middlewares/auth.middleware");
 
 router
-  .use(verifyToken)
-  .use(verifyAdmin)
+  .use(checkRole(["sys_admin"]))
 
   .get("/", (req, res) => {
     res.send("Admin API");

@@ -15,6 +15,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user_id",
         otherKey: "role_id",
       });
+
+      User.hasMany(models.Order, {
+        foreignKey: "user_id",
+      });
+
+      User.hasMany(models.Review, {
+        foreignKey: "user_id",
+      });
     }
   }
 
@@ -44,6 +52,10 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
         required: true,
+      },
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
       },
     },
     {

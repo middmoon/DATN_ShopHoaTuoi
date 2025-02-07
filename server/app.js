@@ -20,13 +20,13 @@ app.set("view engine", "ejs");
 app.use(helmet());
 app.use(compression());
 
-// app.use(
-//   cors({
-//     origin: `http://localhost:${process.env.CLIENT_PORT}`,
-//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-//     credentials: true, // Allow cookies to be sent
-//   })
-// );
+app.use(
+  cors({
+    origin: [`http://localhost:${process.env.CLIENT_PORT}`, `http://localhost:${process.env.ADMIN_PORT}`],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
 
 if (process.env.NODE_ENV === "production") {
   app.use(logger("combined"));

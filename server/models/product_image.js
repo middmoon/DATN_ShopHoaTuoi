@@ -10,7 +10,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      ProductImage.belongsTo(models.Product, { foreignKey: "product_id" });
+      ProductImage.belongsTo(models.Product, {
+        foreignKey: "product_id",
+      });
     }
   }
 
@@ -26,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       product_id: {
         type: DataTypes.INTEGER,
+      },
+      is_avatar: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
       },
     },
     {

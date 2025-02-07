@@ -4,10 +4,14 @@ const express = require("express");
 const { route } = require("./admin.route");
 const router = express.Router();
 
-router.use("/access", require("./access.route"));
+router.use("/auth", require("./auth.route"));
 router.use("/address", require("./address.route"));
 router.use("/product", require("./product.route"));
-router.use("/customer", require("./customer.route"));
-router.use("/admin", require("./admin.route"));
-router.use("/owner", require("./owner.route"));
+router.use("/product-categories", require("./product_category.route"));
+router.use("/inventory", require("./inventory.route"));
+router.use("/order", require("./order.route"));
+
+// router.use("/customer", require("./customer.route"));
+// router.use("/admin", require("./admin.route"));
+// router.use("/owner", require("./owner.route"));
 module.exports = router;

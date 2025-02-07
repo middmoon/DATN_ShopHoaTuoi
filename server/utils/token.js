@@ -1,5 +1,7 @@
 "use strict";
 
+const { User } = require("../models");
+
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const { UNAUTHORIZED } = require("./error.response");
@@ -30,14 +32,11 @@ const createTokenPair = (userId) => {
 
 const refreshAccessToken = (refreshToken) => {
   try {
-    const decoded = verifyToken(refreshToken);
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
 
-    const newAccessToken = jwt.sign({ _id: decoded._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE,
-    });
+    const newAccessToken = createToken(decoded._id, process.env.JWT_SECRET, process.env.JWT_EXPIRES_IN);
 
     return {
-      success: true,
       accessToken: newAccessToken,
     };
   } catch (error) {
@@ -45,4 +44,4 @@ const refreshAccessToken = (refreshToken) => {
   }
 };
 
-module.exports = { createTokenPair };
+module.exports = { createToken, createTokenPair, refreshAccessToken };
