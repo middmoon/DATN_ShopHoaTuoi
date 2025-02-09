@@ -7,6 +7,7 @@ import Test from './pages/Test/test';
 import Login from './pages/Authentication/Login';
 import Register from './pages/Authentication/Register';
 import MasterShop from './pages/MasterShop/mastershop';
+import ProductDetail from "./pages/ProductDetail/ProductDetail";
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Route path='login' element={<Login />}></Route>
       <Route path='register' element={<Register />}></Route>
       <Route path='mastershop' element={<MasterShop />}></Route>
+      <Route path='productdetail' element={<ProductDetail />}></Route>
     </Routes>
   );
 }

@@ -14,7 +14,6 @@ const PLMastershop = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
-  // 👉 Tính toán sản phẩm hiển thị theo trang
   const displayedProducts = products.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -22,8 +21,7 @@ const PLMastershop = () => {
 
   return (
     <div className="PlSale mx-auto relative">
-      {/* Danh sách sản phẩm */}
-      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 pb-10 relative">
+      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-10 relative">
         {displayedProducts.map((product) => (
           <ProductCard
             key={product.id}
