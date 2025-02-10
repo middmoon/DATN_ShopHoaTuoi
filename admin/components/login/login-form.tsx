@@ -16,21 +16,18 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const [option, setOption] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     try {
       const response = await api.post(
-        "/auth/login",
-        {
-          option,
-          password,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
+        "/auth/login/system",
+        { option, password },
+        { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
 
       if (response.status === 200) {
@@ -40,6 +37,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       }
     } catch (err) {
       setError("Có lỗi xảy ra, vui lòng thử lại sau.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -65,12 +64,10 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 </div>
                 <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
-              <Button type="submit" className="w-full">
-                Đăng nhập
+              {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "Đang xử lý..." : "Đăng nhập"}
               </Button>
-              {/* <Button variant="outline" className="w-full">
-                Login with Google
-              </Button> */}
             </div>
           </form>
         </CardContent>

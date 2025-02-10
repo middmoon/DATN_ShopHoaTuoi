@@ -16,7 +16,7 @@ import {
 
 export function NavMain({
   items,
-  pendingOrdersCount, // Thêm props cho số đơn hàng đang chờ xử lý
+  pendingOrdersCount,
 }: {
   items: {
     title: string;
@@ -28,11 +28,11 @@ export function NavMain({
       url: string;
     }[];
   }[];
-  pendingOrdersCount: number; // Số lượng đơn hàng đang chờ xử lý
+  pendingOrdersCount: number;
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Quản lý cửa hàng</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>

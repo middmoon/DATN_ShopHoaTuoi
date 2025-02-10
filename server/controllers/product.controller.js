@@ -9,10 +9,17 @@ const { Product } = require("../models");
 
 class ProductController {
   static createProduct = async (req, res) => {
+    // new CREATED({
+    //   message: "Product created successfully",
+    //   data: await ProductService.createProduct(req.body),
+    // }).send(res);
+
     new CREATED({
       message: "Product created successfully",
-      data: await ProductService.createProduct(req.body),
+      data: req.body,
     }).send(res);
+
+    console.log(req.body);
   };
 
   static deleteProduct = async (req, res) => {

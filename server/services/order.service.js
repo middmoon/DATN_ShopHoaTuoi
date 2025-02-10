@@ -87,10 +87,34 @@ class OrderService {
     }
   };
 
-  static updateOrder = async (id, payload) => {
-    const updatedOrder = await Order.update(payload, {
-      where: { id },
+  static getPendingOrdersCount = async () => {
+    const count = await Order.count({
+      where: {
+        status: "Chờ xác nhận",
+      },
     });
+
+    if (!count) {
+      throw new BAD_REQUEST("Can not get pending orders");
+    }
+
+    return { pending_orders_count: count };
+  };
+
+  static confirmOrder = async (payload) => {
+    const updatedOrder = await Order.update(
+      {
+        status: "Đã xác nhận",
+      },
+      {
+        where: { id: payload.id },
+      }
+    );
+
+    if (!updatedOrder) {
+      throw new BAD_REQUEST("Can not confirm order");
+    }
+
     return updatedOrder;
   };
 

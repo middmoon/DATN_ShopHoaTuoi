@@ -34,12 +34,30 @@ module.exports = {
     }
 
     // Insert the user role for the admin user
-    const addRole = await UserRole.create({
+    const addOwnerRole = await UserRole.create({
       user_id: bossUser._id,
       role_id: ownerRole._id,
     });
 
-    if (!addRole) {
+    if (!addOwnerRole) {
+      throw new Error("Failed to add boss user role.");
+    }
+
+    /////////////
+
+    const adminRole = await Role.findOne({ where: { name: "sys_admin" } });
+
+    if (!adminRole) {
+      throw new Error("owner role not found. Please ensure the 'owner' role exists in the roles table.");
+    }
+
+    // Insert the user role for the admin user
+    const adAdminRole = await UserRole.create({
+      user_id: bossUser._id,
+      role_id: adminRole._id,
+    });
+
+    if (!adAdminRole) {
       throw new Error("Failed to add boss user role.");
     }
   },

@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { BookOpen, Bot, Command, Frame, LifeBuoy, Map, PieChart, Send, Settings2, SquareTerminal } from "lucide-react";
 
+import { BookOpen, Box, Command, Frame, SquareTerminal, NotebookPen, Bitcoin } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -17,6 +17,7 @@ import {
   SidebarMenuItem,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import useGetPendingOrdersCount from "@/hooks/getPendingCountOrders";
 
 const data = {
   user: {
@@ -48,11 +49,11 @@ const data = {
     {
       title: "Sản phẩm",
       url: "/dashboard/products",
-      icon: Bot,
+      icon: Box,
       items: [
         {
           title: "Tất cả sản phẩm",
-          url: "#",
+          url: "/dashboard/products",
         },
         {
           title: "Danh mục sản phẩm",
@@ -60,61 +61,64 @@ const data = {
         },
       ],
     },
-    {
-      title: "Kho hàng",
-      url: "/dashboard/inventory",
-      icon: Settings2,
-      items: [
-        {
-          title: "Nguyên liệu tòn kho",
-          url: "#",
-        },
-        {
-          title: "Danh mục kho hàng",
-          url: "#",
-        },
-      ],
-    },
+    // {
+    //   title: "Kho hàng",
+    //   url: "/dashboard/inventory",
+    //   icon: Settings2,
+    //   items: [
+    //     {
+    //       title: "Nguyên liệu tòn kho",
+    //       url: "#",
+    //     },
+    //     {
+    //       title: "Danh mục kho hàng",
+    //       url: "#",
+    //     },
+    //   ],
+    // },
     {
       title: "Doanh thu",
-      url: "/dashboard/imcome",
-      icon: BookOpen,
+      url: "/dashboard/income",
+      icon: Bitcoin,
     },
   ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
+  // navSecondary: [
+  //   {
+  //     title: "Support",
+  //     url: "#",
+  //     icon: LifeBuoy,
+  //   },
+  //   {
+  //     title: "Feedback",
+  //     url: "#",
+  //     icon: Send,
+  //   },
+  // ],
   projects: [
     {
       name: "Logs",
       url: "#",
-      icon: Frame,
+      icon: NotebookPen,
     },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
+    // {
+    //   name: "Sales & Marketing",
+    //   url: "#",
+    //   icon: PieChart,
+    // },
+    // {
+    //   name: "Travel",
+    //   url: "#",
+    //   icon: Map,
+    // },
   ],
 };
 
-const pendingOrdersCount = 3;
+export function AppSidebar({ roles, ...props }: { roles: string[] }) {
+  const { pendingOrdersCount, loading, error } = useGetPendingOrdersCount();
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const isOwner = roles.includes("owner");
+  const isSysAdmin = roles.includes("sys_admin");
+
   return (
     <Sidebar variant="inset" {...props}>
       {/* Header Icon + Tên cửa hàng */}
@@ -135,16 +139,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       {/* Content */}
       <SidebarContent>
-        {/* Quản lý cửa hàng */}
-        <NavMain items={data.navMain} pendingOrdersCount={pendingOrdersCount} />
-        {/* Quản lý hệ thống */}
-        {/* <NavProjects projects={data.projects} /> */}
-
-        {/* Mở rộng */}
-        {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+        {isOwner && <NavMain items={data.navMain} pendingOrdersCount={pendingOrdersCount} />}
+        {isSysAdmin && <NavProjects projects={data.projects} />}
+        {!isOwner && !isSysAdmin && <p className="text-center text-sm text-gray-500">Không có quyền truy cập</p>}
       </SidebarContent>
+
       {/* Footer */}
       <SidebarFooter>
         <NavUser user={data.user} />
@@ -152,3 +154,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     </Sidebar>
   );
 }
+
+//   {/* Content */}
+//   <SidebarContent>
+//   {/* Quản lý cửa hàng */}
+//   <NavMain items={data.navMain} pendingOrdersCount={pendingOrdersCount} />
+//   {/* Quản lý hệ thống */}
+//   {/* <NavProjects projects={data.projects} /> */}
+
+//   {/* Mở rộng */}
+//   {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+// </SidebarContent>

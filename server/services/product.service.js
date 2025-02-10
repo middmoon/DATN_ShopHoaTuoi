@@ -7,8 +7,6 @@ const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 
 const cloudinary = require("../config/cloudinary.config");
 
-console.log(Product);
-
 class ProductService {
   static createProduct = async (payload) => {
     const { categories, ...product } = payload;

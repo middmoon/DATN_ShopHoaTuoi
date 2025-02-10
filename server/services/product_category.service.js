@@ -10,7 +10,9 @@ class ProductCategoryCategoryService {
   };
 
   static getCategories = async () => {
-    const categories = await ProductCategory.findAll();
+    const categories = await ProductCategory.findAll({
+      attributes: ["_id", "name", "parent_id"],
+    });
     return categories;
   };
 
