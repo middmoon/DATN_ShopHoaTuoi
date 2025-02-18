@@ -1,7 +1,7 @@
 "use strict";
 
 const { sequelize, Product, ProductImage, ProductCategory, ProductCategoryMapping } = require("../models");
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 
@@ -130,8 +130,39 @@ class ProductService {
     return products;
   };
 
-  static getProductById = async (productId, conditions) => {
-    const product = await Product.findByPk(productId, conditions);
+  static getProductById = async (productId) => {
+    const product = await Product.findByPk(productId);
+
+    if (!product) {
+      throw new NOTFOUND("Can not find product by id");
+    }
+
+    return product;
+  };
+
+  static getProductBySlug = async (productSlug) => {
+    const product = await Product.findOne({
+      where: { slug: productSlug },
+      include: [
+        {
+          model: ProductCategory,
+          attributes: ["_id", "name"],
+          through: {
+            attributes: [],
+          },
+        },
+
+        {
+          model: ProductImage,
+          attributes: ["_id", "img_url", "is_avatar"],
+        },
+      ],
+    });
+
+    if (!product) {
+      throw new NOTFOUND("Can not find product by slug");
+    }
+
     return product;
   };
 
@@ -184,31 +215,74 @@ class ProductService {
   };
 
   // Images
-  static addProductImages = async (productId, imageFiles) => {
-    const uploadedImages = [];
-    const uploadPromises = imageFiles.map(async (imageFile) => {
-      try {
-        const result = await cloudinary.uploader.upload(imageFile.path, {
-          folder: "product_images",
-          use_filename: true,
-          unique_filename: false,
-        });
+  // static addProductImages = async (productId, imageFiles, avatarIndex) => {
+  //   const uploadedImages = [];
 
-        const uploadedImage = await ProductImage.create({
-          product_id: productId,
-          img_url: result.url,
-        });
+  //   const numberAvatarIndex = Number(avatarIndex);
 
-        uploadedImages.push(result.url);
-        return uploadedImage;
-      } catch (error) {
-        throw new BAD_REQUEST(`Error: Can not upload image or save to the database`);
-      }
-    });
+  //   const uploadPromises = imageFiles.map(async (imageFile, index) => {
+  //     try {
+  //       const result = await cloudinary.uploader.upload(imageFile.path, {
+  //         folder: "product_images",
+  //         use_filename: true,
+  //         unique_filename: false,
+  //       });
 
-    await Promise.all(uploadPromises);
+  //       const uploadedImage = await ProductImage.create({
+  //         product_id: productId,
+  //         img_url: result.url,
+  //         is_avatar: index === numberAvatarIndex,
+  //       });
 
-    return { uploadedImages };
+  //       uploadedImages.push({
+  //         url: result.url,
+  //         is_avatar: uploadedImage.is_avatar,
+  //       });
+
+  //       return uploadedImage;
+  //     } catch (error) {
+  //       throw new BAD_REQUEST(`Error: Can not upload image or save to the database`);
+  //     }
+  //   });
+
+  //   await Promise.all(uploadPromises);
+
+  //   return { uploadedImages };
+  // };
+
+  static addProductImages = async (productId, imageFiles, avatarIndex) => {
+    const numberAvatarIndex = Number(avatarIndex);
+
+    console.log(avatarIndex);
+
+    if (isNaN(numberAvatarIndex)) {
+      throw new Error("Invalid avatarIndex: Must be a number or a string that can be converted to a number.");
+    }
+
+    const uploadResults = await Promise.all(
+      imageFiles.map(async (imageFile) => {
+        try {
+          return await cloudinary.uploader.upload(imageFile.path, {
+            folder: "product_images",
+            use_filename: true,
+            unique_filename: false,
+          });
+        } catch (error) {
+          console.error("Cloudinary upload error:", error);
+          throw new Error("Error uploading images to Cloudinary.");
+        }
+      })
+    );
+
+    const productImagesData = uploadResults.map((result, index) => ({
+      product_id: productId,
+      img_url: result.url,
+      is_avatar: index === numberAvatarIndex,
+    }));
+
+    const createdImages = await ProductImage.bulkCreate(productImagesData);
+
+    return { uploadedImages: createdImages };
   };
 
   // static updateProductImages = async (id, image) => {};

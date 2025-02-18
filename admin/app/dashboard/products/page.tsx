@@ -2,7 +2,10 @@
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PageHeader } from "@/components/page-header";
-import { AddProductDialog } from "@/components/products/add-product-dialog";
+// import { AddProductDialog } from "@/components/products/add-product-dialog";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 // import { useState } from "react";
 // import { Plus } from "lucide-react";
@@ -68,7 +71,13 @@ export default function ProductsPage() {
       <div className="container mx-auto py-10">
         <h1 className="text-2xl font-bold mb-5">Quản lý sản phẩm</h1>
 
-        <AddProductDialog />
+        <Link href="/dashboard/products/add-new-product">
+          <Button className="mb-5">
+            <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
+          </Button>
+        </Link>
+
+        {/* <AddProductDialog /> */}
 
         {/* <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>

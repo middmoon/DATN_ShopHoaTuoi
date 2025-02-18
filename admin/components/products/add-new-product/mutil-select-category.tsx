@@ -68,6 +68,11 @@ interface MultiSelectProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
 
   onValueChange: (value: number[]) => void;
 
+  // onValueChange: (value: {
+  //   _id: number;
+  //   name: string;
+  // }) => void;
+
   /** The default selected values when the component mounts. */
   // defaultValue?: string[];
 
@@ -117,7 +122,7 @@ interface MultiSelectProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
   // isDialogOpen?: (isDialogOpen: boolean) => void;
 }
 
-export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
+export const MultiSelectCategory = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
   (
     // Setting default values for props if they are not provided
     {
@@ -332,4 +337,4 @@ export const MultiSelect = React.forwardRef<HTMLButtonElement, MultiSelectProps>
   }
 );
 
-MultiSelect.displayName = "MultiSelect";
+MultiSelectCategory.displayName = "MultiSelectCategory";

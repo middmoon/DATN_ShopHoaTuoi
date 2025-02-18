@@ -97,8 +97,18 @@ const data = {
   projects: [
     {
       name: "Logs",
-      url: "#",
+      url: "/dashboard/logs",
       icon: NotebookPen,
+      items: [
+        {
+          title: "Tìm kiếm từ người dùng",
+          url: "/dashboard/logs/user-search",
+        },
+        {
+          title: "Lỗi hệ thống",
+          url: "/dashboard/logs/system-errors",
+        },
+      ],
     },
     // {
     //   name: "Sales & Marketing",

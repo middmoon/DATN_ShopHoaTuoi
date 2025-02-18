@@ -12,7 +12,9 @@ const upload = require("../../../config/multer.config");
 router
   .get("/", asyncHandler(ProductController.getProducts))
 
-  .get("/:productId", asyncHandler(ProductController.getProductById))
+  .get("/:productId(\\d+)", asyncHandler(ProductController.getProductById))
+
+  .get("/:productSlug", asyncHandler(ProductController.getProductBySlug))
 
   //.use(checkRole(["sys_admin", "owner"]))
   .post("/", asyncHandler(ProductController.createProduct))
