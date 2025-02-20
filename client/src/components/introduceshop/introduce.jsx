@@ -4,7 +4,7 @@ const IntroduceShop = () => {
   return (
     <div
       className="introduce px-11 min-h-50vh flex items-center justify-center py-10 bg-cover bg-center relative"
-      style={{ backgroundImage: "url('/Img/Background/4.jpg')" }}
+      style={{ backgroundImage: "url('/Img/Background/7.jpg')" }}
     >
       {/* Lớp phủ trắng */}
       <div className="absolute top-0 left-0 w-full h-full bg-white opacity-80"></div>

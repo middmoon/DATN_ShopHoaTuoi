@@ -19,8 +19,6 @@ const productData = {
     { size: "Vừa", price: { old: 20000, new: 16000 } },
     { size: "To", price: { old: 35000, new: 30000 } },
   ],
-  description:
-    "Một bó hoa tươi đẹp, thích hợp làm quà tặng sinh nhật hoặc trang trí không gian sống.",
 };
 
 const formatCurrency = (value) => {
@@ -45,19 +43,14 @@ export default function ProductInfo() {
 
   return (
     <div className="lg:col-span-7 space-y-6 p-5 bg-color-custom-1 rounded-xl border border-gray-200">
-      {/* Tên sản phẩm */}
       <div>
         <h2 className="text-3xl font-bold">{productData.name}</h2>
-
-        {/* Đánh giá sao */}
         <div className="flex items-center space-x-2 my-3">
           <StarRating rating={productData.rating} />
           <span className="text-gray-500">
             ({productData.reviews} đánh giá)
           </span>
         </div>
-
-        {/* Giá sản phẩm */}
         <div className="text-2xl font-bold">
           <span className="line-through text-gray-400 text-lg mr-2">
             {formatCurrency(selectedSize.price.old)}
@@ -74,11 +67,9 @@ export default function ProductInfo() {
             % giảm
           </span>
         </div>
-        {/* Mô tả sản phẩm */}
         <p className="text-gray-600 mt-4">{productData.description}</p>
       </div>
       <Divider />
-      {/* Kích thước sản phẩm */}
       <div className="space-y-4">
         <p className="font-semibold">Kích thước:</p>
         <div className="flex space-x-4">
@@ -98,22 +89,6 @@ export default function ProductInfo() {
         </div>
       </div>
 
-      {/* Categories dưới dạng nút bấm */}
-      <div className="space-y-4">
-        <p className="font-semibold">Các nhóm hoa:</p>
-        <div className="flex flex-wrap gap-4">
-          {productData.categories.map((category, index) => (
-            <button
-              key={index}
-              className="px-4 py-2 border rounded-full text-gray-600 hover:bg-gray-200"
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Chọn số lượng và tổng giá */}
       <div className="space-y-4">
         <div className="flex items-center space-x-4">
           <button
@@ -134,7 +109,6 @@ export default function ProductInfo() {
           Tổng: {formatCurrency(totalPrice)}
         </p>
         <Divider />
-        {/* Nút thêm vào giỏ hàng và mua ngay */}
         <div className="flex space-x-4">
           <button className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700">
             Thêm vào giỏ hàng
@@ -144,48 +118,51 @@ export default function ProductInfo() {
           </button>
         </div>
       </div>
-
-      {/* Miễn phí vận chuyển */}
-      <p className="text-sm text-gray-500">
-        Miễn phí vận chuyển vào tuần của ngày 14 tháng 2.
-      </p>
-      <div className="col-span-3 mt-12">
-        <div className="flex items-center justify-between space-x-6">
-          <div className="flex flex-col items-center">
-            <img src="/icons/safe.png" alt="An toàn" className="w-8 h-8" />
-            <p className="text-sm text-gray-600">An toàn & Không độc hại</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <img
-              src="/icons/dermatologist.png"
-              alt="Bác sĩ da liễu khuyên dùng"
-              className="w-8 h-8"
-            />
-            <p className="text-sm text-gray-600">Bác sĩ da liễu khuyên dùng</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <img
-              src="/icons/biodegradable.png"
-              alt="Phân hủy sinh học"
-              className="w-8 h-8"
-            />
-            <p className="text-sm text-gray-600">
-              Thành phần phân hủy sinh học
-            </p>
-          </div>
-          <div className="flex flex-col items-center">
-            <img src="/icons/vegan.png" alt="Thuần chay" className="w-8 h-8" />
-            <p className="text-sm text-gray-600">
-              Thuần chay & Không thử nghiệm trên động vật
-            </p>
-          </div>
+      <div className="space-y-4">
+        <p className="font-semibold">Các nhóm hoa:</p>
+        <div className="flex flex-wrap gap-4">
+          {productData.categories.map((category, index) => (
+            <button
+              key={index}
+              className="px-4 py-2 border rounded-full text-gray-600 hover:bg-gray-200"
+            >
+              {category}
+            </button>
+          ))}
         </div>
-
-        {/* Chi tiết sản phẩm */}
-        <div className="mt-8">
-          <h3 className="text-xl font-bold">Chi tiết</h3>
-          <p className="text-gray-600">{productData.description}</p>
-        </div>
+      </div>
+      <div className="border p-4 rounded-lg bg-white">
+        <h2 className="text-blue-600 font-bold text-lg mb-3">
+          ƯU ĐÃI ĐẶC BIỆT
+        </h2>
+        <ul className="space-y-2 text-gray-700">
+          <li className="flex items-start">
+            <span className="text-blue-500 font-semibold mr-2">1.</span>
+            Tặng Banner Hoặc Thiệp (Trị Giá 20.000đ - 50.000đ) Miễn Phí
+          </li>
+          <li className="flex items-start">
+            <span className="text-blue-500 font-semibold mr-2">2.</span>
+            Giảm Tiếp 3% Cho Đơn Hàng Bạn Tạo ONLINE Lần Thứ 2, 5% Cho Đơn Hàng
+            Bạn Tạo ONLINE Lần Thứ 6 Và 10% Cho Đơn Hàng Bạn Tạo ONLINE Lần Thứ
+            12.
+          </li>
+          <li className="flex items-start">
+            <span className="text-blue-500 font-semibold mr-2">3.</span>
+            Miễn Phí Giao Khu Vực Nội Thành ( )
+          </li>
+          <li className="flex items-start">
+            <span className="text-blue-500 font-semibold mr-2">4.</span>
+            Giao Gấp Trong Vòng 2 Giờ
+          </li>
+          <li className="flex items-start">
+            <span className="text-blue-500 font-semibold mr-2">5.</span>
+            Cam Kết 100% Hoàn Lại Tiền Nếu Bạn Không Hài Lòng
+          </li>
+          <li className="flex items-start">
+            <span className="text-blue-500 font-semibold mr-2">6.</span>
+            Cam Kết Hoa Tươi Trên 3 Ngày
+          </li>
+        </ul>
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ export default function Login() {
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-white px-6">
         <div className="max-w-md w-full">
           <div className="flex justify-center mb-6">
-            <div className="flex-1 logo text-3xl font-bold text-black text-center">
+            <div className="flex-1 font-font1 text-3xl font-bold text-center">
               <a href="/">PETACILIOUS</a>
             </div>
           </div>
@@ -20,7 +20,7 @@ export default function Login() {
             Chào mừng trở lại Petacilious
           </h1>
           <p className="text-gray-600 text-center mb-6">
-            Enter your username and password to continue.
+            Nhập thông tin để đăng nhập tài khoản.
           </p>
           <form>
             <div className="mb-4">
