@@ -9,6 +9,7 @@ const logger = require("morgan");
 const compression = require("compression");
 const helmet = require("helmet");
 const cors = require("cors");
+const attachApiKey = require("./middlewares/attach_api_key.middleware");
 
 const app = express();
 
@@ -34,6 +35,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(logger("dev"));
 }
 
+app.use(attachApiKey);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

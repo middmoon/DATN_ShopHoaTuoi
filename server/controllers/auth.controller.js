@@ -19,14 +19,15 @@ class AuthController {
       secure: false,
       sameSite: "strict",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      // maxAge: 10 * 1000,
     });
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: "strict",
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    // });
 
     new OK({
       message: "Login successfully",
@@ -46,10 +47,68 @@ class AuthController {
     }).send(res);
   };
 
+  static loginSystem = async (req, res) => {
+    const { accessToken, refreshToken, roles } = await AuthService.loginSystem(req.body);
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      // maxAge: 10 * 1000,
+    });
+
+    res.cookie("roles", roles, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      // maxAge: 10 * 1000,
+    });
+
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: "strict",
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    // });
+
+    new OK({
+      message: "Login successfully",
+      data: {
+        accessToken,
+        refreshToken,
+      },
+    }).send(res);
+  };
+
+  static logoutSystem = async (req, res) => {
+    res.clearCookie("accessToken", { httpOnly: true, secure: true, sameSite: "strict" });
+    res.clearCookie("roles", { httpOnly: true, secure: true, sameSite: "strict" });
+    new OK({
+      message: "Logout successfully",
+      data: {},
+    }).send(res);
+  };
+
   static getRole = async (req, res) => {
     new OK({
       message: "Check role successfully",
       data: await AuthService.getRole(req._id),
+    }).send(res);
+  };
+
+  static ownerVerify = async (req, res) => {
+    new OK({
+      message: "Check role successfully",
+      data: await AuthService.roleVerify(req._id, "owner"),
+    }).send(res);
+  };
+
+  static adminSystemVerify = async (req, res) => {
+    new OK({
+      message: "Check role successfully",
+      data: await AuthService.roleVerify(req._id, "admin_sys"),
     }).send(res);
   };
 

@@ -13,10 +13,16 @@ router
 
   .post("/login", asyncHandler(AuthController.loginUser))
 
+  .post("/login/system", asyncHandler(AuthController.loginSystem))
+
   .post("/refresh-token", asyncHandler(AuthController.refreshToken))
 
-  .post("/logout", verifyToken, asyncHandler(AuthController.logoutUser))
+  .delete("/logout", verifyToken, asyncHandler(AuthController.logoutUser))
 
-  .get("/get-role", verifyToken, asyncHandler(AuthController.getRole));
+  .delete("/logout/system", verifyToken, asyncHandler(AuthController.logoutUser));
+
+// .post("/role-verify", verifyToken, asyncHandler(AuthController.roleVerify))
+
+// .get("/admin-verify", verifyToken, asyncHandler(AuthController.adminVerify));
 
 module.exports = router;

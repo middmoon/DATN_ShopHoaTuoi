@@ -73,9 +73,9 @@ module.exports = (sequelize, DataTypes) => {
       stock_quantity: {
         type: DataTypes.INTEGER.UNSIGNED,
       },
-      product_category_id: {
-        type: DataTypes.INTEGER,
-      },
+      // product_category_id: {
+      //   type: DataTypes.INTEGER,
+      // },
       is_public: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -91,7 +91,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  Product.afterCreate(async (product) => {
+  Product.afterCreate(async (product, options) => {
     product.slug = slugify(product.name + " " + product._id, {
       replacement: "-",
       remove: undefined,
@@ -100,14 +100,24 @@ module.exports = (sequelize, DataTypes) => {
       locale: "vi",
       trim: true,
     });
+
+    await Product.update(
+      { slug: product.slug },
+      {
+        where: {
+          _id: product._id,
+        },
+        transaction: options.transaction,
+      }
+    );
   });
 
-  Product.afterUpdate(async (product) => {
+  Product.beforeUpdate(async (product) => {
     if (product.changed("name") && product.previous("name") !== product.name) {
       product.slug = slugify(product.name + product._id, {
         replacement: "-",
         remove: undefined,
-        lower: false,
+        lower: true,
         strict: false,
         locale: "vi",
         trim: true,

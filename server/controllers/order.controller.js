@@ -11,6 +11,20 @@ class OrderController {
       data: await OrderService.createOrder(req.body),
     }).send(res);
   };
+
+  static getPendingOrdersCount = async (req, res) => {
+    new OK({
+      message: "get pending order successfully",
+      data: await OrderService.getPendingOrdersCount(),
+    }).send(res);
+  };
+
+  static confirmOrder = async (req, res) => {
+    new OK({
+      message: "Order confirmed successfully",
+      data: await OrderService.confirmOrder(req.body),
+    }).send(res);
+  };
 }
 
 module.exports = OrderController;

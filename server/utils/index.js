@@ -12,9 +12,3 @@ module.exports = {
   getInfoData,
   omitInfoData,
 };
-
-const { Product } = require("../models");
-
-module.exports = {
-  Product,
-};

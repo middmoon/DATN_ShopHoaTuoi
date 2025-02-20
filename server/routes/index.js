@@ -1,12 +1,14 @@
 "use strict";
 
 const express = require("express");
+const { head } = require("../app");
+const { api } = require("../config/cloudinary.config");
 const router = express.Router();
 
 router.use("/api/v1", require("./apis/v1"));
 
 router.get("/test", function (req, res, next) {
-  res.status(200).json({ message: "Test get OK", data: { name: "TMDT CTK45A" } });
+  res.status(200).json({ message: "Test get OK", data: { name: "TMDT CTK45A", header: req.headers } });
 });
 
 router.post("/test", function (req, res, next) {

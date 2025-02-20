@@ -1,16 +1,18 @@
-"use client";
-
-import { useState } from "react";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
+// "use client";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { toast } from "sonner";
 import { PageHeader } from "@/components/page-header";
+// import { AddProductDialog } from "@/components/products/add-product-dialog";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
-import axios from "axios";
-import { api } from "@/utils/api";
+// import { useState } from "react";
+// import { Plus } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+// import { api } from "@/utils/api";
+// import { toast } from "sonner";
 
 type Product = {
   id: number;
@@ -20,7 +22,7 @@ type Product = {
   quantity: number;
 };
 
-const initialProducts: Product[] = [
+const products: Product[] = [
   { id: 1, name: "Product 1", price: 10, quantity: 100 },
   { id: 2, name: "Product 2", price: 20, quantity: 50 },
   { id: 3, name: "Product 3", price: 30, quantity: 75 },
@@ -29,48 +31,55 @@ const initialProducts: Product[] = [
 export default function ProductsPage() {
   const breadcrumbItems = [{ label: "Dashboard", href: "/dashboard" }, { label: "Sản phẩm" }];
 
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  // const [products, setProducts] = useState<Product[]>(initialProducts);
+  // const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const handleAddProduct = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const newProduct = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      price: Number(formData.get("price")),
-      quantity: Number(formData.get("quantity")),
-    };
+  // const handleAddProduct = async (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+  //   const formData = new FormData(event.currentTarget);
+  //   const newProduct = {
+  //     name: formData.get("name") as string,
+  //     description: formData.get("description") as string,
+  //     price: Number(formData.get("price")),
+  //     quantity: Number(formData.get("quantity")),
+  //   };
 
-    try {
-      const response = await api.post("/product", newProduct);
+  //   try {
+  //     const response = await api.post("/product", newProduct);
 
-      console.log(response);
+  //     if (response.status === 201) {
+  //       toast.message("Sản phẩm đã được thêm thành công", {
+  //         duration: 4000,
+  //         action: {
+  //           label: "Xem sản phẩm",
+  //           onClick: () => console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+  //         },
+  //       });
+  //     }
 
-      if (response.status === 201) {
-        toast.message("Sản phẩm đã được thêm thành công", {
-          duration: 4000,
-          action: {
-            label: "Xem sản phẩm",
-            onClick: () => console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
-          },
-        });
-      }
-
-      setIsAddDialogOpen(false);
-    } catch (error) {
-      toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
-        duration: 4000,
-      });
-    }
-  };
+  //     // setIsAddDialogOpen(false);
+  //   } catch (error) {
+  //     toast.error("Có lỗi xảy ra, vui lòng thử lại!", {
+  //       duration: 4000,
+  //     });
+  //   }
+  // };
 
   return (
     <>
       <PageHeader items={breadcrumbItems}></PageHeader>
       <div className="container mx-auto py-10">
         <h1 className="text-2xl font-bold mb-5">Quản lý sản phẩm</h1>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+
+        <Link href="/dashboard/products/add-new-product">
+          <Button className="mb-5">
+            <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
+          </Button>
+        </Link>
+
+        {/* <AddProductDialog /> */}
+
+        {/* <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button className="mb-5">
               <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
@@ -119,7 +128,7 @@ export default function ProductsPage() {
               <Button type="submit">Thêm sản phẩm</Button>
             </form>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
 
         {/* Product List */}
         <Table>
@@ -152,3 +161,37 @@ export default function ProductsPage() {
     </>
   );
 }
+
+// src/app/page.tsx
+
+// "use client";
+
+// import React, { useState } from "react";
+// import { MultiSelect } from "@/components/mutil-select";
+
+// const categories = [
+//   { _id: 1, name: "flower" },
+//   { _id: 2, name: "flower for lover" },
+//   { _id: 3, name: "gift" },
+// ];
+
+// function Home() {
+//   const [selectedFrameworks, setSelectedFrameworks] = useState<number[]>([]);
+
+//   return (
+//     <div className="p-4 max-w-xl">
+//       <h1 className="text-2xl font-bold mb-4">Multi-Select Component</h1>
+//       <MultiSelect
+//         options={categories}
+//         onValueChange={setSelectedFrameworks}
+//         defaultValue={selectedFrameworks}
+//         placeholder="Select frameworks"
+//         variant="inverted"
+//         animation={2}
+//         maxCount={100}
+//       />
+//     </div>
+//   );
+// }
+
+// export default Home;

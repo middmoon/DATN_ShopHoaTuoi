@@ -13,6 +13,13 @@ class ProductController {
       message: "Product created successfully",
       data: await ProductService.createProduct(req.body),
     }).send(res);
+
+    // new CREATED({
+    //   message: "Product created successfully",
+    //   data: req.body,
+    // }).send(res);
+
+    // console.log(req.body);
   };
 
   static deleteProduct = async (req, res) => {
@@ -40,20 +47,48 @@ class ProductController {
   };
 
   static getProductById = async (req, res) => {
-    const product = await ProductService.getProduct(req.params.productId);
     new OK({
       message: "Product retrieved successfully",
-      data: product,
+      data: await ProductService.getProductById(req.params.productId),
+    }).send(res);
+  };
+
+  static getProductBySlug = async (req, res) => {
+    new OK({
+      message: "Product retrieved successfully",
+      data: await ProductService.getProductBySlug(req.params.productSlug),
     }).send(res);
   };
 
   // Product Image
 
   static addProductImage = async (req, res) => {
+    // if (!req.params.productId || !req.files || !req.body.avatarIndex) {
+    //   return new BAD_REQUEST("Missing parameters");
+    // }
+
     new OK({
       message: "Product image added successfully",
-      data: await ProductService.addProductImages(req.params.productId, req.files),
+      data: await ProductService.addProductImages(req.params.productId, req.files, req.body.avatar),
     }).send(res);
+
+    // console.log({
+    //   productId: req.params.productId,
+    //   images: req.files,
+    //   avatarIndex: req.body.avatar,
+    //   imagesCount: req.files.length,
+    //   typeofAvatarIndex: typeof req.body.avatar,
+    // });
+
+    // new OK({
+    //   message: "Product image added successfully",
+    //   data: {
+    //     productId: req.params.productId,
+    //     images: req.files,
+    //     avatarIndex: req.body.avatarIndex,
+    //     typeofAvatarIndex: typeof req.body.avatarIndex,
+    //   },
+    // }).send(res);
   };
 
   // static updateProductImage = async (req, res) => {
