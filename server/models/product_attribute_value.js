@@ -1,11 +1,12 @@
 "use strict";
+
 const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
   class ProductAttributeValue extends Model {
     static associate(models) {
       ProductAttributeValue.belongsTo(models.ProductAttribute, {
         foreignKey: "attribute_id",
-        as: "attribute",
       });
 
       ProductAttributeValue.belongsToMany(models.Product, {
@@ -26,20 +27,17 @@ module.exports = (sequelize, DataTypes) => {
       attribute_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: "product_attributes",
-          key: "_id",
-        },
       },
+      // Value of key
       value: {
         type: DataTypes.STRING,
         allowNull: false,
       },
       extra_price: {
         type: DataTypes.INTEGER.UNSIGNED,
-        defaultValue: 0, // Giá cộng thêm nếu có
+        defaultValue: 0,
       },
-      description: {
+      extra_description: {
         type: DataTypes.TEXT,
         allowNull: true,
       },
@@ -48,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "ProductAttributeValue",
       tableName: "product_attribute_values",
-      timestamps: false,
+      timestamps: true,
     }
   );
 

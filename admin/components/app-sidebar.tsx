@@ -34,21 +34,22 @@ const data = {
       items: [
         {
           title: "Tất cả đơn hàng",
-          url: "#",
+          url: "/dashboard/orders",
         },
         {
           title: "Đang chờ xử lý",
-          url: "#",
+          url: "/dashboard/orders/pending",
         },
         {
           title: "Đơn hoàn thành",
-          url: "#",
+          url: "/dashboard/orders/finished",
         },
       ],
     },
     {
       title: "Sản phẩm",
       url: "/dashboard/products",
+      isActive: true,
       icon: Box,
       items: [
         {

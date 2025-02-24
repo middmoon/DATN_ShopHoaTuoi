@@ -9,17 +9,17 @@ const { Product } = require("../models");
 
 class ProductController {
   static createProduct = async (req, res) => {
-    new CREATED({
-      message: "Product created successfully",
-      data: await ProductService.createProduct(req.body),
-    }).send(res);
-
     // new CREATED({
     //   message: "Product created successfully",
-    //   data: req.body,
+    //   data: await ProductService.createProduct(req.body),
     // }).send(res);
 
-    // console.log(req.body);
+    new CREATED({
+      message: "Product created successfully",
+      data: req.body,
+    }).send(res);
+
+    console.log(req.body);
   };
 
   static deleteProduct = async (req, res) => {
@@ -67,28 +67,28 @@ class ProductController {
     //   return new BAD_REQUEST("Missing parameters");
     // }
 
-    new OK({
-      message: "Product image added successfully",
-      data: await ProductService.addProductImages(req.params.productId, req.files, req.body.avatar),
-    }).send(res);
-
-    // console.log({
-    //   productId: req.params.productId,
-    //   images: req.files,
-    //   avatarIndex: req.body.avatar,
-    //   imagesCount: req.files.length,
-    //   typeofAvatarIndex: typeof req.body.avatar,
-    // });
-
     // new OK({
     //   message: "Product image added successfully",
-    //   data: {
-    //     productId: req.params.productId,
-    //     images: req.files,
-    //     avatarIndex: req.body.avatarIndex,
-    //     typeofAvatarIndex: typeof req.body.avatarIndex,
-    //   },
+    //   data: await ProductService.addProductImages(req.params.productId, req.files, req.body.avatar),
     // }).send(res);
+
+    console.log({
+      productId: req.params.productId,
+      images: req.files,
+      avatarIndex: req.body.avatar,
+      imagesCount: req.files.length,
+      typeofAvatarIndex: typeof req.body.avatar,
+    });
+
+    new OK({
+      message: "Product image added successfully",
+      data: {
+        productId: req.params.productId,
+        images: req.files,
+        avatarIndex: req.body.avatarIndex,
+        typeofAvatarIndex: typeof req.body.avatarIndex,
+      },
+    }).send(res);
   };
 
   // static updateProductImage = async (req, res) => {

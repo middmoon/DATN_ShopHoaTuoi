@@ -15,7 +15,7 @@ const db = require("../models"); // Kết nối Sequelize
 /**
  * Get port from environment and store in Express.
  */
-const port = normalizePort(process.env.SERVER_PORT || "3000");
+const port = normalizePort(process.env.ADMIN_LOGS_PORT || "3000");
 app.set("port", port);
 
 /**

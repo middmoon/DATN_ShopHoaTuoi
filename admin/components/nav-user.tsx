@@ -12,7 +12,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
+import { Button } from "./ui/button";
+import { api } from "@/utils/api";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export function NavUser({
   user,
@@ -24,6 +29,21 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const response = await api.delete("/auth/logout/system");
+
+    if (response.status === 200) {
+      router.push("/login");
+    } else {
+      toast.error("❌ Logout failed:", {
+        duration: 4000,
+      });
+      console.error("❌ Logout failed:", response.statusText);
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -84,8 +104,10 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator /> */}
             <DropdownMenuItem>
-              <LogOut />
-              Log out
+              <Button className="w-full" onClick={handleLogout}>
+                <LogOut />
+                Log out
+              </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

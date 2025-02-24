@@ -1,3 +1,4 @@
+import { OrdersPage } from "@/components/orders/order-page";
 import { PageHeader } from "@/components/page-header";
 
 export default function CategoriesPage() {
@@ -5,6 +6,7 @@ export default function CategoriesPage() {
   return (
     <>
       <PageHeader items={breadcrumbItems}></PageHeader>
+      <OrdersPage />
     </>
   );
 }

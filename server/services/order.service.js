@@ -3,7 +3,7 @@
 const { sequelize, Order, OrderProduct, Product } = require("../models");
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 
-const { Op } = require("sequelize");
+const { Op, or } = require("sequelize");
 
 class OrderService {
   static createOrder = async (payload) => {
@@ -44,6 +44,8 @@ class OrderService {
       const result = await sequelize.transaction(async (t) => {
         const newOrder = await Order.create(
           {
+            // customer_name: order.customer_name,
+            // customer_phone: order.customer_phone,
             note: order.note,
             total_price: total_price,
             delivery_address: delivery_address,
@@ -116,6 +118,47 @@ class OrderService {
     }
 
     return updatedOrder;
+  };
+
+  static getAllOrders = async () => {
+    const orders = await Order.findAll({
+      include: [
+        {
+          model: Product,
+          through: {
+            attributes: ["quantity"],
+          },
+          attributes: ["_id", "name", "retail_price"],
+        },
+      ],
+    });
+
+    if (!orders || orders.length === 0) {
+      throw new NOTFOUND("Can not get orders");
+    }
+
+    return orders;
+  };
+
+  static getOrdersById = async (order_id) => {
+    const orders = await Order.findAll({
+      where: { _id: order_id },
+      include: [
+        {
+          model: Product,
+          through: {
+            attributes: ["quantity"],
+          },
+          attributes: ["_id", "name", "retail_price"],
+        },
+      ],
+    });
+
+    if (!orders) {
+      throw new NOTFOUND("Can not get orders");
+    }
+
+    return orders;
   };
 
   // static getOrders = async () => {

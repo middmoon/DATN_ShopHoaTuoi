@@ -18,25 +18,17 @@ module.exports = (sequelize, DataTypes) => {
       product_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: "products",
-          key: "_id",
-        },
       },
       attribute_value_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: "product_attribute_values",
-          key: "_id",
-        },
       },
     },
     {
       sequelize,
       modelName: "ProductAttributeMapping",
-      tableName: "product_attribute_mappings",
-      timestamps: false,
+      tableName: "product_attrb_mapping",
+      timestamps: true,
     }
   );
 

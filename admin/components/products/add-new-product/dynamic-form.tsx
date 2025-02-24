@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2 } from "lucide-react";
 
-export default function NestedForm() {
+export function DynamicForm() {
   const [items, setItems] = useState([{ id: 1, value: "", price: "", discount_price: "" }]);
 
   const addNewItem = () => {
@@ -19,12 +19,12 @@ export default function NestedForm() {
   };
 
   return (
-    <Card>
+    <Card className="space-y-6">
       <CardContent>
-        <form className="space-y-6">
+        <form className="space-y-6 ">
           {items.map((item, index) => (
             <div key={item.id} className="grid grid-cols-1 gap-4 sm:grid-cols-[3fr_3fr_3fr_1fr] items-end">
-              <div className="space-y-2">
+              <div className="space-y-2 pt-4">
                 <Label htmlFor={`value-${item.id}`}>Kích cỡ</Label>
                 <Input id={`value-${item.id}`} placeholder="Chọn kích cỡ" />
               </div>
@@ -43,7 +43,7 @@ export default function NestedForm() {
               </div>
             </div>
           ))}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-6">
             <Button type="button" variant="outline" size="sm" className="flex items-center gap-2" onClick={addNewItem}>
               <Plus className="h-4 w-4" />
               Thêm thuộc tính

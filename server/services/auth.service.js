@@ -35,6 +35,12 @@ class AuthService {
       throw new BAD_REQUEST("Error: Account already registered");
     }
 
+    const userRole = await Role.findOne({ where: { name: role } });
+
+    if (!userRole) {
+      throw new BAD_REQUEST("Cannot find role for user");
+    }
+
     try {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
@@ -43,11 +49,6 @@ class AuthService {
         const newUser = await User.create({ email, password: hashedPassword }, { transaction: t });
         if (!newUser) {
           throw new BAD_REQUEST("Cannot create user");
-        }
-
-        const userRole = await Role.findOne({ where: { name: role }, transaction: t });
-        if (!userRole) {
-          throw new BAD_REQUEST("Cannot find role for user");
         }
 
         const newRole = await UserRole.create({ user_id: newUser._id, role_id: userRole._id }, { transaction: t });
@@ -65,32 +66,6 @@ class AuthService {
     } catch (error) {
       throw error;
     }
-
-    // return sequelize.transaction(async (t) => {
-    //   const salt = await bcrypt.genSalt(10);
-    //   const hashedPassword = await bcrypt.hash(password, salt);
-
-    //   const newUser = await User.create({ email, password: hashedPassword }, { transaction: t });
-
-    //   if (!newUser) {
-    //     throw new BAD_REQUEST("Cannot create user");
-    //   }
-
-    //   const userRole = await Role.findOne({ where: { name: role }, transaction: t });
-    //   if (!userRole) {
-    //     throw new BAD_REQUEST("Cannot find role for user");
-    //   }
-
-    //   const newRole = await UserRole.create({ user_id: newUser._id, role_id: userRole._id }, { transaction: t });
-
-    //   if (!newRole) {
-    //     throw new BAD_REQUEST("Cannot add role");
-    //   }
-
-    //   return {
-    //     user: getInfoData({ fields: ["_id"], object: newUser }),
-    //   };
-    // });
   };
 
   static loginUser = async ({ option, password }) => {
@@ -211,6 +186,29 @@ class AuthService {
         refreshToken,
         roles,
       };
+    }
+  };
+
+  static getUsserById = async (userId) => {
+    const foundUser = await User.findOne({
+      where: { _id: userId },
+      include: {
+        model: Role,
+        attributes: ["name"],
+        through: {
+          attributes: [],
+        },
+      },
+    });
+
+    if (!foundUser || !foundUser.Roles) {
+      throw new FORBIDDEN("Insufficient privileges");
+    }
+
+    const userRoles = foundUser.Roles.map((role) => role.name);
+
+    if (!userRoles) {
+      throw new FORBIDDEN("Insufficient privileges");
     }
   };
 

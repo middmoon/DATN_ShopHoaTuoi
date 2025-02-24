@@ -25,7 +25,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   return (
     <>
       <PageHeader items={breadcrumbItems}></PageHeader>
-      <div className="container mx-auto py-10">
+      <div className="container mx-auto p-10">
         <h1 className="text-3xl font-bold mb-6">Thêm sản phẩm mới</h1>
         <ProductDetail product={product} />
       </div>

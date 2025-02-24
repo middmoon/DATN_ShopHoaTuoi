@@ -68,7 +68,7 @@ export default function ProductsPage() {
   return (
     <>
       <PageHeader items={breadcrumbItems}></PageHeader>
-      <div className="container mx-auto py-10">
+      <div className="container mx-auto p-10">
         <h1 className="text-2xl font-bold mb-5">Quản lý sản phẩm</h1>
 
         <Link href="/dashboard/products/add-new-product">

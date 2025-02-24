@@ -69,6 +69,7 @@ interface MultiSelectProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
   onValueChange: (value: number[]) => void;
 
   /** The default selected values when the component mounts. */
+  // ButtonHTMLAttributes defaultValue type is string[]
   // defaultValue?: string[];
 
   defaultValue?: number[];

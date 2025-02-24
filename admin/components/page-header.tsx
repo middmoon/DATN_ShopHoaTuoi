@@ -15,7 +15,7 @@ type PageHeaderProps = {
 
 export function PageHeader({ items }: PageHeaderProps) {
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 sticky top-0 z-10 bg-awhite shadow-md">
+    <header className="flex h-16 shrink-0 items-center gap-2 sticky top-0 z-50 bg-white shadow-md rounded-[10px]">
       <div className="flex items-center gap-2 px-4">
         <SidebarTrigger className="-ml-1" />
         <Separator orientation="vertical" className="mr-2 h-4" />

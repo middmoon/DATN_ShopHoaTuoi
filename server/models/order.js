@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "ward_code",
       });
       Order.belongsTo(models.User, {
-        foreignKey: "user_id",
+        foreignKey: "customer_id",
       });
       Order.belongsToMany(models.Product, {
         through: models.OrderProduct,
@@ -53,8 +53,16 @@ module.exports = (sequelize, DataTypes) => {
       delivery_address: {
         type: DataTypes.STRING,
       },
-      user_id: {
+      customer_id: {
         type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      customer_name: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      customer_phone: {
+        type: DataTypes.STRING,
         allowNull: true,
       },
       ward_code: {
@@ -69,9 +77,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(20),
         allowNull: true,
       },
-      some: {
-        type: DataTypes.STRING,
-      },
+      // some: {
+      //   type: DataTypes.STRING,
+      // },
     },
     {
       sequelize,

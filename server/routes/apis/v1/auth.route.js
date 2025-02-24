@@ -19,7 +19,7 @@ router
 
   .delete("/logout", verifyToken, asyncHandler(AuthController.logoutUser))
 
-  .delete("/logout/system", verifyToken, asyncHandler(AuthController.logoutUser));
+  .delete("/logout/system", verifyToken, asyncHandler(AuthController.logoutSystem));
 
 // .post("/role-verify", verifyToken, asyncHandler(AuthController.roleVerify))
 

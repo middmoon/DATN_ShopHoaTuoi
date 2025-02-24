@@ -33,6 +33,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "product_id",
         otherKey: "order_id",
       });
+
+      Product.belongsToMany(models.ProductAttributeValue, {
+        through: models.ProductAttributeMapping,
+        foreignKey: "product_id",
+        otherKey: "attribute_value_id",
+      });
+
+      //Product Atribute 2
     }
   }
 

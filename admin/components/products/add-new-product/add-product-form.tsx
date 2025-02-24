@@ -10,6 +10,15 @@ import { toast } from "sonner";
 import { api } from "@/utils/api";
 import { MultiSelectCategory } from "./mutil-select-category";
 import { ImageUpload } from "./image-upload";
+import { DynamicForm } from "./dynamic-form";
+import { ReusableDynamicForm, FieldConfig } from "./dynamic-form copy";
+
+const attributeFields: FieldConfig[] = [
+  { name: "size", label: "Kích cỡ", placeholder: "Chọn kích cỡ" },
+  { name: "price", label: "Giá", placeholder: "Nhập giá bán", type: "number" },
+  { name: "discount_price", label: "Giá khuyến mãi", placeholder: "Nhập giá khuyến mãi", type: "number" },
+  { name: "some_f", label: "some_f", placeholder: "some_f", type: "number" },
+];
 
 const getCategories = async () => {
   const res = await api.get("/product-categories");
@@ -22,9 +31,9 @@ export default function AddProductForm() {
   // const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<{ _id: number; name: string }[]>([]);
   const [categories, setCategories] = useState<{ _id: number; name: string; parent_id: number | null }[]>([]);
-
   const [images, setImages] = useState<File[]>([]);
   const [avatarIndex, setAvatarIndex] = useState(0);
+  const [attributes, setAttributes] = useState<Record<string, any>[]>([]);
 
   const [productData, setProductData] = useState({
     name: "",
@@ -65,6 +74,20 @@ export default function AddProductForm() {
     setAvatarIndex(index);
   };
 
+  const handleAttributesChange = (attrs: Record<string, any>[]) => {
+    const newAttributes = attrs.map((attr) => {
+      return {
+        ...attr,
+        price: Number(attr.price),
+        discount_price: Number(attr.discount_price),
+      };
+    });
+
+    console.log("Attributes changed:", attrs);
+
+    setAttributes(newAttributes);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -74,16 +97,24 @@ export default function AddProductForm() {
       retail_price: Number(productData.retail_price),
       stock_quantity: Number(productData.stock_quantity),
       categories: selectedCategories,
+      attributes: attributes,
     };
+
+    try {
+    } catch (error) {
+      console.error("Lỗi:", error);
+      toast.error(error instanceof Error ? error.message : "Có lỗi xảy ra, vui lòng thử lại!", { duration: 8000 });
+    }
 
     try {
       // Gửi thông tin sản phẩm
       const res = await api.post("/product", newProduct);
       if (res.status !== 201) throw new Error("Không thể tạo sản phẩm");
 
-      const productId = res.data.data.product._id;
-      const productSlug = res.data.data.product.slug;
-      // const productId = 1;
+      // const productId = res.data.data.product._id;
+      // const productSlug = res.data.data.product.slug;
+
+      const productId = 1;
 
       if (images.length > 0) {
         const formData = new FormData();
@@ -106,7 +137,8 @@ export default function AddProductForm() {
           duration: 8000,
           action: {
             label: "Xem sản phẩm",
-            onClick: () => router.push(`/dashboard/products/${productSlug}`),
+            // onClick: () => router.push(`/dashboard/products/${productSlug}`),
+            onClick: () => console.log(newProduct),
           },
         });
 
@@ -118,11 +150,12 @@ export default function AddProductForm() {
         //   },
         // });
       } else {
-        toast.success(`Sản phẩm được tạo mới thành công! ${productSlug}`, {
+        toast.success(`Sản phẩm được tạo mới thành công! ${JSON.stringify(newProduct)}`, {
           duration: 8000,
           action: {
             label: "Xem sản phẩm",
-            onClick: () => router.push(`/dashboard/products/${productSlug}`),
+            // onClick: () => router.push(`/dashboard/products/${productSlug}`),
+            onClick: () => console.log(newProduct),
           },
         });
       }
@@ -131,7 +164,7 @@ export default function AddProductForm() {
       toast.error(error instanceof Error ? error.message : "Có lỗi xảy ra, vui lòng thử lại!", { duration: 8000 });
     }
 
-    router.push(`/dashboard/products`);
+    // router.push(`/dashboard/products`);
   };
 
   // const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -198,16 +231,21 @@ export default function AddProductForm() {
         <Textarea id="description" name="description" value={productData.description} onChange={handleChange} required />
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="wholesale_price">Giá bán buôn</Label>
-        <Input type="number" id="wholesale_price" name="wholesale_price" value={productData.wholesale_price} onChange={handleChange} required />
-      </div>
-      <div className="grid gap-2">
         <Label htmlFor="retail_price">Giá bán lẻ</Label>
         <Input type="number" id="retail_price" name="retail_price" value={productData.retail_price} onChange={handleChange} required />
       </div>
       <div className="grid gap-2">
+        <Label htmlFor="wholesale_price">Giá bán buôn</Label>
+        <Input type="number" id="wholesale_price" name="wholesale_price" value={productData.wholesale_price} onChange={handleChange} required />
+      </div>
+      <div className="grid gap-2">
         <Label htmlFor="categories">Danh mục sản phẩm</Label>
         <MultiSelectCategory options={categories} onValueChange={handleCategoryChange} defaultValue={selectedCategories.map((cat) => cat._id)} />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="attributes">Thuộc tính sản phẩm</Label>
+        {/* <DynamicForm /> */}
+        <ReusableDynamicForm fields={attributeFields} onChange={handleAttributesChange} />
       </div>
       <div>
         <Label className="text-sm font-medium">Hình ảnh sản phẩm</Label>

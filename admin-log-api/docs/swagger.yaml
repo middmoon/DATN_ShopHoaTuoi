@@ -1,0 +1,88 @@
+openapi: 3.0.0
+info:
+  title: Quản lý doanh nghiệp
+  version: 1.0.0
+  description: Document API quản lý doanh nghiệp
+tags:
+  - name: Test
+    description: Test operations
+
+paths:
+  /test:
+    get:
+      summary: Get All Test
+      description: Get All Test
+      tags: [Test]
+      responses:
+        200:
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Test"
+    post:
+      summary: Create Test
+      description: Create Test
+      tags: [Test]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      responses:
+        200:
+          description: A successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Test"
+  /test/{testId}:
+    get:
+      summary: Get Test By Id
+      description: Get Test By Id
+      tags: [Test]
+      parameters:
+        - name: testId
+          in: path
+          description: Test Id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A successful response
+
+components:
+  schemas:
+    Test:
+      type: object
+      properties:
+        id:
+          type: string
+        message:
+          type: string
+
+    User:
+      type: object
+      properties:
+        userId:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+
+    Product:
+      type: object
+      properties:
+        productId:
+          type: string
+        name:
+          type: string
+        price:
+          type: number

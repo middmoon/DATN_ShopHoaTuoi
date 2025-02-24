@@ -25,6 +25,20 @@ class OrderController {
       data: await OrderService.confirmOrder(req.body),
     }).send(res);
   };
+
+  static getAllOrders = async (req, res) => {
+    new OK({
+      message: "get all orders successfully",
+      data: await OrderService.getAllOrders(),
+    }).send(res);
+  };
+
+  static getOrdersById = async (req, res) => {
+    new OK({
+      message: "get orders by id successfully",
+      data: await OrderService.getOrdersById(req.params._id),
+    }).send(res);
+  };
 }
 
 module.exports = OrderController;
