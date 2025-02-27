@@ -6,7 +6,7 @@ export default function CategoriesPage() {
   return (
     <>
       <PageHeader items={breadcrumbItems}></PageHeader>
-      <OrdersPage />
+      <OrdersPage queryRoute={"/order"} />
     </>
   );
 }

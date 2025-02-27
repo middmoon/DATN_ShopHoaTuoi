@@ -102,14 +102,39 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
+
+const os = require("os");
+
+function getLocalIP() {
+  const interfaces = os.networkInterfaces();
+
+  for (const [name, iface] of Object.entries(interfaces)) {
+    if (!name.toLowerCase().includes("wi-fi") && !name.toLowerCase().includes("wireless")) {
+      continue;
+    }
+
+    for (const config of iface) {
+      if (config.family === "IPv4" && !config.internal) {
+        return config.address;
+      }
+    }
+  }
+
+  return "127.0.0.1";
+}
+
 function onListening() {
   const addr = server.address();
   const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  const localIP = getLocalIP();
 
   if (process.env.NODE_ENV !== "production") {
     debug("Listening on " + bind);
   }
-  console.log(`🚀 Server is running on http://localhost:${addr.port}`);
+
+  console.log(`🚀 Server is running on:`);
+  console.log(`   - Local:   http://localhost:${addr.port}`);
+  console.log(`   - Network: http://${localIP}:${addr.port}`);
 }
 
 // Handle graceful shutdown

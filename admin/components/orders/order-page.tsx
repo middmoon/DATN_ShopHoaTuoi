@@ -19,7 +19,7 @@ type Order = {
   _id: number;
   total_price: number;
   note: string;
-  status: string;
+  status: "Chờ xác nhận" | "Đang xử lý" | "Hoàn thành" | "Đơn bị hủy";
   delivery_day: string | null;
   delivery_address: string;
   createdAt: string;
@@ -27,7 +27,7 @@ type Order = {
   Products: OrderProduct[];
 };
 
-export const OrdersPage = () => {
+export const OrdersPage = ({ queryRoute }: { queryRoute: string }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -36,7 +36,7 @@ export const OrdersPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await api.get<{ data: Order[] }>("/order");
+        const response = await api.get<{ data: Order[] }>(queryRoute);
         setOrders(response.data.data);
         setLoading(false);
       } catch (err) {
@@ -48,7 +48,11 @@ export const OrdersPage = () => {
     fetchOrders();
   }, []);
 
-  if (loading) return <p className="text-center">Loading...</p>;
+  const handleUpdateStatus = (orderId: number, newStatus: Order["status"]) => {
+    setOrders((prevOrders) => prevOrders.map((order) => (order._id === orderId ? { ...order, status: newStatus } : order)));
+  };
+
+  if (loading) return <p className="text-center">Đang tải...</p>;
   if (error) return <p>{error}</p>;
 
   return (
@@ -73,7 +77,7 @@ export const OrdersPage = () => {
         </Card>
       ))}
 
-      <OrderDetailDialog order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+      <OrderDetailDialog order={selectedOrder} onClose={() => setSelectedOrder(null)} onUpdateStatus={handleUpdateStatus} />
     </div>
   );
 };

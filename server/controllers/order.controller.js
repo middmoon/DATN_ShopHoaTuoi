@@ -26,10 +26,38 @@ class OrderController {
     }).send(res);
   };
 
+  static changeOrderStatus = async (req, res) => {
+    new OK({
+      message: "Order status changed successfully",
+      data: await OrderService.changeOrderStatus(req.params._id, req.body),
+    }).send(res);
+  };
+
   static getAllOrders = async (req, res) => {
     new OK({
       message: "get all orders successfully",
       data: await OrderService.getAllOrders(),
+    }).send(res);
+  };
+
+  static getPendingOrders = async (req, res) => {
+    new OK({
+      message: "get pending orders successfully",
+      data: await OrderService.getPendingOrders(),
+    }).send(res);
+  };
+
+  static getFinishedOrders = async (req, res) => {
+    new OK({
+      message: "get finished orders successfully",
+      data: await OrderService.getFinishedOrders(),
+    }).send(res);
+  };
+
+  static getComfirmedOrders = async (req, res) => {
+    new OK({
+      message: "get comfirmed orders successfully",
+      data: await OrderService.getComfirmedOrders(),
     }).send(res);
   };
 

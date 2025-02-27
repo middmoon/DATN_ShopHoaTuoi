@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SidebarProvider>
           <AppSidebar roles={roles} />
           <SidebarInset>
-            <div className="flex flex-1 flex-col gap-4 p-0 pt-0">{children}</div>
+            <div className="flex flex-1 flex-col gap-0 p-0 pt-0">{children}</div>
           </SidebarInset>
         </SidebarProvider>
         <Toaster position="top-right" richColors expand={true} />

@@ -60,9 +60,9 @@ module.exports = (sequelize, DataTypes) => {
       description: {
         type: DataTypes.TEXT,
       },
-      wholesale_price: {
-        type: DataTypes.INTEGER.UNSIGNED,
-      },
+      // wholesale_price: {
+      //   type: DataTypes.INTEGER.UNSIGNED,
+      // },
       retail_price: {
         type: DataTypes.INTEGER.UNSIGNED,
       },
@@ -78,9 +78,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
-      stock_quantity: {
-        type: DataTypes.INTEGER.UNSIGNED,
-      },
+      // stock_quantity: {
+      //   type: DataTypes.INTEGER.UNSIGNED,
+      // },
       // product_category_id: {
       //   type: DataTypes.INTEGER,
       // },

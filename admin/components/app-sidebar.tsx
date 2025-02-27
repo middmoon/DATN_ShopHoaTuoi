@@ -37,12 +37,20 @@ const data = {
           url: "/dashboard/orders",
         },
         {
-          title: "Đang chờ xử lý",
+          title: "Chờ xác nhận",
           url: "/dashboard/orders/pending",
+        },
+        {
+          title: "Đang xử lý",
+          url: "/dashboard/orders/confirmed",
         },
         {
           title: "Đơn hoàn thành",
           url: "/dashboard/orders/finished",
+        },
+        {
+          title: "Đơn bị hủy",
+          url: "/dashboard/orders/canceled",
         },
       ],
     },
@@ -62,65 +70,43 @@ const data = {
         },
       ],
     },
-    // {
-    //   title: "Kho hàng",
-    //   url: "/dashboard/inventory",
-    //   icon: Settings2,
-    //   items: [
-    //     {
-    //       title: "Nguyên liệu tòn kho",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Danh mục kho hàng",
-    //       url: "#",
-    //     },
-    //   ],
-    // },
     {
-      title: "Doanh thu",
-      url: "/dashboard/income",
+      title: "Hoạt động kinh doanh",
+      url: "/dashboard/business",
       icon: Bitcoin,
-    },
-  ],
-  // navSecondary: [
-  //   {
-  //     title: "Support",
-  //     url: "#",
-  //     icon: LifeBuoy,
-  //   },
-  //   {
-  //     title: "Feedback",
-  //     url: "#",
-  //     icon: Send,
-  //   },
-  // ],
-  projects: [
-    {
-      name: "Logs",
-      url: "/dashboard/logs",
-      icon: NotebookPen,
       items: [
         {
-          title: "Tìm kiếm từ người dùng",
-          url: "/dashboard/logs/user-search",
+          title: "Doanh thu",
+          url: "/dashboard/business",
         },
         {
-          title: "Lỗi hệ thống",
-          url: "/dashboard/logs/system-errors",
+          title: "Đánh giá khách hàng",
+          url: "/dashboard/business",
         },
       ],
     },
-    // {
-    //   name: "Sales & Marketing",
-    //   url: "#",
-    //   icon: PieChart,
-    // },
-    // {
-    //   name: "Travel",
-    //   url: "#",
-    //   icon: Map,
-    // },
+  ],
+  projects: [
+    {
+      title: "Hệ thống",
+      url: "/dashboard/system",
+      isActive: true,
+      icon: NotebookPen,
+      items: [
+        {
+          title: "Logs hệ thống",
+          url: "/dashboard/system/system-logs",
+        },
+        {
+          title: "Xu hướng tìm kiếm",
+          url: "/dashboard/system/user-search",
+        },
+        {
+          title: "Lỗi hệ thống",
+          url: "/dashboard/system/system-errors",
+        },
+      ],
+    },
   ],
 };
 
@@ -154,7 +140,7 @@ export function AppSidebar({ roles, ...props }: { roles: string[] }) {
       {/* Content */}
       <SidebarContent>
         {isOwner && <NavMain items={data.navMain} pendingOrdersCount={pendingOrdersCount} />}
-        {isSysAdmin && <NavProjects projects={data.projects} />}
+        {isSysAdmin && <NavMain items={data.projects} pendingOrdersCount={0} />}
         {!isOwner && !isSysAdmin && <p className="text-center text-sm text-gray-500">Không có quyền truy cập</p>}
       </SidebarContent>
 
@@ -165,14 +151,3 @@ export function AppSidebar({ roles, ...props }: { roles: string[] }) {
     </Sidebar>
   );
 }
-
-//   {/* Content */}
-//   <SidebarContent>
-//   {/* Quản lý cửa hàng */}
-//   <NavMain items={data.navMain} pendingOrdersCount={pendingOrdersCount} />
-//   {/* Quản lý hệ thống */}
-//   {/* <NavProjects projects={data.projects} /> */}
-
-//   {/* Mở rộng */}
-//   {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
-// </SidebarContent>

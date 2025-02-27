@@ -3,7 +3,7 @@
 const { sequelize, Order, OrderProduct, Product } = require("../models");
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 
-const { Op, or } = require("sequelize");
+const { Op, or, where } = require("sequelize");
 
 class OrderService {
   static createOrder = async (payload) => {
@@ -103,20 +103,27 @@ class OrderService {
     return { pending_orders_count: count };
   };
 
-  static confirmOrder = async (payload) => {
-    const updatedOrder = await Order.update(
-      {
-        status: "Đã xác nhận",
-      },
-      {
-        where: { id: payload.id },
-      }
-    );
+  // static confirmOrder = async (payload) => {
+  //   const updatedOrder = await Order.update(
+  //     {
+  //       status: "Đã xác nhận",
+  //     },
+  //     {
+  //       where: { id: payload.id },
+  //     }
+  //   );
 
-    if (!updatedOrder) {
-      throw new BAD_REQUEST("Can not confirm order");
-    }
+  //   if (!updatedOrder) {
+  //     throw new BAD_REQUEST("Can not confirm order");
+  //   }
 
+  //   return updatedOrder;
+  // };
+
+  static changeOrderStatus = async (orderId, order) => {
+    const updatedOrder = await Order.update(order, {
+      where: { _id: orderId },
+    });
     return updatedOrder;
   };
 
@@ -133,7 +140,7 @@ class OrderService {
       ],
     });
 
-    if (!orders || orders.length === 0) {
+    if (!orders) {
       throw new NOTFOUND("Can not get orders");
     }
 
@@ -159,6 +166,76 @@ class OrderService {
     }
 
     return orders;
+  };
+
+  static getPendingOrders = async () => {
+    const orders = await Order.findAll({
+      where: { status: "Chờ xác nhận" },
+      include: [
+        {
+          model: Product,
+          through: {
+            attributes: ["quantity"],
+          },
+          attributes: ["_id", "name", "retail_price"],
+        },
+      ],
+    });
+
+    if (!orders) {
+      throw new NOTFOUND("Can not get orders");
+    }
+
+    return orders;
+  };
+
+  static getComfirmedOrders = async () => {
+    const orders = await Order.findAll({
+      where: { status: "Đang xử lý" },
+      include: [
+        {
+          model: Product,
+          through: {
+            attributes: ["quantity"],
+          },
+          attributes: ["_id", "name", "retail_price"],
+        },
+      ],
+    });
+
+    if (!orders) {
+      throw new NOTFOUND("Can not get orders");
+    }
+
+    return orders;
+  };
+
+  static getFinishedOrders = async () => {
+    const orders = await Order.findAll({
+      where: { status: "Hoàn thành" },
+      include: [
+        {
+          model: Product,
+          through: {
+            attributes: ["quantity"],
+          },
+          attributes: ["_id", "name", "retail_price"],
+        },
+      ],
+    });
+
+    if (!orders) {
+      throw new NOTFOUND("Can not get orders");
+    }
+
+    return orders;
+  };
+
+  static updateOrder = async (orderId, order) => {
+    const updatedOrder = await Order.update(order, {
+      where: { _id: orderId },
+    });
+    return updatedOrder;
   };
 
   // static getOrders = async () => {

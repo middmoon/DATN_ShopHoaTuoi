@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { api } from "@/utils/api"; // Đảm bảo bạn có file này để gọi API
 
 type OrderProduct = {
   _id: number;
@@ -15,7 +18,7 @@ type Order = {
   _id: number;
   total_price: number;
   note: string;
-  status: string;
+  status: "Chờ xác nhận" | "Đang xử lý" | "Hoàn thành" | "Đơn bị hủy";
   delivery_day: string | null;
   delivery_address: string;
   createdAt: string;
@@ -26,10 +29,26 @@ type Order = {
 type OrderDetailDialogProps = {
   order: Order | null;
   onClose: () => void;
+  onUpdateStatus: (orderId: number, newStatus: Order["status"]) => void;
 };
 
-export const OrderDetailDialog = ({ order, onClose }: OrderDetailDialogProps) => {
+export const OrderDetailDialog = ({ order, onClose, onUpdateStatus }: OrderDetailDialogProps) => {
   if (!order) return null;
+  const [status, setStatus] = useState<Order["status"]>(order.status);
+  const [loading, setLoading] = useState(false);
+
+  const handleConfirmOrder = async () => {
+    setLoading(true);
+    try {
+      await api.patch(`/order/${order._id}/status`, { status: "Đang xử lý" });
+      setStatus("Đang xử lý");
+      onUpdateStatus(order._id, "Đang xử lý");
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog open={!!order} onOpenChange={onClose}>
@@ -53,6 +72,23 @@ export const OrderDetailDialog = ({ order, onClose }: OrderDetailDialogProps) =>
             </li>
           ))}
         </ul>
+
+        <div className="mt-4">
+          <p>
+            <strong>Trạng thái:</strong> {status}
+          </p>
+        </div>
+
+        {/* Chỉ hiển thị nút xác nhận nếu trạng thái là "Chờ xác nhận" */}
+        {status === "Chờ xác nhận" && (
+          <Button variant="primary" onClick={handleConfirmOrder} disabled={loading} className="mt-4">
+            {loading ? "Đang xác nhận..." : "Xác nhận đơn hàng"}
+          </Button>
+        )}
+
+        <Button variant="outline" onClick={onClose} className="mt-4">
+          Đóng
+        </Button>
       </DialogContent>
     </Dialog>
   );

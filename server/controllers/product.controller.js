@@ -63,22 +63,10 @@ class ProductController {
   // Product Image
 
   static addProductImage = async (req, res) => {
-    // if (!req.params.productId || !req.files || !req.body.avatarIndex) {
-    //   return new BAD_REQUEST("Missing parameters");
-    // }
-
     // new OK({
     //   message: "Product image added successfully",
     //   data: await ProductService.addProductImages(req.params.productId, req.files, req.body.avatar),
     // }).send(res);
-
-    console.log({
-      productId: req.params.productId,
-      images: req.files,
-      avatarIndex: req.body.avatar,
-      imagesCount: req.files.length,
-      typeofAvatarIndex: typeof req.body.avatar,
-    });
 
     new OK({
       message: "Product image added successfully",
@@ -89,6 +77,14 @@ class ProductController {
         typeofAvatarIndex: typeof req.body.avatarIndex,
       },
     }).send(res);
+
+    console.log({
+      productId: req.params.productId,
+      images: req.files,
+      avatarIndex: req.body.avatar,
+      imagesCount: req.files.length,
+      typeofAvatarIndex: typeof req.body.avatar,
+    });
   };
 
   // static updateProductImage = async (req, res) => {

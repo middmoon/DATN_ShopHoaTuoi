@@ -18,7 +18,6 @@ type Category = {
 
 const fetchCategories = async (): Promise<Category[]> => {
   const response = await api.get("/product-categories");
-  console.log(`Dataaaaaaaaa: ${response.data.data}`);
   return response.data.data;
 };
 
@@ -66,7 +65,7 @@ export default function ProductCategoryPage() {
   return (
     <div className="space-y-6">
       <PageHeader items={breadcrumbItems} />
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto p-10">
         <h1 className="text-2xl font-bold mb-4">Danh mục sản phẩm</h1>
         {isLoading ? (
           <div className="flex justify-center items-center h-64">

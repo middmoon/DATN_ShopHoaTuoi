@@ -15,26 +15,6 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ images, onImagesChange, onAvatarChange, avatarIndex }: ImageUploadProps) {
-  // const onDrop = useCallback(
-  //   (acceptedFiles: File[]) => {
-  //     const newImages = [...images, ...acceptedFiles];
-  //     onImagesChange(newImages);
-  //   },
-  //   [images, onImagesChange]
-  // );
-
-  // const onDrop = useCallback(
-  //   (acceptedFiles: File[]) => {
-  //     const validImages = acceptedFiles.filter((file) => file.type.startsWith("image/"));
-  //     if (validImages.length !== acceptedFiles.length) {
-  //       toast.error("Một số file không hợp lệ. Chỉ chấp nhận hình ảnh!");
-  //     }
-  //     onImagesChange([...images, ...validImages]);
-  //   },
-  //   [images, onImagesChange]
-
-  // );
-
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const validImages = acceptedFiles.filter((file) => file.type.startsWith("image/"));

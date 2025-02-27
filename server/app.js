@@ -10,11 +10,11 @@ const compression = require("compression");
 const helmet = require("helmet");
 const cors = require("cors");
 const attachApiKey = require("./middlewares/attach_api_key.middleware");
-
 const app = express();
 
 const swaggerUI = require("swagger-ui-express");
 const swaggerDocument = require("./config/swagger.config");
+const auditLogger = require("./middlewares/audit-loger.middleware");
 
 app.set("view engine", "ejs");
 
@@ -35,11 +35,14 @@ if (process.env.NODE_ENV === "production") {
   app.use(logger("dev"));
 }
 
-app.use(attachApiKey);
+// app.use(attachApiKey);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// audit logger
+app.use(auditLogger);
 
 app.use("/", require("./routes"));
 
