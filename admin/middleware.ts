@@ -12,25 +12,35 @@ function incomeMiddleware(request: NextRequest) {
 }
 
 export function middleware(request: NextRequest) {
-  const token = request.cookies.get("accessToken");
+  const token = request.cookies.get("accessToken")?.value;
+  const roles = request.cookies.get("roles")?.value;
+  const url = request.nextUrl.clone();
+  const pathname = request.nextUrl.pathname;
 
-  // console.log(request.cookies.get("roles"));
+  if (pathname === "/login" && token) {
+    url.pathname = "/dashboard";
+    return NextResponse.redirect(url);
+  }
 
-  const loginUrl = new URL("/login", request.url);
+  if (pathname === "/login") {
+    return NextResponse.next();
+  }
 
   if (!token) {
-    return NextResponse.redirect(loginUrl);
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
   }
 
-  if (!request.cookies.get("roles")) {
-    return NextResponse.redirect("/unauthorized");
+  if (!roles) {
+    url.pathname = "/unauthorized";
+    return NextResponse.redirect(url);
   }
 
-  if (request.nextUrl.pathname.startsWith("/dashboard/product")) {
+  if (pathname.startsWith("/dashboard/product")) {
     return productMiddleware(request);
   }
 
-  if (request.nextUrl.pathname.startsWith("/dashboard/income")) {
+  if (pathname.startsWith("/dashboard/income")) {
     return incomeMiddleware(request);
   }
 
@@ -38,5 +48,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/dashboard/:path*",
+  matcher: ["/login", "/dashboard/:path*", "/unauthorized"],
 };

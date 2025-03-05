@@ -44,6 +44,17 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
 
+  //   const productInfo: {
+  //     _id: number;
+  //     name: string;
+  //     description: string;
+  //     retail_price: number;
+  //     status: string;
+  //     slug: string;
+  //     unit: string;
+  //     is_feature: boolean;
+  //     is_public: boolean;
+  // }
   Product.init(
     {
       _id: {
@@ -60,9 +71,6 @@ module.exports = (sequelize, DataTypes) => {
       description: {
         type: DataTypes.TEXT,
       },
-      // wholesale_price: {
-      //   type: DataTypes.INTEGER.UNSIGNED,
-      // },
       retail_price: {
         type: DataTypes.INTEGER.UNSIGNED,
       },
@@ -74,16 +82,13 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         unique: true,
       },
-      is_featured: {
+      slug: {
+        type: DataTypes.STRING,
+      },
+      is_feature: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
-      // stock_quantity: {
-      //   type: DataTypes.INTEGER.UNSIGNED,
-      // },
-      // product_category_id: {
-      //   type: DataTypes.INTEGER,
-      // },
       is_public: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

@@ -18,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
       },
       user_id: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       action: {
         type: DataTypes.STRING,

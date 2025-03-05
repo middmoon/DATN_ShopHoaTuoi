@@ -7,6 +7,7 @@ const { UNAUTHORIZED, FORBIDDEN } = require("../utils/error.response");
 
 const { User, Role } = require("../models");
 const { refreshAccessToken } = require("../utils/token");
+const redis = require("../config/redis.config");
 
 const HEADER = {
   API_KEY: "x-api-key",
@@ -24,21 +25,29 @@ const checkRole = (allowedRoles) => {
   return async (req, res, next) => {
     const token = req.cookies[COOKIE.AUTHORIZATION];
 
-    if (!token) throw new UNAUTHORIZED("Not found token");
+    if (!token) {
+      return next(new FORBIDDEN("Invalid token"));
+    }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-      if (err) throw new UNAUTHORIZED("Invalid token");
-      req._id = decoded._id;
-    });
+    const isBlacklisted = await redis.get(`blacklist:${token}`);
 
-    const userId = req._id;
+    if (isBlacklisted) {
+      return next(new FORBIDDEN("Invalid token blacklist"));
+    }
 
-    if (!userId) {
-      throw new FORBIDDEN("User ID is required.");
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      return next(new UNAUTHORIZED("Invalid token"));
+    }
+
+    if (!decoded || !decoded.user._id) {
+      return next(new FORBIDDEN("User ID is required."));
     }
 
     const foundUser = await User.findOne({
-      where: { _id: userId },
+      where: { _id: decoded.user._id },
       include: {
         model: Role,
         attributes: ["name"],
@@ -54,7 +63,9 @@ const checkRole = (allowedRoles) => {
     }
 
     const userRoles = foundUser.Roles.map((role) => role.name);
+    console.log(userRoles);
     const hasRole = allowedRoles.some((role) => userRoles.includes(role));
+    console.log(userRoles);
 
     if (hasRole) {
       return next();
@@ -67,10 +78,22 @@ const checkRole = (allowedRoles) => {
 const verifyToken = async (req, res, next) => {
   const token = req.cookies[COOKIE.AUTHORIZATION];
 
-  if (!token) throw new UNAUTHORIZED("Not found token");
+  if (!token) return next(new UNAUTHORIZED("Not found token"));
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) throw new UNAUTHORIZED("Invalid token");
+    if (err) return next(new UNAUTHORIZED("Invalid token"));
+    req._id = decoded._id;
+    next();
+  });
+};
+
+const flexVerifyToken = async (req, res, next) => {
+  const token = req.cookies[COOKIE.AUTHORIZATION];
+
+  if (!token) return next();
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return next(new UNAUTHORIZED("Invalid token"));
     req._id = decoded._id;
     next();
   });
@@ -79,6 +102,8 @@ const verifyToken = async (req, res, next) => {
 module.exports = {
   checkRole,
   verifyToken,
+  flexVerifyToken,
+  COOKIE,
 };
 
 //

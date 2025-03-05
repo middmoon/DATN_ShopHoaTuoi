@@ -51,34 +51,26 @@ const products = [
 export default function ProductList() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-      {products.map((product) => (
-        <Card key={product._id}>
-          <CardHeader>
-            <div className="w-full h-40 relative">
-              <Image
-                src={product.images[0]?.img_url || "/placeholder.jpg"}
-                alt={product.name}
-                layout="fill"
-                objectFit="cover"
-                className="rounded-lg"
-              />
-            </div>
-            <CardTitle>{product.name}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-500 mb-2">{product.description}</p>
-            <p className="font-semibold text-lg text-red-500">{product.retail_price.toLocaleString()} VND</p>
-            {/* <div className="flex gap-2 my-2">
-              {product.categories.map((category) => (
-                <Badge key={category._id}>{category.name}</Badge>
-              ))}
-            </div> */}
-            <Button variant="outline" className="mt-2 w-full">
-              Xem chi tiết
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
+      {products.map((product) => {
+        const avatarImage = product.images.find((img) => img.is_avatar) || product.images[0];
+        return (
+          <Card key={product._id}>
+            <CardHeader>
+              <div className="w-full h-40 relative">
+                <Image src={avatarImage?.img_url || "/placeholder.jpg"} alt={product.name} layout="fill" objectFit="cover" className="rounded-lg" />
+              </div>
+              <CardTitle>{product.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500 mb-2">{product.description}</p>
+              <p className="font-semibold text-lg text-red-500">{product.retail_price.toLocaleString()} VND</p>
+              <Button variant="outline" className="mt-2 w-full">
+                Xem chi tiết
+              </Button>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

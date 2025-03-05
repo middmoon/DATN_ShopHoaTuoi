@@ -9,8 +9,13 @@ const { checkRole } = require("../../../middlewares/auth.middleware");
 
 const upload = require("../../../config/multer.config");
 
+const searchLogger = require("../../../middlewares/search-logger.middleware");
+const { getResData } = require("../../../middlewares/cature-response.middleware");
+const cacheMiddleware = require("../../../middlewares/cache-query.middleware");
+
 router
-  .get("/", asyncHandler(ProductController.getProducts))
+  .get("/", getResData, searchLogger, cacheMiddleware, asyncHandler(ProductController.getProducts))
+  //.get("/", asyncHandler(ProductController.getProducts))
 
   .get("/:productId(\\d+)", asyncHandler(ProductController.getProductById))
 

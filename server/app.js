@@ -9,12 +9,41 @@ const logger = require("morgan");
 const compression = require("compression");
 const helmet = require("helmet");
 const cors = require("cors");
-const attachApiKey = require("./middlewares/attach_api_key.middleware");
 const app = express();
 
 const swaggerUI = require("swagger-ui-express");
 const swaggerDocument = require("./config/swagger.config");
-const auditLogger = require("./middlewares/audit-loger.middleware");
+const auditLogger = require("./middlewares/audit-logger.middleware");
+
+// // prometheus metrics
+// const client = require("prom-client");
+// const collectDefaultMetrics = client.collectDefaultMetrics;
+// collectDefaultMetrics();
+
+// const httpRequestsTotal = new client.Counter({
+//   name: "http_requests_total",
+//   help: "Total number of HTTP requests",
+//   labelNames: ["method", "status"],
+// });
+
+// app.use(async (req, res, next) => {
+//   res.on("finish", () => {
+//     httpRequestsTotal.inc({ method: req.method, status: res.statusCode });
+//   });
+//   next();
+// });
+
+// app.get("/metrics", async (req, res) => {
+//   res.set("Content-Type", client.register.contentType);
+//   try {
+//     const metrics = await client.register.metrics();
+//     res.end(metrics);
+//   } catch (err) {
+//     res.status(500).send("Error fetching metrics");
+//   }
+// });
+
+// // prometheus metrics
 
 app.set("view engine", "ejs");
 
@@ -35,7 +64,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(logger("dev"));
 }
 
-// app.use(attachApiKey);
+//app.use(attachApiKey);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

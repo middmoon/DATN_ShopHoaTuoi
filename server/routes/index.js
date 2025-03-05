@@ -4,10 +4,11 @@ const express = require("express");
 const { head } = require("../app");
 const { api } = require("../config/cloudinary.config");
 const router = express.Router();
+const { checkRole } = require("../middlewares/auth.middleware");
 
 router.use("/api/v1", require("./apis/v1"));
 
-router.get("/test", function (req, res, next) {
+router.get("/test", checkRole(["owner"]), function (req, res, next) {
   res.status(200).json({ message: "Test get OK", data: { name: "TMDT CTK45A", header: req.headers } });
 });
 

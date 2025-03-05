@@ -73,15 +73,20 @@ const data = {
     {
       title: "Hoạt động kinh doanh",
       url: "/dashboard/business",
+      isActive: true,
       icon: Bitcoin,
       items: [
         {
           title: "Doanh thu",
-          url: "/dashboard/business",
+          url: "/dashboard/business/income",
         },
         {
-          title: "Đánh giá khách hàng",
-          url: "/dashboard/business",
+          title: "Phản hồi khách hàng",
+          url: "/dashboard/customer-satisfaction",
+        },
+        {
+          title: "Xu hướng tìm kiếm",
+          url: "/dashboard/business/trends",
         },
       ],
     },
@@ -97,10 +102,10 @@ const data = {
           title: "Logs hệ thống",
           url: "/dashboard/system/system-logs",
         },
-        {
-          title: "Xu hướng tìm kiếm",
-          url: "/dashboard/system/user-search",
-        },
+        // {
+        //   title: "Xu hướng tìm kiếm",
+        //   url: "/dashboard/system/user-search",
+        // },
         {
           title: "Lỗi hệ thống",
           url: "/dashboard/system/system-errors",

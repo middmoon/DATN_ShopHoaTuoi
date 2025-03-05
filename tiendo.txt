@@ -1,0 +1,16 @@
+Audit logs by RabbitMQ: DONE
+Searching logs by RabbitMQ: DONE
+Redis black list token: DONE
+Redis cache query: DONE
+-----------------------------
+
+Thanh toán VN Pay: NOT DONE - khi nào có danh sách sản phẩm
+Logs services - user searching: NOT DONE
+
+-----------------------------
+-----------------------------
+
+Setup pm2 cluster: NOT DONE
+Setup Kong - API gateway, load balancer: NOT DONE
+
+Machine learning detect SQL injection: NOT DONE

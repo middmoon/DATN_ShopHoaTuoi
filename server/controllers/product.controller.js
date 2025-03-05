@@ -7,6 +7,8 @@ const ProductService = require("../services/product.service");
 
 const { Product } = require("../models");
 
+const redis = require("../config/redis.config");
+
 class ProductController {
   static createProduct = async (req, res) => {
     // new CREATED({
@@ -39,10 +41,9 @@ class ProductController {
   };
 
   static getProducts = async (req, res) => {
-    const products = await ProductService.getProducts();
     new OK({
       message: "Products retrieved successfully",
-      data: products,
+      data: await ProductService.getProducts(),
     }).send(res);
   };
 

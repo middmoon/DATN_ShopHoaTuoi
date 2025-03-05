@@ -18,6 +18,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -53,7 +59,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="option">Email - Tên đăng nhập</Label>
-                <Input id="option" placeholder="" required value={option} onChange={(e) => setOption(e.target.value)} />
+                <Input id="option" placeholder="" required value={option} onKeyDown={handleKeyDown} onChange={(e) => setOption(e.target.value)} />
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">

@@ -11,7 +11,6 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ProductImage {
   _id: number;
@@ -33,7 +32,7 @@ interface Product {
   retail_price: number;
   status: "Còn hàng" | "Hết hàng" | "Ngưng kinh doanh";
   slug: string;
-  is_featured: boolean;
+  is_feature: boolean;
   stock_quantity: number;
   is_public: boolean;
   createdAt: string;
@@ -170,8 +169,8 @@ export function ProductDetail({ product }: ProductDetailProps) {
             <Label htmlFor="is_public">Public</Label>
           </div>
           <div className="flex items-center space-x-2">
-            <Switch id="is_featured" checked={editedProduct.is_featured} onCheckedChange={handleToggleChange("is_featured")} />
-            <Label htmlFor="is_featured">Featured</Label>
+            <Switch id="is_feature" checked={editedProduct.is_feature} onCheckedChange={handleToggleChange("is_feature")} />
+            <Label htmlFor="is_feature">Featured</Label>
           </div>
           <div className="flex justify-end space-x-2">
             <Button type="submit" variant="default">
@@ -215,7 +214,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
             </div>
             <div>
               <p className="font-semibold">Featured</p>
-              <p className="text-lg">{product.is_featured ? "Yes" : "No"}</p>
+              <p className="text-lg">{product.is_feature ? "Yes" : "No"}</p>
             </div>
           </div>
           <div>

@@ -1,10 +1,10 @@
-"use strict";
-require("dotenv").config();
+// "use strict";
+// require("dotenv").config();
 
-const amqp = require("amqplib");
-const jwt = require("jsonwebtoken");
-const QUEUE_NAME = "audit_logs";
-let channel;
+// const amqp = require("amqplib");
+// const jwt = require("jsonwebtoken");
+// const QUEUE_NAME = "audit_logs";
+// let channel;
 
 // Kết nối tới RabbitMQ một lần duy nhất
 async function connectRabbitMQ() {

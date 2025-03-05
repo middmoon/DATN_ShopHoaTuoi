@@ -18,8 +18,8 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
       },
       user_id: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: DataTypes.INTEGER,
+        allowNull: true,
       },
       action: {
         type: DataTypes.STRING,
@@ -54,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "AuditLog",
       tableName: "audit_logs",
-      timestamps: true, // Vì đã có `created_at`
+      timestamps: true,
     }
   );
 

@@ -40,7 +40,6 @@ class AuthController {
 
   static logoutUser = async (req, res) => {
     res.clearCookie("accessToken", { httpOnly: true, secure: true, sameSite: "strict" });
-    res.clearCookie("refreshToken", { httpOnly: true, secure: true, sameSite: "strict" });
     new OK({
       message: "Logout successfully",
       data: {},

@@ -47,6 +47,33 @@ body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Tổng quan hệ thống */
+    --actions: 200 70% 50%; /* Xanh dương nhạt - Số lượng hành động */
+    --create: 120 60% 45%; /* Xanh lá - CREATE */
+    --update: 40 80% 50%; /* Vàng cam - UPDATE */
+    --delete: 0 70% 50%; /* Đỏ - DELETE */
+    --view: 260 50% 60%; /* Tím nhạt - VIEW */
+    /* Thành công/Thất bại */
+    --success: 150 80% 40%; /* Xanh ngọc - Thành công */
+    --failure: 0 80% 50%; /* Đỏ tươi - Thất bại */
+    /* Top Users */
+    --top-user-1: 340 70% 50%; /* Hồng đậm - Top 1 */
+    --top-user-2: 280 60% 50%; /* Tím - Top 2 */
+    --top-user-3: 220 60% 50%; /* Xanh dương đậm - Top 3 */
+    --top-user-4: 160 60% 45%; /* Xanh lục nhạt - Top 4 */
+    --top-user-5: 60 70% 50%; /* Vàng - Top 5 */
+    /* Heatmap địa lý */
+    --heatmap-low: 240 20% 80%; /* Xanh xám nhạt - Mật độ thấp */
+    --heatmap-medium: 240 50% 60%; /* Xanh dương trung - Mật độ trung bình */
+    --heatmap-high: 240 80% 40%; /* Xanh dương đậm - Mật độ cao */
+    /* Phát hiện bất thường */
+    --alert: 10 90% 50%; /* Đỏ cam - Cảnh báo */
+    /* Hiệu suất hệ thống */
+    --server-error: 0 80% 45%; /* Đỏ đậm - Server Error (5xx) */
+    --client-error: 20 80% 50%; /* Cam đậm - Client Error (4xx) */
+    /* Báo cáo */
+    --export-csv: 210 60% 50%; /* Xanh dương trung - Xuất CSV */
+    --export-pdf: 300 60% 50%; /* Tím trung - Xuất PDF */
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -81,6 +108,33 @@ body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Tổng quan hệ thống */
+    --actions: 200 70% 50%; /* Xanh dương nhạt - Số lượng hành động */
+    --create: 120 60% 45%; /* Xanh lá - CREATE */
+    --update: 40 80% 50%; /* Vàng cam - UPDATE */
+    --delete: 0 70% 50%; /* Đỏ - DELETE */
+    --view: 260 50% 60%; /* Tím nhạt - VIEW */
+    /* Thành công/Thất bại */
+    --success: 150 80% 40%; /* Xanh ngọc - Thành công */
+    --failure: 0 80% 50%; /* Đỏ tươi - Thất bại */
+    /* Top Users */
+    --top-user-1: 340 70% 50%; /* Hồng đậm - Top 1 */
+    --top-user-2: 280 60% 50%; /* Tím - Top 2 */
+    --top-user-3: 220 60% 50%; /* Xanh dương đậm - Top 3 */
+    --top-user-4: 160 60% 45%; /* Xanh lục nhạt - Top 4 */
+    --top-user-5: 60 70% 50%; /* Vàng - Top 5 */
+    /* Heatmap địa lý */
+    --heatmap-low: 240 20% 80%; /* Xanh xám nhạt - Mật độ thấp */
+    --heatmap-medium: 240 50% 60%; /* Xanh dương trung - Mật độ trung bình */
+    --heatmap-high: 240 80% 40%; /* Xanh dương đậm - Mật độ cao */
+    /* Phát hiện bất thường */
+    --alert: 10 90% 50%; /* Đỏ cam - Cảnh báo */
+    /* Hiệu suất hệ thống */
+    --server-error: 0 80% 45%; /* Đỏ đậm - Server Error (5xx) */
+    --client-error: 20 80% 50%; /* Cam đậm - Client Error (4xx) */
+    /* Báo cáo */
+    --export-csv: 210 60% 50%; /* Xanh dương trung - Xuất CSV */
+    --export-pdf: 300 60% 50%; /* Tím trung - Xuất PDF */
   }
 }
 
