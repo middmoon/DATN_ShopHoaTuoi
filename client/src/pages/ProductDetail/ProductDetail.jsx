@@ -1,11 +1,11 @@
-import HeaderIn4 from "../../components/header/Nav/headerin4";
-import Navbar from "../../components/header/Nav/navbar";
+import HeaderIn4 from "../../components/layout/header/headerin4";
+import Navbar from "../../components/layout/header/navbar";
 import ProductImageGallery from "../../components/ProductImageGallery/ProductImageGallery";
 import ProductInfo from "../../components/ProductInfo/ProductInfo";
 import WhyChoiceMe from "../../components/WCM/whychoiceme";
 import PLProductDetail from "../../components/Listcard/PL-ProductDetail";
-import Footer from "../../components/Footer/Footer";
-import Divider from "../../components/Divider/Divider";
+import Footer from "../../components/layout/Footer/Footer";
+import Divider from "../../components/common/Divider/Divider";
 
 export default function ProductDetail() {
   return (

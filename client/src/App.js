@@ -9,12 +9,16 @@ import Register from './pages/Authentication/Register';
 import MasterShop from './pages/MasterShop/mastershop';
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
 
+import WithLayout from "./Layouts/WithLayout";
+
+const HomeWithLayout = WithLayout(Home);
+
 
 function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<HomeWithLayout />} />
       <Route path='test' element={<Test />}></Route>
       <Route path='login' element={<Login />}></Route>
       <Route path='register' element={<Register />}></Route>

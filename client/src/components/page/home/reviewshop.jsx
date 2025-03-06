@@ -1,7 +1,7 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
-import CategoryCard from "../Card/CategoryCard";
+import CategoryCard from "../../Card/CategoryCard";
 
 export default function ReviewService() {
   const categories = [
