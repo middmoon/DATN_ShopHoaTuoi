@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CONSULTATION_DATA } from "../../../Common/constant/CONSULTATION_DATA.js";
 
 const FlowerConsultation = () => {
   const [theme, setTheme] = useState("birthday");
@@ -18,9 +19,11 @@ const FlowerConsultation = () => {
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
           >
-            <option value="birthday">Hoa sinh nhật</option>
-            <option value="love">Hoa tình yêu</option>
-            <option value="congratulations">Hoa chúc mừng</option>
+            {CONSULTATION_DATA.themes.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -31,10 +34,11 @@ const FlowerConsultation = () => {
             value={price}
             onChange={(e) => setPrice(e.target.value)}
           >
-            <option value="all">Tất cả</option>
-            <option value="low">Dưới 500K</option>
-            <option value="medium">500K - 1 Triệu</option>
-            <option value="high">Trên 1 Triệu</option>
+            {CONSULTATION_DATA.prices.map((item) => (
+              <option key={item.value} value={item.value}>
+                {item.label}
+              </option>
+            ))}
           </select>
         </div>
 

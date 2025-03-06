@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import CategoryList from "../../components/CategoryList/Categorylist";
 import PLMastershop from "../../components/Listcard/PL-Mastershop";
 
-import HeaderIn4 from "../../components/header/Nav/headerin4";
-import Navbar from "../../components/header/Nav/navbar";
+import HeaderIn4 from "../../components/layout/header/headerin4";
+import Navbar from "../../components/layout/header/navbar";
 
 export default function Mastershop() {
   return (

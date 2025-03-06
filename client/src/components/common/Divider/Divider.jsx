@@ -5,7 +5,6 @@ export default function Divider() {
     <div className="relative flex items-center">
       <div className="flex-grow border-t border-gray-200"></div>
       <span className="mx-2">
-        {/* Thay thế bằng SVG của bạn */}
         <svg
           fill="#000000"
           width="12"

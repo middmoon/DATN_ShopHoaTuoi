@@ -14,7 +14,6 @@ const ProductCard = ({ image, name, price, isSale }) => {
             Giảm Giá
           </div>
         )}
-        {/* Nút yêu thích đặt ở góc dưới bên phải của hình ảnh */}
         <button className="absolute bottom-2 right-2 bg-color-custom-6 text-white p-3 rounded-full hover:bg-color-custom-2  transition-all w-12 h-12 flex items-center justify-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"

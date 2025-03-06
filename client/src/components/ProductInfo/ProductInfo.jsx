@@ -1,6 +1,6 @@
 import { useState } from "react";
 import StarRating from "../StarRating/StarRating";
-import Divider from "../Divider/Divider";
+import Divider from "../common/Divider/Divider";
 
 const productData = {
   name: "Bó Hoa Tươi - Baby Flower",
