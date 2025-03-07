@@ -27,6 +27,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "order_id",
         otherKey: "product_id",
       });
+      Order.hasOne(models.Payment, {
+        foreignKey: "order_id",
+        as: "payment",
+      });
     }
   }
 
@@ -37,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+      type: {
+        type: DataTypes.ENUM("Đơn online", "Đơn cửa hàng", "Đơn bán sĩ"),
+        defaultValue: "Đơn online",
+      },
       total_price: {
         type: DataTypes.INTEGER.UNSIGNED,
       },
@@ -44,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
       },
       status: {
-        type: DataTypes.ENUM("Chờ xác nhận", "Đang xử lý", "Hoàn thành", "Đơn bị hủy"),
+        type: DataTypes.ENUM("Chờ xác nhận", "Đang xử lý", "Hoàn thành", "Đơn bị hủy", "Đang giao hàng"),
         defaultValue: "Chờ xác nhận",
       },
       delivery_day: {

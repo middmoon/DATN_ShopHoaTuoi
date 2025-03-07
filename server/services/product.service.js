@@ -123,7 +123,7 @@ class ProductService {
         },
         {
           model: ProductImage,
-          attributes: ["img_url"],
+          attributes: ["is_avatar", "img_url"],
         },
       ],
     });

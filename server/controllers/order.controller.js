@@ -43,21 +43,21 @@ class OrderController {
   static getPendingOrders = async (req, res) => {
     new OK({
       message: "get pending orders successfully",
-      data: await OrderService.getPendingOrders(),
+      data: await OrderService.getOrdersByStatus("Chờ xác nhận"),
     }).send(res);
   };
 
   static getFinishedOrders = async (req, res) => {
     new OK({
       message: "get finished orders successfully",
-      data: await OrderService.getFinishedOrders(),
+      data: await OrderService.getOrdersByStatus("Hoàn thành"),
     }).send(res);
   };
 
   static getComfirmedOrders = async (req, res) => {
     new OK({
       message: "get comfirmed orders successfully",
-      data: await OrderService.getComfirmedOrders(),
+      data: await OrderService.getOrdersByStatus("Đang xử lý"),
     }).send(res);
   };
 

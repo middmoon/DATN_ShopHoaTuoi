@@ -29,10 +29,20 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       method: {
-        type: DataTypes.ENUM("Tiền mặt", "Thẻ tín dụng", "Paypal", "Momo", "VN Pay", "Zalo Pay", "Chuyển khoản ngân hàng"),
+        type: DataTypes.ENUM(
+          "Tiền mặt",
+          "Thẻ tín dụng",
+          "Paypal",
+          "Momo",
+          "VN Pay",
+          "Zalo Pay",
+          "Chuyển khoản ngân hàng",
+          "Thanh toán khi nhận hàng"
+        ),
       },
       status: {
         type: DataTypes.ENUM("Chờ xác nhận", "Đang xử lý", "Hoàn thành", "Thất bại"),
+        defaultValue: "Chờ xác nhận",
       },
       delivery_day: {
         type: DataTypes.DATE,

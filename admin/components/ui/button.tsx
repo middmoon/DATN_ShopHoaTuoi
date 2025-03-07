@@ -16,6 +16,13 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         primary: "text-primary-foreground bg-primary shadow hover:bg-primary/90",
+        actions: "bg-[hsl(var(--actions))] text-white hover:bg-[hsl(var(--actions))]/90",
+        create: "bg-[hsl(var(--create))] text-white hover:bg-[hsl(var(--create))]/90",
+        update: "bg-[hsl(var(--update))] text-white hover:bg-[hsl(var(--update))]/90",
+        delete: "bg-[hsl(var(--delete))] text-white hover:bg-[hsl(var(--delete))]/90",
+        view: "bg-[hsl(var(--view))] text-white hover:bg-[hsl(var(--view))]/90",
+        success: "bg-[hsl(var(--success))] text-white hover:bg-[hsl(var(--success))]/90",
+        failure: "bg-[hsl(var(--failure))] text-white hover:bg-[hsl(var(--failure))]/90",
       },
       size: {
         default: "h-9 px-4 py-2",

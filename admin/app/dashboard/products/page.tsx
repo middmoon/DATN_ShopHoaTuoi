@@ -13,7 +13,7 @@ export default function ProductsPage() {
         <h1 className="text-2xl font-bold mb-5">Quản lý sản phẩm</h1>
 
         <Link href="/dashboard/products/add-new-product">
-          <Button className="mb-5">
+          <Button className="mb-5" variant="create">
             <Plus className="mr-2 h-4 w-4" /> Thêm sản phẩm
           </Button>
         </Link>

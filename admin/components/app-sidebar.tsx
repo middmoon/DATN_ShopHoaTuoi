@@ -82,7 +82,7 @@ const data = {
         },
         {
           title: "Phản hồi khách hàng",
-          url: "/dashboard/customer-satisfaction",
+          url: "/dashboard/business/customer-satisfaction",
         },
         {
           title: "Xu hướng tìm kiếm",

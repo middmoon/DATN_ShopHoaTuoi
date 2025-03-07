@@ -23,6 +23,7 @@ export function CategoryTree({ categories, level = 0 }: CategoryTreeProps) {
           <div className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-md">
             <Folder className="h-4 w-4 text-blue-500" />
             <span className="font-medium">{category.name}</span>
+            {/* <p className="font-semibold">Số sản phẩm: </p> */}
             {category.description && <span className="text-sm text-gray-500">({category.description})</span>}
           </div>
           {category.children && category.children.length > 0 && <CategoryTree categories={category.children} level={level + 1} />}

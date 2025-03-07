@@ -1,13 +1,14 @@
 "use strict";
 
-const { sequelize, Order, OrderProduct, Product } = require("../models");
+const { sequelize, Order, OrderProduct, Product, Payment } = require("../models");
+const payment = require("../models/payment");
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 
-const { Op, or, where } = require("sequelize");
+const { Op } = require("sequelize");
 
 class OrderService {
   static createOrder = async (payload) => {
-    const { products, ...order } = payload;
+    const { products, payment_method, ...order } = payload;
 
     if (Array.isArray(products) && products.length > 0) {
       const foundProducts = await Product.findAll({
@@ -44,8 +45,8 @@ class OrderService {
       const result = await sequelize.transaction(async (t) => {
         const newOrder = await Order.create(
           {
-            // customer_name: order.customer_name,
-            // customer_phone: order.customer_phone,
+            customer_name: order.customer_name,
+            customer_phone: order.customer_phone,
             note: order.note,
             total_price: total_price,
             delivery_address: delivery_address,
@@ -80,7 +81,23 @@ class OrderService {
           }
         }
 
-        return { order: newOrder, orderProducts: newOrderProducts };
+        let newPayment;
+        if (payment_method) {
+          newPayment = await Payment.create(
+            {
+              amount: order.total_price,
+              method: payment_method,
+              order_id: newOrder._id,
+            },
+            { transaction: t, returning: true }
+          );
+
+          if (!newPayment) {
+            throw new BAD_REQUEST("Can not create payment");
+          }
+        }
+
+        return { order: newOrder, products: newOrderProducts, payment: newPayment };
       });
 
       return result;
@@ -96,29 +113,8 @@ class OrderService {
       },
     });
 
-    if (!count) {
-      throw new BAD_REQUEST("Can not get pending orders");
-    }
-
     return { pending_orders_count: count };
   };
-
-  // static confirmOrder = async (payload) => {
-  //   const updatedOrder = await Order.update(
-  //     {
-  //       status: "Đã xác nhận",
-  //     },
-  //     {
-  //       where: { id: payload.id },
-  //     }
-  //   );
-
-  //   if (!updatedOrder) {
-  //     throw new BAD_REQUEST("Can not confirm order");
-  //   }
-
-  //   return updatedOrder;
-  // };
 
   static changeOrderStatus = async (orderId, order) => {
     const updatedOrder = await Order.update(order, {
@@ -168,51 +164,9 @@ class OrderService {
     return orders;
   };
 
-  static getPendingOrders = async () => {
+  static getOrdersByStatus = async (status) => {
     const orders = await Order.findAll({
-      where: { status: "Chờ xác nhận" },
-      include: [
-        {
-          model: Product,
-          through: {
-            attributes: ["quantity"],
-          },
-          attributes: ["_id", "name", "retail_price"],
-        },
-      ],
-    });
-
-    if (!orders) {
-      throw new NOTFOUND("Can not get orders");
-    }
-
-    return orders;
-  };
-
-  static getComfirmedOrders = async () => {
-    const orders = await Order.findAll({
-      where: { status: "Đang xử lý" },
-      include: [
-        {
-          model: Product,
-          through: {
-            attributes: ["quantity"],
-          },
-          attributes: ["_id", "name", "retail_price"],
-        },
-      ],
-    });
-
-    if (!orders) {
-      throw new NOTFOUND("Can not get orders");
-    }
-
-    return orders;
-  };
-
-  static getFinishedOrders = async () => {
-    const orders = await Order.findAll({
-      where: { status: "Hoàn thành" },
+      where: { status: status },
       include: [
         {
           model: Product,
@@ -237,40 +191,6 @@ class OrderService {
     });
     return updatedOrder;
   };
-
-  // static getOrders = async () => {
-  //   const orders = await Order.findAll({
-  //     include: [OrderProduct],
-  //   });
-  //   return orders;
-  // };
-
-  // static getOrder = async (id) => {
-  //   const order = await Order.findByPk(id, {
-  //     include: [OrderProduct],
-  //   });
-  //   return order;
-  // };
-
-  // static getOrderByCustomer = async (customer_id) => {
-  //   const order = await Order.findOne({
-  //     where: { customer_id },
-  //     include: [OrderProduct],
-  //   });
-  //   return order;
-  // };
-
-  // static updateOrder = async (id, order) => {
-  //   const updatedOrder = await Order.update(order, {
-  //     where: { id },
-  //   });
-  //   return updatedOrder;
-  // };
-
-  // static deleteOrder = async (id) => {
-  //   const deletedOrder = await Order.destroy({ where: { id } });
-  //   return deletedOrder;
-  // };
 }
 
 module.exports = OrderService;
