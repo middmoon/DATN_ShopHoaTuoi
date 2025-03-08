@@ -9,15 +9,17 @@ import { api } from "@/utils/api";
 export default function ProductList() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await api.get<any>("/product");
         setProducts(response.data.data);
+        setLoading(false);
       } catch (error) {
         console.error("Lỗi khi fetch sản phẩm:", error);
-      } finally {
+        setError("Có lỗi xảy ra khi tải dữ liệu");
         setLoading(false);
       }
     };
@@ -28,6 +30,8 @@ export default function ProductList() {
   if (loading) {
     return <p className="text-center text-gray-500">Đang tải sản phẩm...</p>;
   }
+
+  if (error) return <p>{error}</p>;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
