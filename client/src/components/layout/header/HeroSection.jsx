@@ -21,11 +21,11 @@ export default function HeroSection() {
               className="h-full w-full rounded-lg"
             >
               {[
-                "Img/Page/p1.jpg",
-                "Img/Page/p2.jpg",
-                "Img/Page/p3.jpg",
-                "Img/Page/p4.jpg",
-                "Img/Page/p5.jpg",
+                "Img/Page/p1.webp",
+                "Img/Page/p2.webp",
+                "Img/Page/p3.webp",
+                "Img/Page/p4.webp",
+                "Img/Page/p5.webp",
               ].map((src, index) => (
                 <SwiperSlide key={index}>
                   <img

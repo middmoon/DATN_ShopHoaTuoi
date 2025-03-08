@@ -5,7 +5,7 @@ import ProductCard from "../Card/ProductCard";
 const generateProducts = (count = 15) => {
   return Array.from({ length: count }, (_, index) => ({
     id: index + 1,
-    image: "/Img/Page/p2.jpg",
+    image: "/Img/Page/p2.webp",
     name: `Sản Phẩm ${index + 1}`,
     price: `${150000 + index * 10000}`,
     isSale: true,
@@ -18,13 +18,7 @@ const PLSale = () => {
   const saleProducts = products.filter((product) => product.isSale);
 
   return (
-    <div
-      className="PlSale bg-cover bg-center mx-auto"
-      style={{
-        backgroundImage:
-          "linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('/Img/Background/7.jpg')",
-      }}
-    >
+    <div className="PlSale bg-cover bg-center mx-auto">
       <div className="container mx-auto py-10 text-center">
         <h1 className="text-2xl font-bold font-font4">Sản Phẩm Giảm Giá</h1>
       </div>

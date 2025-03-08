@@ -1,129 +1,91 @@
-import React, { useEffect, useState } from "react";
-import { getCategories } from "../../APIs/categoryAPI";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { getProductBySlug } from "../../APIs/productAPI";
+import ButtonAddToCard from "../../components/common/Button/buttonAddToCard";
 
-export default function Navbar() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const [openSubmenu, setOpenSubmenu] = useState(null);
+export default function Test() {
+  const { slug } = useParams();
+  const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchProduct = async () => {
       try {
-        const response = await getCategories();
-        if (response && Array.isArray(response.data)) {
-          setCategories(response.data);
-        } else {
-          setError("Invalid API response format");
+        const response = await getProductBySlug(slug);
+        if (response.status === 200) {
+          console.log("Product data:", response.data);
+          setProduct(response.data);
         }
-      } catch (err) {
-        setError("Failed to fetch categories");
+      } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm:", error);
       }
-      setLoading(false);
     };
 
-    fetchCategories();
-  }, []);
+    if (slug) fetchProduct();
+  }, [slug]);
 
-  const groupedCategories =
-    categories?.reduce((acc, category) => {
-      const { parent_id } = category;
-      if (!acc[parent_id]) acc[parent_id] = [];
-      acc[parent_id].push(category);
-      return acc;
-    }, {}) || {};
+  const getDirectImageURL = (url) => {
+    const match = url.match(/id=([^&]+)/);
+    return match
+      ? `https://lh3.googleusercontent.com/d/${match[1]}=s1000`
+      : url;
+  };
 
-  const mainCategories = ["Đối Tượng", "Kiểu Dáng", "Chủ Đề"];
-  const filteredCategories =
-    groupedCategories[null]?.filter((category) =>
-      mainCategories.includes(category.name)
-    ) || [];
-  const otherCategories =
-    groupedCategories[null]?.filter(
-      (category) => !mainCategories.includes(category.name)
-    ) || [];
+  if (!product) return <p>Loading...</p>;
 
   return (
-    <nav className="text-black p-4 shadow-md">
-      <div className="container mx-auto flex justify-between items-center">
-        <ul className="flex space-x-6">
-          {filteredCategories.map((parent) => (
-            <li key={parent._id} className="relative">
-              <button
-                className="hover:underline cursor-pointer flex items-center"
-                onClick={() =>
-                  setOpenDropdown(
-                    openDropdown === parent._id ? null : parent._id
-                  )
-                }
-              >
-                {parent.name}
-              </button>
-              {openDropdown === parent._id && (
-                <ul className="absolute left-0 mt-2 w-52 bg-white text-black border border-gray-300 shadow-lg rounded-lg">
-                  {groupedCategories[parent._id]?.map((child) => (
-                    <li
-                      key={child._id}
-                      className="px-4 py-2 hover:bg-gray-100"
-                      onClick={() => setOpenDropdown(null)}
-                    >
-                      {child.name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
+    <div className="container mx-auto py-10 px-5">
+      <h1 className="text-2xl font-bold">{product.name}</h1>
+
+      {/* Ảnh sản phẩm */}
+      <div className="flex gap-4 mt-4">
+        {product.ProductImages?.length > 0 ? (
+          product.ProductImages.map((img, index) => (
+            <img
+              key={index}
+              src={getDirectImageURL(img.img_url)}
+              alt={`Hình ảnh ${index + 1}`}
+              className="w-40 h-40 object-cover rounded-lg shadow-md"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/150?text=No+Image";
+              }}
+            />
+          ))
+        ) : (
+          <img
+            src="https://via.placeholder.com/150?text=No+Image"
+            alt="Ảnh mặc định"
+            className="w-40 h-40 object-cover rounded-lg shadow-md"
+          />
+        )}
+      </div>
+
+      <p className="text-lg font-semibold mt-4">
+        Giá:{" "}
+        {product.retail_price
+          ? `${product.retail_price.toLocaleString("vi-VN")} VND`
+          : "Liên hệ"}
+      </p>
+      <p className="text-md mt-2">Trạng thái: {product.status}</p>
+      <p className="mt-2">{product.description}</p>
+
+      <div className="mt-4">
+        <h2 className="text-lg font-semibold">Danh mục:</h2>
+        <ul className="list-disc list-inside">
+          {product.ProductCategories?.map((category) => (
+            <li key={category._id}>{category.name}</li>
           ))}
-          {otherCategories.length > 0 && (
-            <li className="relative">
-              <button
-                className="hover:underline cursor-pointer flex items-center"
-                onClick={() =>
-                  setOpenDropdown(openDropdown === "more" ? null : "more")
-                }
-              >
-                Xem Thêm
-              </button>
-              {openDropdown === "more" && (
-                <ul className="absolute left-0 mt-2 w-52 bg-white text-black border border-gray-300 shadow-lg rounded-lg">
-                  {otherCategories.map((parent) => (
-                    <li key={parent._id} className="relative">
-                      <button
-                        className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                        onClick={() =>
-                          setOpenSubmenu(
-                            openSubmenu === parent._id ? null : parent._id
-                          )
-                        }
-                      >
-                        {parent.name} {groupedCategories[parent._id] ? "" : ""}
-                      </button>
-                      {openSubmenu === parent._id &&
-                        groupedCategories[parent._id] && (
-                          <ul className="absolute left-full top-0 mt-0 w-48 bg-white text-black border border-gray-300 shadow-lg rounded-lg">
-                            {groupedCategories[parent._id].map((child) => (
-                              <li
-                                key={child._id}
-                                className="px-4 py-2 hover:bg-gray-100"
-                                onClick={() => {
-                                  setOpenDropdown(null);
-                                  setOpenSubmenu(null);
-                                }}
-                              >
-                                {child.name}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-          )}
         </ul>
       </div>
-    </nav>
+
+      <div className="flex space-x-4">
+        <ButtonAddToCard
+          product={product}
+          text={"Thêm vào giỏ hàng"}
+          type="text"
+          className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700"
+        />
+      </div>
+    </div>
   );
 }

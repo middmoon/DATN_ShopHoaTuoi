@@ -4,13 +4,13 @@ import ProductCard from "../Card/ProductCard";
 const PLMastershop = () => {
   const products = Array.from({ length: 80 }, (_, index) => ({
     id: index + 1,
-    image: "/Img/Page/p2.jpg",
+    image: "/Img/Page/p2.webp",
     name: `Product ${index + 1}`,
     price: `${1500000 + index * 100000}`,
     isSale: true,
   }));
 
-  const itemsPerPage = 20; // Số sản phẩm trên mỗi trang
+  const itemsPerPage = 20;
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
