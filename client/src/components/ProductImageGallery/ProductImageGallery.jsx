@@ -29,7 +29,7 @@ export default function ProductImageGallery({ images = [] }) {
 
       {/* Slider ảnh nhỏ */}
       <div className="w-full py-10 px-4 bg-color-custom-4">
-        <Swiper spaceBetween={10} slidesPerView={5} className="h-[100px]">
+        <Swiper spaceBetween={10} slidesPerView={3} className="h-[100px]">
           {images.map((img, index) => (
             <SwiperSlide
               key={index}
@@ -38,7 +38,7 @@ export default function ProductImageGallery({ images = [] }) {
               <img
                 src={getDirectImageURL(img.img_url)}
                 alt={`Thumbnail ${index + 1}`}
-                className="w-full h-full max-h-[80px] rounded-lg border cursor-pointer object-cover"
+                className="w-full h-full max-h-[100px] rounded-lg border cursor-pointer object-cover"
                 onClick={() => setMainImage(getDirectImageURL(img.img_url))}
                 onError={(e) => {
                   e.target.onerror = null;

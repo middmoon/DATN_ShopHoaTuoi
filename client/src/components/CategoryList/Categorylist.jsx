@@ -10,7 +10,6 @@ export default function CategoryList() {
       try {
         const response = await getCategories();
         if (response.status === 200) {
-          console.log("Dữ liệu sản phẩm:", response.data);
           const categoryData = response.data;
 
           const categoryMap = {};

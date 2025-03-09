@@ -3,7 +3,7 @@ import React from "react";
 const IntroduceShop = () => {
   return (
     <div className="introduce px-11 min-h-50vh flex items-center justify-center py-10 bg-cover bg-center relative">
-      <div className="absolute top-0 left-0 w-full h-full bg-white opacity-80"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-white"></div>
 
       <div className="container mx-auto flex flex-col md:flex-row items-center gap-8 relative">
         <div className="flex-1 text-center md:text-left">
