@@ -36,9 +36,9 @@ const searchLogger = async (req, res, next) => {
     }
 
     let product_list_ids = [];
-    // if (data.length > 0) {
-    //   product_list_ids = data.map((p) => p._id);
-    // }
+    if (data.length > 0) {
+      product_list_ids = data.map((p) => p._id);
+    }
 
     const logData = {
       user_id: userId,

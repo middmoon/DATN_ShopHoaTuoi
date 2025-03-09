@@ -1,12 +1,14 @@
-import { ReactNode } from "react";
+"use client"; // Đảm bảo file có thể sử dụng hooks trong Next.js App Router
+
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 import React from "react";
 
 export type BreadcrumbItem = {
   label: string;
-  href?: string;
+  href?: string; // Dùng route thay vì href
 };
 
 type PageHeaderProps = {
@@ -28,7 +30,11 @@ export function PageHeader({ items }: PageHeaderProps) {
                   {index === items.length - 1 ? (
                     <BreadcrumbPage>{item.label}</BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                    <BreadcrumbLink asChild>
+                      <Link href={item.href || "#"} className="text-blue-600 hover:underline">
+                        {item.label}
+                      </Link>
+                    </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>
               </React.Fragment>

@@ -1,7 +1,6 @@
 "use strict";
 
 const express = require("express");
-const { route } = require("./admin.route");
 const router = express.Router();
 
 router.use("/auth", require("./auth.route"));

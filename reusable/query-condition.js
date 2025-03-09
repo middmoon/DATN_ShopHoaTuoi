@@ -12,14 +12,14 @@ function buildQueryOptions(params) {
     q,
     categories,
     "price-range": priceRange,
-    brand,
+    // brand,
     availability,
     attributes,
-    location,
-    rating,
+    // location,
+    // rating,
     discount,
-    seller,
-    shipping,
+    // seller,
+    // shipping,
     sortBy,
     page,
     limit,
@@ -34,6 +34,8 @@ function buildQueryOptions(params) {
     whereConditions[Op.or] = [
       { name: { [Op.iLike]: `%${keyword}%` } }, // Tìm theo tên sản phẩm
       { description: { [Op.iLike]: `%${keyword}%` } }, // Tìm theo mô tả sản phẩm
+      { slug: { [Op.iLike]: `%${keyword}%` } }, // Tìm theo slug sản phẩm
+      { categoryName: { [Op.iLike]: `%${keyword}%` } }, // Tìm theo tên sản phẩm
     ];
   }
 
@@ -46,20 +48,20 @@ function buildQueryOptions(params) {
     }
   }
 
-  // --- Lọc theo thương hiệu ---
-  if (brand) {
-    whereConditions.brand = brand;
-  }
+  // // --- Lọc theo thương hiệu ---
+  // if (brand) {
+  //   whereConditions.brand = brand;
+  // }
 
   // --- Lọc theo tình trạng hàng ---
   if (availability) {
     whereConditions.availability = availability;
   }
 
-  // --- Lọc theo đánh giá ---
-  if (rating) {
-    whereConditions.rating = { [Op.gte]: Number(rating) };
-  }
+  // // --- Lọc theo đánh giá ---
+  // if (rating) {
+  //   whereConditions.rating = { [Op.gte]: Number(rating) };
+  // }
 
   // --- Lọc theo discount ---
   if (discount) {
@@ -73,25 +75,25 @@ function buildQueryOptions(params) {
     }
   }
 
-  // --- Lọc theo seller ---
-  if (seller) {
-    if (seller.startsWith("seller-id=")) {
-      const sellerId = seller.split("=")[1];
-      whereConditions.sellerId = sellerId;
-    } else {
-      whereConditions.sellerType = seller;
-    }
-  }
+  // // --- Lọc theo seller ---
+  // if (seller) {
+  //   if (seller.startsWith("seller-id=")) {
+  //     const sellerId = seller.split("=")[1];
+  //     whereConditions.sellerId = sellerId;
+  //   } else {
+  //     whereConditions.sellerType = seller;
+  //   }
+  // }
 
-  // --- Lọc theo shipping ---
-  if (shipping) {
-    whereConditions.shipping = shipping;
-  }
+  // // --- Lọc theo shipping ---
+  // if (shipping) {
+  //   whereConditions.shipping = shipping;
+  // }
 
-  // --- Lọc theo location ---
-  if (location) {
-    whereConditions.location = location;
-  }
+  // // --- Lọc theo location ---
+  // if (location) {
+  //   whereConditions.location = location;
+  // }
 
   // --- Lọc theo attributes (nâng cao) ---
   let attributeConditions = null;
@@ -117,12 +119,12 @@ function buildQueryOptions(params) {
       case "newest":
         orderCondition.push(["createdAt", "DESC"]);
         break;
-      case "popularity":
-        orderCondition.push(["popularity", "DESC"]);
-        break;
-      case "rating":
-        orderCondition.push(["rating", "DESC"]);
-        break;
+      // case "popularity":
+      //   orderCondition.push(["popularity", "DESC"]);
+      //   break;
+      // case "rating":
+      //   orderCondition.push(["rating", "DESC"]);
+      //   break;
       default:
         orderCondition.push(["createdAt", "DESC"]);
     }
@@ -132,7 +134,7 @@ function buildQueryOptions(params) {
 
   // --- Phân trang ---
   const currentPage = page ? parseInt(page) : 1;
-  const perPage = limit ? parseInt(limit) : 20;
+  const perPage = limit ? parseInt(limit) : 15;
   const offset = (currentPage - 1) * perPage;
 
   // --- Xây dựng queryOptions ---

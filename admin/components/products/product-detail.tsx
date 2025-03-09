@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import type React from "react";
+
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +13,10 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { X, Check, Trash2, PlusCircle, ImagePlus } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ProductImage {
   _id: number;
@@ -28,12 +34,11 @@ interface Product {
   name: string;
   unit: string | null;
   description: string;
-  wholesale_price: number;
   retail_price: number;
   status: "Còn hàng" | "Hết hàng" | "Ngưng kinh doanh";
   slug: string;
   is_feature: boolean;
-  stock_quantity: number;
+  stock_quantity?: number;
   is_public: boolean;
   createdAt: string;
   updatedAt: string;
@@ -43,15 +48,34 @@ interface Product {
 
 interface ProductDetailProps {
   product: Product;
+  availableCategories?: ProductCategory[];
 }
 
-export function ProductDetail({ product }: ProductDetailProps) {
+export function ProductDetail({ product, availableCategories = [] }: ProductDetailProps) {
   const [editMode, setEditMode] = useState(false);
-  const [editedProduct, setEditedProduct] = useState(product);
+  const [editedProduct, setEditedProduct] = useState<Product>(product);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<ProductCategory[]>(product.ProductCategories);
+  const [newCategory, setNewCategory] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Combine all available categories with the product's existing categories
+  const allCategories = [...availableCategories];
+  product.ProductCategories.forEach((cat) => {
+    if (!allCategories.some((c) => c._id === cat._id)) {
+      allCategories.push(cat);
+    }
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEditedProduct((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditedProduct((prev) => ({ ...prev, [name]: Number.parseFloat(value) }));
   };
 
   const handleToggleChange = (name: string) => (checked: boolean) => {
@@ -62,172 +86,502 @@ export function ProductDetail({ product }: ProductDetailProps) {
     setEditedProduct((prev) => ({ ...prev, status: value as Product["status"] }));
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setNewImages((prev) => [...prev, ...filesArray]);
+
+      // Create preview URLs
+      const previewUrls = filesArray.map((file) => URL.createObjectURL(file));
+      setNewImagePreviews((prev) => [...prev, ...previewUrls]);
+    }
+  };
+
+  const removeNewImage = (index: number) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
+
+    // Revoke the object URL to avoid memory leaks
+    URL.revokeObjectURL(newImagePreviews[index]);
+    setNewImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (imageId: number) => {
+    setEditedProduct((prev) => ({
+      ...prev,
+      ProductImages: prev.ProductImages.filter((img) => img._id !== imageId),
+    }));
+  };
+
+  const setImageAsAvatar = (imageId: number) => {
+    setEditedProduct((prev) => ({
+      ...prev,
+      ProductImages: prev.ProductImages.map((img) => ({
+        ...img,
+        is_avatar: img._id === imageId,
+      })),
+    }));
+  };
+
+  const addCategory = (category: ProductCategory) => {
+    if (!selectedCategories.some((cat) => cat._id === category._id)) {
+      setSelectedCategories((prev) => [...prev, category]);
+    }
+  };
+
+  const removeCategory = (categoryId: number) => {
+    setSelectedCategories((prev) => prev.filter((cat) => cat._id !== categoryId));
+  };
+
+  const createNewCategory = () => {
+    if (newCategory.trim()) {
+      // In a real app, you would make an API call to create the category
+      // For now, we'll simulate it with a temporary ID
+      const tempId = Math.floor(Math.random() * -1000);
+      const newCat = { _id: tempId, name: newCategory.trim() };
+      addCategory(newCat);
+      setNewCategory("");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
+      // Create a FormData object to handle file uploads
+      const formData = new FormData();
+
+      // Add the edited product data
+      const productData = {
+        ...editedProduct,
+        ProductCategories: selectedCategories,
+      };
+      formData.append("productData", JSON.stringify(productData));
+
+      // Add new images
+      newImages.forEach((file) => {
+        formData.append("images", file);
+      });
+
       const response = await fetch(`/api/products/${product._id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editedProduct),
+        body: formData,
       });
+
       if (response.ok) {
         toast.success("Product updated successfully");
         setEditMode(false);
+        // In a real app, you would refresh the product data here
       } else {
         throw new Error("Failed to update product");
       }
     } catch (error) {
       toast.error("An error occurred while updating the product");
+      console.error(error);
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    const formattedDate = new Date(dateString).toLocaleDateString("vi-VN", {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     });
+
+    return formattedDate.replace(/^(\w)/, (c) => c.toUpperCase());
   };
 
   return (
     <div className="w-full space-y-6 p-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{editMode ? "Edit Product" : product.name}</h1>
-        {!editMode && <Button onClick={() => setEditMode(true)}>Edit Product</Button>}
+        <h1 className="text-2xl font-bold">{editMode ? "Chỉnh sửa sản phẩm" : product.name}</h1>
+        {!editMode && <Button onClick={() => setEditMode(true)}>Chỉnh sửa</Button>}
       </div>
 
-      <Carousel className="w-full max-w-xs mx-auto mb-8">
-        <CarouselContent>
-          {product.ProductImages.map((image) => (
-            <CarouselItem key={image._id}>
-              <div className="relative aspect-square">
-                <Image
-                  src={image.img_url || "/placeholder.svg"}
-                  alt={`${product.name} - Image`}
-                  fill
-                  className="rounded-lg object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  priority={image.is_avatar}
-                />
-                {image.is_avatar && <Badge className="absolute top-2 right-2 z-10">Avatar</Badge>}
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
+      {!editMode && (
+        <Carousel className="w-full max-w-xs mx-auto mb-8">
+          <CarouselContent>
+            {product.ProductImages.map((image) => (
+              <CarouselItem key={image._id}>
+                <div className="relative aspect-square">
+                  <Image
+                    src={image.img_url || "/placeholder.svg?height=300&width=300"}
+                    alt={`${product.name} - Image`}
+                    fill
+                    className="rounded-lg object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={image.is_avatar}
+                  />
+                  {image.is_avatar && <Badge className="absolute top-2 right-2 z-10 bg-[hsl(var(--create))]">Avatar</Badge>}
+                </div>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      )}
 
       {editMode ? (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="name">Product Name</Label>
-            <Input id="name" name="name" value={editedProduct.name} onChange={handleChange} required />
-          </div>
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea id="description" name="description" value={editedProduct.description} onChange={handleChange} required />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="wholesale_price">Wholesale Price</Label>
-              <Input
-                type="number"
-                id="wholesale_price"
-                name="wholesale_price"
-                value={editedProduct.wholesale_price}
-                onChange={handleChange}
-                required
-              />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Product Information */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Thông tin sản phẩm</h2>
+
+              <div>
+                <Label htmlFor="name">Tên sản phẩm</Label>
+                <Input id="name" name="name" value={editedProduct.name} onChange={handleChange} required />
+              </div>
+
+              <div>
+                <Label htmlFor="unit">Đơn vị</Label>
+                <Input id="unit" name="unit" value={editedProduct.unit || ""} onChange={handleChange} />
+              </div>
+
+              <div>
+                <Label htmlFor="description">Mô tả</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={editedProduct.description}
+                  onChange={handleChange}
+                  className="min-h-[120px]"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="retail_price">Giá bán lẻ (VND)</Label>
+                <Input
+                  type="number"
+                  id="retail_price"
+                  name="retail_price"
+                  value={editedProduct.retail_price}
+                  onChange={handleNumberChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="status">Trạng thái</Label>
+                <Select onValueChange={handleStatusChange} defaultValue={editedProduct.status}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn trạng thái" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Còn hàng">Còn hàng</SelectItem>
+                    <SelectItem value="Hết hàng">Hết hàng</SelectItem>
+                    <SelectItem value="Ngưng kinh doanh">Ngưng kinh doanh</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_public"
+                  checked={editedProduct.is_public}
+                  onCheckedChange={handleToggleChange("is_public")}
+                  style={{
+                    backgroundColor: editedProduct.is_public ? "hsl(var(--create))" : "hsl(var(--muted))",
+                  }}
+                />
+                <Label htmlFor="is_public">Công khai</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_feature"
+                  checked={editedProduct.is_feature}
+                  onCheckedChange={handleToggleChange("is_feature")}
+                  style={{
+                    backgroundColor: editedProduct.is_feature ? "hsl(var(--create))" : "hsl(var(--muted))",
+                  }}
+                />
+                <Label htmlFor="is_feature">Nổi bật</Label>
+              </div>
             </div>
-            <div>
-              <Label htmlFor="retail_price">Retail Price</Label>
-              <Input type="number" id="retail_price" name="retail_price" value={editedProduct.retail_price} onChange={handleChange} required />
+
+            {/* Categories and Images */}
+            <div className="space-y-6">
+              {/* Categories Section */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Danh mục</h2>
+
+                <div className="flex flex-wrap gap-2 min-h-[60px] p-2 border rounded-md">
+                  {selectedCategories.map((category) => (
+                    <Badge key={category._id} variant="secondary" className="flex items-center gap-1">
+                      {category.name}
+                      <button type="button" onClick={() => removeCategory(category._id)} className="ml-1 rounded-full hover:bg-muted p-0.5">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="flex gap-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        className="bg-[hsl(var(--actions))] hover:!bg-[hsl(var(--actions))] hover:!border-[hsl(var(--actions))] hover:!text-white"
+                        type="button"
+                        size="sm"
+                      >
+                        <PlusCircle className="h-4 w-4 mr-2 text-white" />
+                        <p className="text-sm text-white">Thêm danh mục</p>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Thêm danh mục</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        {/* <div className="space-y-2">
+                          <Label htmlFor="newCategory">Tạo danh mục mới</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="newCategory"
+                              value={newCategory}
+                              onChange={(e) => setNewCategory(e.target.value)}
+                              placeholder="Tên danh mục mới"
+                            />
+                            <Button type="button" onClick={createNewCategory} size="sm">
+                              <PlusCircle className="h-4 w-4 mr-2" />
+                              Tạo
+                            </Button>
+                          </div>
+                        </div> */}
+
+                        <div className="space-y-2">
+                          <Label>Danh mục có sẵn</Label>
+                          <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto p-2 border rounded-md">
+                            {allCategories
+                              .filter((cat) => !selectedCategories.some((sc) => sc._id === cat._id))
+                              .map((category) => (
+                                <Button
+                                  key={category._id}
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => addCategory(category)}
+                                  className="justify-start"
+                                >
+                                  <PlusCircle className="h-4 w-4 mr-2" />
+                                  {category.name}
+                                </Button>
+                              ))}
+                          </div>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button type="button" variant="outline">
+                            Đóng
+                          </Button>
+                        </DialogClose>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
+
+              {/* Images Section */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-semibold">Hình ảnh sản phẩm</h2>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {editedProduct.ProductImages.map((image) => (
+                    <Card key={image._id} className="relative overflow-hidden">
+                      <CardContent className="p-2">
+                        <div className="relative aspect-square">
+                          <Image
+                            src={image.img_url || "/placeholder.svg?height=200&width=200"}
+                            alt="Product image"
+                            fill
+                            className="rounded-md object-cover"
+                          />
+                          {image.is_avatar && (
+                            <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-md">Avatar</div>
+                          )}
+                          <div className="absolute bottom-1 right-1 flex gap-1">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="icon" variant="secondary" className="h-8 w-8">
+                                  <span className="sr-only">Open menu</span>
+                                  <span className="text-xs">⋮</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                {!image.is_avatar && (
+                                  <DropdownMenuItem onClick={() => setImageAsAvatar(image._id)}>
+                                    <Check className="h-4 w-4 mr-2" />
+                                    Đặt làm avatar
+                                  </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem onClick={() => removeExistingImage(image._id)} className="text-destructive focus:text-destructive">
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Xóa ảnh
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {/* New image previews */}
+                  {newImagePreviews.map((preview, index) => (
+                    <Card key={`new-${index}`} className="relative overflow-hidden">
+                      <CardContent className="p-2">
+                        <div className="relative aspect-square">
+                          <Image src={preview || "/placeholder.svg"} alt="New product image" fill className="rounded-md object-cover" />
+                          <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-2 py-0.5 rounded-md">New</div>
+                          <Button size="icon" variant="destructive" className="absolute top-1 right-1 h-6 w-6" onClick={() => removeNewImage(index)}>
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+
+                  {/* Add image button */}
+                  <Card className="border-dashed cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => fileInputRef.current?.click()}>
+                    <CardContent className="flex flex-col items-center justify-center p-6 h-full">
+                      <ImagePlus className="h-8 w-8 mb-2 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">Thêm ảnh mới</p>
+                      <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" multiple className="hidden" />
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
           </div>
-          <div>
-            <Label htmlFor="stock_quantity">Stock Quantity</Label>
-            <Input type="number" id="stock_quantity" name="stock_quantity" value={editedProduct.stock_quantity} onChange={handleChange} required />
-          </div>
-          <div>
-            <Label htmlFor="status">Status</Label>
-            <Select onValueChange={handleStatusChange} defaultValue={editedProduct.status}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Còn hàng">Còn hàng</SelectItem>
-                <SelectItem value="Hết hàng">Hết hàng</SelectItem>
-                <SelectItem value="Ngưng kinh doanh">Ngưng kinh doanh</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Switch id="is_public" checked={editedProduct.is_public} onCheckedChange={handleToggleChange("is_public")} />
-            <Label htmlFor="is_public">Public</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Switch id="is_feature" checked={editedProduct.is_feature} onCheckedChange={handleToggleChange("is_feature")} />
-            <Label htmlFor="is_feature">Featured</Label>
-          </div>
-          <div className="flex justify-end space-x-2">
-            <Button type="submit" variant="default">
-              Save Changes
-            </Button>
+
+          <div className="flex justify-end space-x-2 pt-4 border-t">
             <Button type="button" variant="outline" onClick={() => setEditMode(false)}>
-              Cancel
+              Hủy
+            </Button>
+            <Button type="submit" variant="default">
+              Lưu thay đổi
             </Button>
           </div>
         </form>
       ) : (
-        <div className="space-y-6">
-          <div className="flex flex-wrap gap-2">
-            {product.ProductCategories.map((category) => (
-              <Badge key={category._id} variant="secondary">
-                {category.name}
-              </Badge>
-            ))}
+        <div className="space-y-8">
+          {/* Product description section */}
+          <div className="bg-muted/30 rounded-lg p-6 border border-[hsl(var(--backgound))]">
+            <h2 className="text-xl font-semibold mb-3">Mô tả sản phẩm</h2>
+            <p className="text-gray-600 leading-relaxed">{product.description}</p>
           </div>
-          <p className="text-gray-600">{product.description}</p>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="font-semibold">Wholesale Price</p>
-              <p className="text-lg">{product.wholesale_price.toLocaleString()} VND</p>
-            </div>
-            <div>
-              <p className="font-semibold">Retail Price</p>
-              <p className="text-lg">{product.retail_price.toLocaleString()} VND</p>
-            </div>
-            <div>
-              <p className="font-semibold">Stock Quantity</p>
-              <p className="text-lg">{product.stock_quantity}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Status</p>
-              <p className="text-lg">{product.status}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Visibility</p>
-              <p className="text-lg">{product.is_public ? "Public" : "Private"}</p>
-            </div>
-            <div>
-              <p className="font-semibold">Featured</p>
-              <p className="text-lg">{product.is_feature ? "Yes" : "No"}</p>
+
+          {/* Categories section */}
+          <div className="bg-muted/30 rounded-lg p-6 border border-[hsl(var(--backgound))]">
+            <h2 className="text-xl font-semibold mb-3">Danh mục</h2>
+            <div className="flex flex-wrap gap-2">
+              {product.ProductCategories.map((category) => (
+                <Badge key={category._id} variant="secondary" className="px-3 py-1 text-sm bg-[hsl(var(--actions))] pointer-events-none">
+                  {category.name}
+                </Badge>
+              ))}
             </div>
           </div>
+
+          {/* Product details grid */}
           <div>
-            <p className="font-semibold">Slug</p>
-            <p className="text-lg">{product.slug}</p>
+            <h2 className="text-xl font-semibold mb-3">Thông tin chi tiết</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Price card */}
+              <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
+                <div className="bg-primary/10 p-3 border-b">
+                  <h3 className="font-medium text-primary">Giá bán lẻ</h3>
+                </div>
+                <div className="p-4">
+                  <p className="text-2xl font-bold text-primary border-[hsl(var(--backgound))]">{product.retail_price.toLocaleString()} VND</p>
+                </div>
+              </div>
+
+              {/* Status card */}
+              <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
+                <div className="bg-muted p-3 border-b">
+                  <h3 className="font-medium">Trạng thái</h3>
+                </div>
+                <div className="p-4">
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                      product.status === "Còn hàng"
+                        ? "bg-green-100 text-green-800"
+                        : product.status === "Hết hàng"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-yellow-100 text-yellow-800"
+                    }`}
+                  >
+                    {product.status}
+                  </span>
+                </div>
+              </div>
+
+              {/* Visibility card */}
+              <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
+                <div className="bg-muted p-3 border-b">
+                  <h3 className="font-medium">Hiển thị</h3>
+                </div>
+                <div className="p-4 flex items-center">
+                  <div className={`w-4 h-4 rounded-full mr-2 ${product.is_public ? "bg-green-500" : "bg-red-500"}`}></div>
+                  <p className="text-lg">{product.is_public ? "Công khai" : "Riêng tư"}</p>
+                </div>
+              </div>
+
+              {/* Featured card */}
+              <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
+                <div className="bg-muted p-3 border-b">
+                  <h3 className="font-medium">Nổi bật</h3>
+                </div>
+                <div className="p-4 flex items-center">
+                  <div className={`w-4 h-4 rounded-full mr-2 ${product.is_feature ? "bg-green-500" : "bg-red-500"}`}></div>
+                  <p className="text-lg">{product.is_feature ? "Có" : "Không"}</p>
+                </div>
+              </div>
+
+              {/* Unit card (conditional) */}
+              {product.unit && (
+                <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
+                  <div className="bg-muted p-3 border-b">
+                    <h3 className="font-medium">Đơn vị</h3>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-lg">{product.unit}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Slug card */}
+              <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
+                <div className="bg-muted p-3 border-b">
+                  <h3 className="font-medium">Slug</h3>
+                </div>
+                <div className="p-4">
+                  <p className="text-sm font-mono bg-muted/50 p-2 rounded overflow-x-auto">{product.slug}</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="font-semibold">Created At</p>
-            <p className="text-lg">{formatDate(product.createdAt)}</p>
-          </div>
-          <div>
-            <p className="font-semibold">Last Updated</p>
-            <p className="text-lg">{formatDate(product.updatedAt)}</p>
+
+          {/* Timestamps section */}
+          <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
+            <div className="bg-muted p-3 border-b">
+              <h3 className="font-medium">Thời gian</h3>
+            </div>
+            <div className="divide-y">
+              <div className="p-4 flex items-center gap-2">
+                <span className="font-medium text-muted-foreground">Ngày tạo: </span>
+                <p className="font-medium">{formatDate(product.createdAt)}</p>
+              </div>
+              <div className="p-4 flex items-center gap-2">
+                <span className="font-medium text-muted-foreground">Cập nhật lần cuối: </span>
+                <p className="font-medium">{formatDate(product.updatedAt)}</p>
+              </div>
+            </div>
           </div>
         </div>
       )}

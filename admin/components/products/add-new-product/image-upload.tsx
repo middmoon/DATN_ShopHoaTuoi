@@ -34,30 +34,6 @@ export function ImageUpload({ images, onImagesChange, onAvatarChange, avatarInde
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-  // const removeImage = (index: number) => {
-  //   const newImages = images.filter((_, i) => i !== index);
-  //   onImagesChange(newImages);
-
-  //   if (index === avatarIndex) {
-  //     onAvatarChange(0);
-  //   } else if (index < avatarIndex) {
-  //     onAvatarChange(avatarIndex - 1);
-  //   }
-  // };
-
-  // const removeImage = (index: number) => {
-  //   const newImages = images.filter((_, i) => i !== index);
-  //   onImagesChange(newImages);
-
-  //   if (newImages.length === 0) {
-  //     onAvatarChange(-1);
-  //   } else if (index === avatarIndex) {
-  //     onAvatarChange(0);
-  //   } else if (index < avatarIndex) {
-  //     onAvatarChange(avatarIndex - 1);
-  //   }
-  // };
-
   const removeImage = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
     onImagesChange(newImages);

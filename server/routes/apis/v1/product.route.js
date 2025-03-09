@@ -14,19 +14,18 @@ const { getResData } = require("../../../middlewares/cature-response.middleware"
 const cacheMiddleware = require("../../../middlewares/cache-query.middleware");
 
 router
+  //getResData, searchLogger, cacheMiddleware
   .get("/", getResData, searchLogger, cacheMiddleware, asyncHandler(ProductController.getProducts))
-  //.get("/", asyncHandler(ProductController.getProducts))
+
+  .get("/manage", checkRole(["owner"]), asyncHandler(ProductController.getProducts))
 
   .get("/:productId(\\d+)", asyncHandler(ProductController.getProductById))
 
   .get("/:productSlug", asyncHandler(ProductController.getProductBySlug))
 
-  //.use(checkRole(["sys_admin", "owner"]))
   .post("/", asyncHandler(ProductController.createProduct))
 
   .post("/:productId/images", upload.array("images"), asyncHandler(ProductController.addProductImage))
-
-  // .put("/:productId/avatar", upload.single("avatar"), asyncHandler(ProductController.updateProductImage))
 
   .patch("/:productId", asyncHandler(ProductController.updateProduct));
 

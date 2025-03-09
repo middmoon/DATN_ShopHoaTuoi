@@ -113,6 +113,9 @@ class ProductService {
 
   static getProducts = async () => {
     const products = await Product.findAll({
+      where: {
+        is_public: true,
+      },
       include: [
         {
           model: ProductCategory,

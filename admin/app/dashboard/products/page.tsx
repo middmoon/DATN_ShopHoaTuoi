@@ -3,7 +3,6 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import ProductList from "@/components/products/product-list";
-import { api } from "@/utils/api";
 
 export default function ProductsPage() {
   const breadcrumbItems = [{ label: "Dashboard", href: "/dashboard" }, { label: "Sản phẩm" }];
