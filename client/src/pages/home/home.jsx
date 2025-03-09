@@ -1,5 +1,4 @@
 import React from "react";
-import "../home/home.css";
 import ReviewService from "../../components/page/home/reviewshop";
 import PLSale from "../../components/Listcard/PLSale";
 import IntroduceShop from "../../components/page/home/introduce";
@@ -9,7 +8,7 @@ export default function Home() {
   return (
     <>
       <ReviewService></ReviewService>
-      <PLSale></PLSale>
+      {/* <PLSale></PLSale> */}
       <IntroduceShop></IntroduceShop>
       <ProductList></ProductList>
     </>

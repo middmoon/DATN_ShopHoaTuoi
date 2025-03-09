@@ -12,7 +12,6 @@ export default function CategoryList() {
         if (response.status === 200) {
           const categoryData = response.data;
 
-          // Chuyển đổi dữ liệu thành dạng phân cấp
           const categoryMap = {};
           categoryData.forEach((cat) => {
             if (!cat.parent_id) {

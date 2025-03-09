@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { getCategories } from "../../../APIs/categoryAPI";
+import { useCart } from "../../../context/cartContext";
 
 export default function Navbar() {
-  const [cartCount, setCartCount] = useState(5);
+  const { getTotalItems } = useCart();
+  const cartCount = getTotalItems();
+
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -154,7 +157,9 @@ export default function Navbar() {
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
-              <span className="ml-2 font-font2">Giỏ Hàng</span>
+              <span className="ml-2 font-font2">
+                <a href="/cart">Giỏ Hàng</a>
+              </span>
               {cartCount > 0 && (
                 <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {cartCount}

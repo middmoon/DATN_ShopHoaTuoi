@@ -3,18 +3,22 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 
-export default function ProductImageGallery() {
-  const [mainImage, setMainImage] = useState("/Img/Background/2.jpg");
-  const thumbnails = [
-    "/Img/Background/2.jpg",
-    "/Img/Background/3.jpg",
-    "/Img/Background/4.jpg",
-    "/Img/Background/5.jpg",
-    "/Img/Background/6.jpg",
-  ];
+// Hàm chuyển đổi URL Google Drive (đặt lên đầu)
+const getDirectImageURL = (url) => {
+  const match = url.match(/id=([^&]+)/);
+  return match ? `https://lh3.googleusercontent.com/d/${match[1]}=s1000` : url;
+};
+
+export default function ProductImageGallery({ images = [] }) {
+  const [mainImage, setMainImage] = useState(
+    images.length > 0
+      ? getDirectImageURL(images[0].img_url)
+      : "https://via.placeholder.com/150?text=No+Image"
+  );
 
   return (
     <div className="lg:col-span-5 flex flex-col items-center">
+      {/* Ảnh chính */}
       <div className="flex w-full pt-5 bg-color-custom-1 justify-center items-center">
         <img
           src={mainImage}
@@ -22,18 +26,25 @@ export default function ProductImageGallery() {
           className="w-[90%] h-[500px] bg-color-custom-4 object-contain rounded-lg border"
         />
       </div>
+
+      {/* Slider ảnh nhỏ */}
       <div className="w-full py-10 px-4 bg-color-custom-4">
-        <Swiper spaceBetween={10} slidesPerView={5} className="h-[100px]">
-          {thumbnails.map((src, index) => (
+        <Swiper spaceBetween={10} slidesPerView={3} className="h-[100px]">
+          {images.map((img, index) => (
             <SwiperSlide
               key={index}
               className="flex justify-center items-center h-full"
             >
               <img
-                src={src}
+                src={getDirectImageURL(img.img_url)}
                 alt={`Thumbnail ${index + 1}`}
-                className="w-full h-full max-h-[80px] rounded-lg border cursor-pointer object-cover"
-                onClick={() => setMainImage(src)}
+                className="w-full h-full max-h-[100px] rounded-lg border cursor-pointer object-cover"
+                onClick={() => setMainImage(getDirectImageURL(img.img_url))}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src =
+                    "https://via.placeholder.com/150?text=No+Image";
+                }}
               />
             </SwiperSlide>
           ))}

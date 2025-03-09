@@ -18,6 +18,7 @@ module.exports = {
         'color-custom-4': '#fffaf6',
         'color-custom-5': '#fcf6f6',
         'color-custom-6': '#f9f0eb',
+        'color-custom-7': 'black',
 
       },
     },
