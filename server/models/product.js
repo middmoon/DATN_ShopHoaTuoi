@@ -108,7 +108,7 @@ module.exports = (sequelize, DataTypes) => {
     product.slug = slugify(product.name + " " + product._id, {
       replacement: "-",
       remove: undefined,
-      lower: false,
+      lower: true,
       strict: false,
       locale: "vi",
       trim: true,
@@ -125,9 +125,9 @@ module.exports = (sequelize, DataTypes) => {
     );
   });
 
-  Product.beforeUpdate(async (product) => {
-    if (product.changed("name") && product.previous("name") !== product.name) {
-      product.slug = slugify(product.name + product._id, {
+  Product.afterUpdate(async (product, options) => {
+    if (product.changed("name")) {
+      const newSlug = slugify(product.name + " " + product._id, {
         replacement: "-",
         remove: undefined,
         lower: true,
@@ -135,6 +135,16 @@ module.exports = (sequelize, DataTypes) => {
         locale: "vi",
         trim: true,
       });
+
+      await Product.update(
+        { slug: newSlug },
+        {
+          where: {
+            _id: product._id,
+          },
+          transaction: options.transaction,
+        }
+      );
     }
   });
 

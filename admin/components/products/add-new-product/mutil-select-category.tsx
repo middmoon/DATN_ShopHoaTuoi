@@ -18,9 +18,9 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 const multiSelectVariants = cva("m-1 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300", {
   variants: {
     variant: {
-      default: "border-foreground/10 text-foreground bg-card hover:bg-card/80",
-      secondary: "border-foreground/10 bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+      default: "",
+      secondary: " ",
+      destructive: "",
       inverted: "inverted",
     },
   },
@@ -132,7 +132,7 @@ export const MultiSelectCategory = React.forwardRef<HTMLButtonElement, MultiSele
       defaultValue = [],
       placeholder = "Select options",
       animation = 0,
-      maxCount = 5,
+      maxCount = 100,
       // #### default
       // modalPopover = false,
       modalPopover = false,
@@ -147,10 +147,6 @@ export const MultiSelectCategory = React.forwardRef<HTMLButtonElement, MultiSele
     const [selectedValues, setSelectedValues] = React.useState<number[]>(defaultValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
-
-    // React.useEffect(() => {
-    //   console.log("Dialog state changed:", isPopoverOpen ? "Open" : "Closed");
-    // }, [isPopoverOpen]);
 
     const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
@@ -215,11 +211,7 @@ export const MultiSelectCategory = React.forwardRef<HTMLButtonElement, MultiSele
                     const option = options.find((o) => o._id === value);
                     // const IconComponent = option?.icon;
                     return (
-                      <Badge
-                        key={value}
-                        className={cn(isAnimating ? "animate-bounce" : "", multiSelectVariants({ variant }))}
-                        style={{ animationDuration: `${animation}s` }}
-                      >
+                      <Badge key={value} className={cn(multiSelectVariants({ variant }), "bg-[hsl(var(--actions)/20)] p-2")}>
                         {/* {IconComponent && <IconComponent className="h-4 w-4 mr-2" />} */}
                         {option?.name}
                         <XCircle
@@ -235,7 +227,7 @@ export const MultiSelectCategory = React.forwardRef<HTMLButtonElement, MultiSele
                   {selectedValues.length > maxCount && (
                     <Badge
                       className={cn(
-                        "bg-transparent text-foreground border-foreground/1 hover:bg-transparent",
+                        "bg-transparent text-foreground border-foreground/1",
                         isAnimating ? "animate-bounce" : "",
                         multiSelectVariants({ variant })
                       )}

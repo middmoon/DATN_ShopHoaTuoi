@@ -1,8 +1,8 @@
 "use client";
 
 import type React from "react";
-
-import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,10 @@ import { X, Check, Trash2, PlusCircle, ImagePlus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
+import { MultiSelectCategory } from "./add-new-product/mutil-select-category";
+import { api } from "@/utils/api";
+
+const units = ["Bó", "Chiếc", "Hộp", "Bình", "Túi", "Giỏ"];
 
 interface ProductImage {
   _id: number;
@@ -29,13 +33,15 @@ interface ProductCategory {
   name: string;
 }
 
+type StatusType = "Còn hàng" | "Hết hàng" | "Ngưng kinh doanh";
+
 interface Product {
   _id: number;
   name: string;
   unit: string | null;
   description: string;
   retail_price: number;
-  status: "Còn hàng" | "Hết hàng" | "Ngưng kinh doanh";
+  status: StatusType;
   slug: string;
   is_feature: boolean;
   stock_quantity?: number;
@@ -51,16 +57,52 @@ interface ProductDetailProps {
   availableCategories?: ProductCategory[];
 }
 
+interface EditedProductFields {
+  name?: string;
+  unit?: string | null;
+  description?: string;
+  retail_price?: number;
+  status?: StatusType;
+  is_public?: boolean;
+  is_feature?: boolean;
+}
+
+interface CategoryChanges {
+  newCategories: number[]; // Chỉ gửi ID của danh mục mới
+  removedCategoryIds: number[];
+}
+
+interface ImageChanges {
+  newImages: File[]; // Hình ảnh mới để gửi trong FormData
+  removedImageIds: number[]; // ID của hình ảnh bị xóa
+  newAvatarId?: number; // ID của ảnh avatar mới
+}
+
+const getCategories = async () => {
+  const res = await api.get("/product-categories");
+  return res.status === 200 ? res.data.data : [];
+};
+
 export function ProductDetail({ product, availableCategories = [] }: ProductDetailProps) {
+  const router = useRouter();
   const [editMode, setEditMode] = useState(false);
   const [editedProduct, setEditedProduct] = useState<Product>(product);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
+  const [removedImageIds, setRemovedImageIds] = useState<number[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<ProductCategory[]>(product.ProductCategories);
-  const [newCategory, setNewCategory] = useState("");
+  const [removedCategoryIds, setRemovedCategoryIds] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [categories, setCategories] = useState<{ _id: number; name: string; parent_id: number | null }[]>([]);
 
-  // Combine all available categories with the product's existing categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const data = await getCategories();
+      setCategories(data);
+    };
+    fetchCategories();
+  }, []);
+
   const allCategories = [...availableCategories];
   product.ProductCategories.forEach((cat) => {
     if (!allCategories.some((c) => c._id === cat._id)) {
@@ -82,16 +124,24 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
     setEditedProduct((prev) => ({ ...prev, [name]: checked }));
   };
 
-  const handleStatusChange = (value: string) => {
-    setEditedProduct((prev) => ({ ...prev, status: value as Product["status"] }));
+  const handleStatusChange = (value: StatusType) => {
+    setEditedProduct((prevState) => ({
+      ...prevState,
+      status: value,
+    }));
+  };
+
+  const handleStatusUnit = (value: string) => {
+    setEditedProduct((prevState) => ({
+      ...prevState,
+      unit: value,
+    }));
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
       setNewImages((prev) => [...prev, ...filesArray]);
-
-      // Create preview URLs
       const previewUrls = filesArray.map((file) => URL.createObjectURL(file));
       setNewImagePreviews((prev) => [...prev, ...previewUrls]);
     }
@@ -99,8 +149,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
 
   const removeNewImage = (index: number) => {
     setNewImages((prev) => prev.filter((_, i) => i !== index));
-
-    // Revoke the object URL to avoid memory leaks
     URL.revokeObjectURL(newImagePreviews[index]);
     setNewImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
@@ -110,6 +158,7 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
       ...prev,
       ProductImages: prev.ProductImages.filter((img) => img._id !== imageId),
     }));
+    setRemovedImageIds((prev) => [...prev, imageId]);
   };
 
   const setImageAsAvatar = (imageId: number) => {
@@ -122,60 +171,106 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
     }));
   };
 
-  const addCategory = (category: ProductCategory) => {
-    if (!selectedCategories.some((cat) => cat._id === category._id)) {
-      setSelectedCategories((prev) => [...prev, category]);
-    }
-  };
-
   const removeCategory = (categoryId: number) => {
     setSelectedCategories((prev) => prev.filter((cat) => cat._id !== categoryId));
+    if (categoryId > 0) {
+      setRemovedCategoryIds((prev) => [...prev, categoryId]);
+    }
   };
 
-  const createNewCategory = () => {
-    if (newCategory.trim()) {
-      // In a real app, you would make an API call to create the category
-      // For now, we'll simulate it with a temporary ID
-      const tempId = Math.floor(Math.random() * -1000);
-      const newCat = { _id: tempId, name: newCategory.trim() };
-      addCategory(newCat);
-      setNewCategory("");
-    }
+  const handleCategoryChange = (selectedIds: number[]) => {
+    const selectedCategoryObjects = selectedIds.map((id) => {
+      const category = categories.find((cat) => cat._id === id);
+      return { _id: id, name: category ? category.name : "" };
+    });
+    setSelectedCategories(selectedCategoryObjects);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // 1. Edited Product: Các trường cơ bản đã thay đổi
+    const changedProductFields: EditedProductFields = {};
+    const fieldsToCheck = ["name", "unit", "description", "retail_price", "status", "is_public", "is_feature"] as const;
+
+    fieldsToCheck.forEach((field) => {
+      if (editedProduct[field] !== product[field]) {
+        changedProductFields[field] = editedProduct[field] as any;
+      }
+    });
+
+    // 2 & 3. New Categories & Remove Categories
+    const originalCategoryIds = new Set(product.ProductCategories.map((cat) => cat._id));
+    const newCategoryIds = new Set(selectedCategories.map((cat) => cat._id));
+
+    // Tìm danh mục mới (có trong selectedCategories nhưng không có trong product.ProductCategories)
+    const newCategories = Array.from(newCategoryIds).filter((id) => !originalCategoryIds.has(id));
+    // Tìm danh mục bị xóa (có trong product.ProductCategories nhưng không có trong selectedCategories)
+    const removedCategoryIdsSet = Array.from(originalCategoryIds).filter((id) => !newCategoryIds.has(id));
+
+    const categoryChanges: CategoryChanges = {
+      newCategories,
+      removedCategoryIds: removedCategoryIdsSet.length > 0 ? removedCategoryIdsSet : removedCategoryIds,
+    };
+
+    // 4, 5 & 6. New Images, Remove Images & New Avatar
+    const originalAvatarId = product.ProductImages.find((img) => img.is_avatar)?._id;
+    const newAvatarId = editedProduct.ProductImages.find((img) => img.is_avatar)?._id;
+
+    const imageChanges: ImageChanges = {
+      newImages,
+      removedImageIds,
+      newAvatarId: newAvatarId !== originalAvatarId ? newAvatarId : undefined, // Chỉ gửi nếu avatar thay đổi
+    };
+
+    // // Console log để kiểm tra dữ liệu
+    // console.log("1. Edited Product:", changedProductFields);
+
+    // console.log("2. New Categories:", categoryChanges.newCategories);
+    // console.log("3. Removed Categories:", categoryChanges.removedCategoryIds);
+
+    // console.log("4. New Images:", imageChanges.newImages);
+    // console.log("5. Removed Images:", imageChanges.removedImageIds);
+    // console.log("6. New Avatar:", imageChanges.newAvatarId);
+
+    // Thêm dữ liệu JSON vào FormData
+    const payload = {
+      changedProductFields,
+      categoryChanges,
+      imageChanges: {
+        removedImageIds,
+        newAvatarId: imageChanges.newAvatarId, // Nếu có thay đổi avatar
+      },
+    };
+
+    const formData = new FormData();
+
+    formData.append("data", JSON.stringify(payload));
+
+    // Thêm ảnh vào FormData (Gửi riêng nhưng chung API)
+    newImages.forEach((file) => {
+      formData.append("newImages", file);
+    });
     try {
-      // Create a FormData object to handle file uploads
-      const formData = new FormData();
-
-      // Add the edited product data
-      const productData = {
-        ...editedProduct,
-        ProductCategories: selectedCategories,
-      };
-      formData.append("productData", JSON.stringify(productData));
-
-      // Add new images
-      newImages.forEach((file) => {
-        formData.append("images", file);
-      });
-
-      const response = await fetch(`/api/products/${product._id}`, {
-        method: "PUT",
-        body: formData,
-      });
-
-      if (response.ok) {
-        toast.success("Product updated successfully");
-        setEditMode(false);
-        // In a real app, you would refresh the product data here
+      if (
+        Object.keys(changedProductFields).length === 0 &&
+        categoryChanges.newCategories.length === 0 &&
+        categoryChanges.removedCategoryIds.length === 0 &&
+        imageChanges.removedImageIds.length === 0 &&
+        imageChanges.newAvatarId === undefined &&
+        imageChanges.newImages.length === 0
+      ) {
+        toast.warning("Bạn không có thay đổi nào được thực hiện");
       } else {
-        throw new Error("Failed to update product");
+        const response = await api.patch(`/product/${product._id}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+        const updatedProduct = response.data.data;
+        const newSlug = updatedProduct.slug;
+        router.push(`/dashboard/products/${newSlug}`);
+        router.refresh();
+        toast.success("Sản phẩm đã được cập nhật thành công!");
+        setEditMode(false);
       }
     } catch (error) {
-      toast.error("An error occurred while updating the product");
       console.error(error);
     }
   };
@@ -188,7 +283,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
       hour: "2-digit",
       minute: "2-digit",
     });
-
     return formattedDate.replace(/^(\w)/, (c) => c.toUpperCase());
   };
 
@@ -202,21 +296,22 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
       {!editMode && (
         <Carousel className="w-full max-w-xs mx-auto mb-8">
           <CarouselContent>
-            {product.ProductImages.map((image) => (
-              <CarouselItem key={image._id}>
-                <div className="relative aspect-square">
-                  <Image
-                    src={image.img_url || "/placeholder.svg?height=300&width=300"}
-                    alt={`${product.name} - Image`}
-                    fill
-                    className="rounded-lg object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority={image.is_avatar}
-                  />
-                  {image.is_avatar && <Badge className="absolute top-2 right-2 z-10 bg-[hsl(var(--create))]">Avatar</Badge>}
-                </div>
-              </CarouselItem>
-            ))}
+            {product.ProductImages.sort((a, b) => (b.is_avatar ? 1 : 0) - (a.is_avatar ? 1 : 0)) // Sắp xếp is_avatar lên đầu
+              .map((image) => (
+                <CarouselItem key={image._id}>
+                  <div className="relative aspect-square">
+                    <Image
+                      src={image.img_url || "/placeholder.svg?height=300&width=300"}
+                      alt={`${product.name} - Image`}
+                      fill
+                      className="rounded-lg object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority={image.is_avatar}
+                    />
+                    {image.is_avatar && <Badge className="absolute top-2 right-2 z-10 bg-[hsl(var(--create))]">Avatar</Badge>}
+                  </div>
+                </CarouselItem>
+              ))}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />
@@ -226,20 +321,27 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
       {editMode ? (
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Product Information */}
             <div className="space-y-4">
               <h2 className="text-xl font-semibold">Thông tin sản phẩm</h2>
-
               <div>
                 <Label htmlFor="name">Tên sản phẩm</Label>
                 <Input id="name" name="name" value={editedProduct.name} onChange={handleChange} required />
               </div>
-
               <div>
                 <Label htmlFor="unit">Đơn vị</Label>
-                <Input id="unit" name="unit" value={editedProduct.unit || ""} onChange={handleChange} />
+                <Select onValueChange={handleStatusUnit} defaultValue={product.unit ?? undefined}>
+                  <SelectTrigger>
+                    <SelectValue placeholder={product.unit ?? "Chọn đơn vị"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {units.map((unit) => (
+                      <SelectItem key={unit} value={unit}>
+                        {unit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-
               <div>
                 <Label htmlFor="description">Mô tả</Label>
                 <Textarea
@@ -251,7 +353,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                   required
                 />
               </div>
-
               <div>
                 <Label htmlFor="retail_price">Giá bán lẻ (VND)</Label>
                 <Input
@@ -263,7 +364,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                   required
                 />
               </div>
-
               <div>
                 <Label htmlFor="status">Trạng thái</Label>
                 <Select onValueChange={handleStatusChange} defaultValue={editedProduct.status}>
@@ -288,7 +388,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                 />
                 <Label htmlFor="is_public">Công khai</Label>
               </div>
-
               <div className="flex items-center space-x-2">
                 <Switch
                   id="is_feature"
@@ -302,93 +401,19 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
               </div>
             </div>
 
-            {/* Categories and Images */}
-            <div className="space-y-6">
-              {/* Categories Section */}
+            <div className="space-y-4">
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Danh mục</h2>
-
-                <div className="flex flex-wrap gap-2 min-h-[60px] p-2 border rounded-md">
-                  {selectedCategories.map((category) => (
-                    <Badge key={category._id} variant="secondary" className="flex items-center gap-1">
-                      {category.name}
-                      <button type="button" onClick={() => removeCategory(category._id)} className="ml-1 rounded-full hover:bg-muted p-0.5">
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-
-                <div className="flex gap-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        className="bg-[hsl(var(--actions))] hover:!bg-[hsl(var(--actions))] hover:!border-[hsl(var(--actions))] hover:!text-white"
-                        type="button"
-                        size="sm"
-                      >
-                        <PlusCircle className="h-4 w-4 mr-2 text-white" />
-                        <p className="text-sm text-white">Thêm danh mục</p>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Thêm danh mục</DialogTitle>
-                      </DialogHeader>
-                      <div className="space-y-4 py-4">
-                        {/* <div className="space-y-2">
-                          <Label htmlFor="newCategory">Tạo danh mục mới</Label>
-                          <div className="flex gap-2">
-                            <Input
-                              id="newCategory"
-                              value={newCategory}
-                              onChange={(e) => setNewCategory(e.target.value)}
-                              placeholder="Tên danh mục mới"
-                            />
-                            <Button type="button" onClick={createNewCategory} size="sm">
-                              <PlusCircle className="h-4 w-4 mr-2" />
-                              Tạo
-                            </Button>
-                          </div>
-                        </div> */}
-
-                        <div className="space-y-2">
-                          <Label>Danh mục có sẵn</Label>
-                          <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto p-2 border rounded-md">
-                            {allCategories
-                              .filter((cat) => !selectedCategories.some((sc) => sc._id === cat._id))
-                              .map((category) => (
-                                <Button
-                                  key={category._id}
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => addCategory(category)}
-                                  className="justify-start"
-                                >
-                                  <PlusCircle className="h-4 w-4 mr-2" />
-                                  {category.name}
-                                </Button>
-                              ))}
-                          </div>
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <DialogClose asChild>
-                          <Button type="button" variant="outline">
-                            Đóng
-                          </Button>
-                        </DialogClose>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
+                <h2 className="text-xl font-semibold">Danh mục sản phẩm</h2>
+                <MultiSelectCategory
+                  options={categories}
+                  onValueChange={handleCategoryChange}
+                  defaultValue={selectedCategories.map((cat) => cat._id)}
+                  modalPopover={true}
+                />
               </div>
 
-              {/* Images Section */}
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">Hình ảnh sản phẩm</h2>
-
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {editedProduct.ProductImages.map((image) => (
                     <Card key={image._id} className="relative overflow-hidden">
@@ -401,7 +426,7 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                             className="rounded-md object-cover"
                           />
                           {image.is_avatar && (
-                            <div className="absolute top-1 left-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-md">Avatar</div>
+                            <div className="absolute top-1 left-1 bg-[hsl(var(--create))] text-white text-xs px-2 py-0.5 rounded-md">Avatar</div>
                           )}
                           <div className="absolute bottom-1 right-1 flex gap-1">
                             <DropdownMenu>
@@ -429,8 +454,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                       </CardContent>
                     </Card>
                   ))}
-
-                  {/* New image previews */}
                   {newImagePreviews.map((preview, index) => (
                     <Card key={`new-${index}`} className="relative overflow-hidden">
                       <CardContent className="p-2">
@@ -444,8 +467,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                       </CardContent>
                     </Card>
                   ))}
-
-                  {/* Add image button */}
                   <Card className="border-dashed cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => fileInputRef.current?.click()}>
                     <CardContent className="flex flex-col items-center justify-center p-6 h-full">
                       <ImagePlus className="h-8 w-8 mb-2 text-muted-foreground" />
@@ -462,20 +483,17 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
             <Button type="button" variant="outline" onClick={() => setEditMode(false)}>
               Hủy
             </Button>
-            <Button type="submit" variant="default">
+            <Button type="submit" variant="actions">
               Lưu thay đổi
             </Button>
           </div>
         </form>
       ) : (
         <div className="space-y-8">
-          {/* Product description section */}
           <div className="bg-muted/30 rounded-lg p-6 border border-[hsl(var(--backgound))]">
             <h2 className="text-xl font-semibold mb-3">Mô tả sản phẩm</h2>
             <p className="text-gray-600 leading-relaxed">{product.description}</p>
           </div>
-
-          {/* Categories section */}
           <div className="bg-muted/30 rounded-lg p-6 border border-[hsl(var(--backgound))]">
             <h2 className="text-xl font-semibold mb-3">Danh mục</h2>
             <div className="flex flex-wrap gap-2">
@@ -486,12 +504,9 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
               ))}
             </div>
           </div>
-
-          {/* Product details grid */}
           <div>
             <h2 className="text-xl font-semibold mb-3">Thông tin chi tiết</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Price card */}
               <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
                 <div className="bg-primary/10 p-3 border-b">
                   <h3 className="font-medium text-primary">Giá bán lẻ</h3>
@@ -500,8 +515,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                   <p className="text-2xl font-bold text-primary border-[hsl(var(--backgound))]">{product.retail_price.toLocaleString()} VND</p>
                 </div>
               </div>
-
-              {/* Status card */}
               <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
                 <div className="bg-muted p-3 border-b">
                   <h3 className="font-medium">Trạng thái</h3>
@@ -520,19 +533,15 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                   </span>
                 </div>
               </div>
-
-              {/* Visibility card */}
               <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
                 <div className="bg-muted p-3 border-b">
                   <h3 className="font-medium">Hiển thị</h3>
                 </div>
                 <div className="p-4 flex items-center">
                   <div className={`w-4 h-4 rounded-full mr-2 ${product.is_public ? "bg-green-500" : "bg-red-500"}`}></div>
-                  <p className="text-lg">{product.is_public ? "Công khai" : "Riêng tư"}</p>
+                  <p className="text-lg">{product.is_public ? "Công khai" : "Không công khai"}</p>
                 </div>
               </div>
-
-              {/* Featured card */}
               <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
                 <div className="bg-muted p-3 border-b">
                   <h3 className="font-medium">Nổi bật</h3>
@@ -542,8 +551,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                   <p className="text-lg">{product.is_feature ? "Có" : "Không"}</p>
                 </div>
               </div>
-
-              {/* Unit card (conditional) */}
               {product.unit && (
                 <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
                   <div className="bg-muted p-3 border-b">
@@ -554,8 +561,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
                   </div>
                 </div>
               )}
-
-              {/* Slug card */}
               <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
                 <div className="bg-muted p-3 border-b">
                   <h3 className="font-medium">Slug</h3>
@@ -566,8 +571,6 @@ export function ProductDetail({ product, availableCategories = [] }: ProductDeta
               </div>
             </div>
           </div>
-
-          {/* Timestamps section */}
           <div className="bg-card rounded-lg overflow-hidden border shadow-sm border-[hsl(var(--backgound))]">
             <div className="bg-muted p-3 border-b">
               <h3 className="font-medium">Thời gian</h3>

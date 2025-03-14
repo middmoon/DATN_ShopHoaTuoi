@@ -19,7 +19,7 @@ export default function ProductList() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await api.get<any>("/product");
+        const response = await api.get<any>("/product/manage");
         setProducts(response.data.data);
         setLoading(false);
       } catch (error) {

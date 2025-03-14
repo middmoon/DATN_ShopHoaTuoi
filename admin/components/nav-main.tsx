@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronRight, type LucideIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
@@ -31,8 +31,6 @@ export function NavMain({
   }[];
   pendingOrdersCount: number;
 }) {
-  const router = useRouter();
-
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="text-md b">Quản lý cửa hàng</SidebarGroupLabel>
@@ -40,8 +38,8 @@ export function NavMain({
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title} onClick={() => router.push(item.url)}>
-                <button className="flex items-center gap-2 w-full text-left">
+              <SidebarMenuButton asChild tooltip={item.title}>
+                <Link href={item.url} className="flex items-center gap-2 w-full text-left">
                   <item.icon />
                   <span>
                     {item.title}
@@ -49,7 +47,7 @@ export function NavMain({
                       <span className="ml-2 rounded bg-gray-200 px-2 py-1 text-xs">{pendingOrdersCount}</span>
                     ) : null}
                   </span>
-                </button>
+                </Link>
               </SidebarMenuButton>
               {item.items?.length ? (
                 <>
@@ -63,15 +61,15 @@ export function NavMain({
                     <SidebarMenuSub>
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild onClick={() => router.push(subItem.url)}>
-                            <button className="w-full text-left">
+                          <SidebarMenuSubButton asChild>
+                            <Link href={subItem.url} className="w-full text-left">
                               <span>
                                 {subItem.title}
                                 {subItem.title === "Chờ xác nhận" && pendingOrdersCount > 0 ? (
                                   <span className="ml-2 rounded bg-gray-200 px-2 py-1 text-xs">{pendingOrdersCount}</span>
                                 ) : null}
                               </span>
-                            </button>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}

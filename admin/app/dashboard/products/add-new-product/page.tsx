@@ -1,6 +1,5 @@
 import { PageHeader } from "@/components/page-header";
 import AddProductForm from "@/components/products/add-new-product/add-product-form";
-import { Button } from "@/components/ui/button";
 
 export default function AddProductPage() {
   const breadcrumbItems = [

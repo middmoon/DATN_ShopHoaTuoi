@@ -61,36 +61,6 @@ class ProductService {
         }
 
         return { product: newProduct, categories: newProductCategories };
-
-        //#endregion
-
-        //#region method 2
-        // if (!categories.length || categories.length === 0) {
-        //   for (const category of categories) {
-        //     const productCategory = await ProductCategory.findByPk({
-        //       where: { _id: category },
-        //       transaction: t,
-        //     });
-
-        //     if (!productCategory) {
-        //       throw BAD_REQUEST(`Can not find product category ${category.name} with id ${category._id}`);
-        //     }
-
-        //     const newProductCategory = await ProductCategory.create(
-        //       {
-        //         product_id: newProduct._id,
-        //         parent_id: productCategory._id,
-        //       },
-        //       { transaction: t }
-        //     );
-
-        //     if (!newProductCategory) {
-        //       throw BAD_REQUEST("Can not create product category");
-        //     }
-        //   }
-        // }
-
-        //#endregion
       });
 
       return result;
@@ -105,17 +75,151 @@ class ProductService {
   // };
 
   static updateProduct = async (productId, payload) => {
-    const updatedProduct = await Product.update(payload, {
-      where: { productId },
-    });
-    return updatedProduct;
+    const foundProduct = await Product.findByPk(productId);
+
+    if (!foundProduct) {
+      throw new NOTFOUND("Can not find product by id");
+    }
+
+    const { changedProductFields, categoryChanges, imageChanges } = payload;
+
+    console.log(imageChanges);
+
+    try {
+      const result = await sequelize.transaction(async (t) => {
+        if (Object.keys(changedProductFields).length > 0) {
+          const updatedProduct = await foundProduct.update(changedProductFields, {
+            where: { _id: productId },
+            transaction: t,
+          });
+
+          if (!updatedProduct) {
+            throw new BAD_REQUEST("Can not update product");
+          }
+        }
+
+        if (categoryChanges.newCategories.length > 0) {
+          const newCategoryData = categoryChanges.newCategories.map((categoryId) => ({
+            product_id: productId,
+            product_category_id: categoryId,
+          }));
+
+          const newProductCategories = await ProductCategoryMapping.bulkCreate(newCategoryData, { transaction: t });
+
+          if (newProductCategories.length !== categoryChanges.newCategories.length) {
+            throw new BAD_REQUEST("Can not create product category");
+          }
+        }
+
+        if (categoryChanges.removedCategoryIds.length > 0) {
+          const count = await ProductCategoryMapping.destroy({
+            where: {
+              product_id: productId,
+              product_category_id: categoryChanges.removedCategoryIds,
+            },
+            transaction: t,
+          });
+
+          if (count !== categoryChanges.removedCategoryIds.length) {
+            throw new BAD_REQUEST("Can not delete product category");
+          }
+        }
+
+        if (imageChanges.removedImageIds.length > 0) {
+          const deletedImageIds = imageChanges.removedImageIds.map((imageId) => ({
+            productId,
+            imageId,
+          }));
+
+          const deletedImageIdsData = deletedImageIds.map((imageId) => ({
+            product_id: productId,
+            img_url: imageId,
+          }));
+
+          await ProductImage.destroy({
+            where: {
+              product_id: productId,
+              img_url: deletedImageIds,
+            },
+            transaction: t,
+          });
+
+          if (deletedImageIdsData.length !== deletedImageIds.length) {
+            throw new BAD_REQUEST("Can not delete product image");
+          }
+        }
+
+        if (imageChanges.newAvatarId !== undefined) {
+          const oldAvatar = await ProductImage.findOne({
+            where: {
+              product_id: productId,
+              is_avatar: true,
+            },
+            attributes: ["_id"],
+            transaction: t,
+          });
+
+          await ProductImage.update(
+            { is_avatar: false },
+            {
+              where: {
+                product_id: productId,
+                _id: oldAvatar._id,
+              },
+              transaction: t,
+            }
+          );
+
+          const [count, newAvatar] = await ProductImage.update(
+            { is_avatar: true },
+            {
+              where: {
+                product_id: productId,
+                _id: imageChanges.newAvatarId,
+              },
+              transaction: t,
+            }
+          );
+
+          if (count.length === 0) {
+            throw new BAD_REQUEST("Can not update product avatar");
+          }
+        }
+
+        const product = await Product.findOne({
+          where: { _id: productId },
+          include: [
+            {
+              model: ProductCategory,
+              attributes: ["_id", "name"],
+              through: {
+                attributes: [],
+              },
+            },
+
+            {
+              model: ProductImage,
+              attributes: ["_id", "img_url", "is_avatar"],
+            },
+          ],
+          transaction: t,
+        });
+
+        if (!product) {
+          throw new NOTFOUND("Can not find product by slug");
+        }
+
+        return product;
+      });
+      return result;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  static getProducts = async () => {
+  static getProducts = async (conditions = {}) => {
     const products = await Product.findAll({
-      where: {
-        is_public: true,
-      },
+      where: conditions,
       include: [
         {
           model: ProductCategory,
@@ -130,6 +234,7 @@ class ProductService {
         },
       ],
     });
+
     return products;
   };
 
@@ -218,45 +323,8 @@ class ProductService {
   };
 
   // Images
-  // static addProductImages = async (productId, imageFiles, avatarIndex) => {
-  //   const uploadedImages = [];
-
-  //   const numberAvatarIndex = Number(avatarIndex);
-
-  //   const uploadPromises = imageFiles.map(async (imageFile, index) => {
-  //     try {
-  //       const result = await cloudinary.uploader.upload(imageFile.path, {
-  //         folder: "product_images",
-  //         use_filename: true,
-  //         unique_filename: false,
-  //       });
-
-  //       const uploadedImage = await ProductImage.create({
-  //         product_id: productId,
-  //         img_url: result.url,
-  //         is_avatar: index === numberAvatarIndex,
-  //       });
-
-  //       uploadedImages.push({
-  //         url: result.url,
-  //         is_avatar: uploadedImage.is_avatar,
-  //       });
-
-  //       return uploadedImage;
-  //     } catch (error) {
-  //       throw new BAD_REQUEST(`Error: Can not upload image or save to the database`);
-  //     }
-  //   });
-
-  //   await Promise.all(uploadPromises);
-
-  //   return { uploadedImages };
-  // };
-
   static addProductImages = async (productId, imageFiles, avatarIndex) => {
     const numberAvatarIndex = Number(avatarIndex);
-
-    console.log(avatarIndex);
 
     if (isNaN(numberAvatarIndex)) {
       throw new Error("Invalid avatarIndex: Must be a number or a string that can be converted to a number.");
@@ -271,7 +339,6 @@ class ProductService {
             unique_filename: false,
           });
         } catch (error) {
-          console.error("Cloudinary upload error:", error);
           throw new Error("Error uploading images to Cloudinary.");
         }
       })
@@ -287,6 +354,10 @@ class ProductService {
 
     return { uploadedImages: createdImages };
   };
+
+  static deleteProductImages = async (productId, imageIds) => {};
+
+  static updateProductAvatar = async (productId, imageId) => {};
 
   // static updateProductImages = async (id, image) => {};
 

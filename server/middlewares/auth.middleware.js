@@ -63,9 +63,7 @@ const checkRole = (allowedRoles) => {
     }
 
     const userRoles = foundUser.Roles.map((role) => role.name);
-    console.log(userRoles);
     const hasRole = allowedRoles.some((role) => userRoles.includes(role));
-    console.log(userRoles);
 
     if (hasRole) {
       return next();

@@ -27,6 +27,6 @@ router
 
   .post("/:productId/images", upload.array("images"), asyncHandler(ProductController.addProductImage))
 
-  .patch("/:productId", asyncHandler(ProductController.updateProduct));
+  .patch("/:productId", upload.any("images"), asyncHandler(ProductController.updateProduct));
 
 module.exports = router;

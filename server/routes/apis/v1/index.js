@@ -14,7 +14,23 @@ router.get("/", (req, res) => {
   res.send("TEST API V1");
 });
 
-// router.use("/customer", require("./customer.route"));
-// router.use("/admin", require("./admin.route"));
-// router.use("/owner", require("./owner.route"));
+const upload = require("../../../config/multer.config");
+
+router.post("/test", upload.any(), function (req, res, next) {
+  console.log("Body:", req.body); // Dữ liệu text (JSON string của productData)
+  console.log("Files:", req.files); // Các file được upload
+
+  res.status(200).json({ message: "Test post OK", data: req.body });
+});
+
+router.patch("/test", upload.any("images"), async function (req, res, next) {
+  const { data } = req.body;
+  const parsedData = JSON.parse(data);
+
+  console.log("Received JSON Payload:", parsedData);
+  console.log("Received Files:", req.files);
+
+  res.status(200).json({ message: "Test patch OK", data: req.body });
+});
+
 module.exports = router;

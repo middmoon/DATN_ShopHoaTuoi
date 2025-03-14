@@ -4,13 +4,15 @@ import { ProductDetail } from "@/components/products/product-detail";
 import { PageHeader } from "@/components/page-header";
 
 export async function getProductDetail(params: string) {
-  const res = await api.get(`/product/${params}`);
-
-  if (res.status === 404) {
-    return notFound(); // 404 page
+  try {
+    const res = await api.get(`/product/${params}`);
+    return res.data.data;
+  } catch (error: any) {
+    if (error.response?.status === 404) {
+      return notFound();
+    }
+    throw error;
   }
-
-  return res.data.data;
 }
 
 export default async function ProductPage({ params }: { params: { slug: string } }) {

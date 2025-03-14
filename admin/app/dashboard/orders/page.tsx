@@ -13,7 +13,7 @@ export default function CategoriesPage() {
       <div className="container mx-auto pb-0 pt-5 px-10">
         <h1 className="text-2xl font-bold mb-5">Quản lý đơn hàng</h1>
 
-        <Link href="/dashboard/products/add-new-product">
+        <Link href="/dashboard/orders/add-new-order">
           <Button className="mb-5" variant="create">
             <Plus className="mr-2 h-4 w-4" /> Thêm đơn hàng trực tiếp
           </Button>
