@@ -1,119 +1,100 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { getProductBySlug } from "../../APIs/productAPI";
-import { useCart } from "../../context/cartContext";
+import { useEffect, useState } from "react";
+import { fetchProvinces, fetchDistricts, fetchWards } from "../../APIs/adress";
 
-export default function Test() {
-  const { slug } = useParams();
-  const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
-  const [message, setMessage] = useState(""); // State để hiển thị thông báo
+export default function AddressSelect() {
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [selectedProvinceCode, setSelectedProvinceCode] = useState("");
+  const [selectedDistrictCode, setSelectedDistrictCode] = useState("");
+  const [selectedWardCode, setSelectedWardCode] = useState("");
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await getProductBySlug(slug);
-        if (response.status === 200) {
-          setProduct(response.data);
-        }
-      } catch (error) {
-        console.error("Lỗi khi lấy sản phẩm:", error);
-      }
+    const getProvinces = async () => {
+      const data = await fetchProvinces();
+      setProvinces(data);
     };
+    getProvinces();
+  }, []);
 
-    if (slug) fetchProduct();
-  }, [slug]);
+  const handleProvinceChange = async (event) => {
+    const provinceCode = event.target.value;
+    setSelectedProvinceCode(provinceCode);
+    setSelectedDistrictCode("");
+    setSelectedWardCode("");
+    setWards([]);
 
-  const handleAddToCart = () => {
-    if (product && quantity > 0) {
-      for (let i = 0; i < quantity; i++) {
-        addToCart(product);
-      }
-      setMessage(`Đã thêm ${quantity} sản phẩm vào giỏ hàng!`);
-      setTimeout(() => setMessage(""), 2000);
-    }
+    const data = await fetchDistricts(provinceCode);
+    setDistricts(data);
   };
 
-  const getDirectImageURL = (url) => {
-    const match = url.match(/id=([^&]+)/);
-    return match
-      ? `https://lh3.googleusercontent.com/d/${match[1]}=s1000`
-      : url;
+  const handleDistrictChange = async (event) => {
+    const districtCode = event.target.value;
+    setSelectedDistrictCode(districtCode);
+    setSelectedWardCode("");
+
+    const data = await fetchWards(districtCode);
+    setWards(data);
   };
 
-  if (!product) return <p>Loading...</p>;
+  const handleWardChange = (event) => {
+    setSelectedWardCode(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    console.log("Dữ liệu gửi đi:", {
+      province: selectedProvinceCode,
+      district: selectedDistrictCode,
+      ward: selectedWardCode,
+    });
+  };
 
   return (
-    <div className="container mx-auto py-10 px-5">
-      <h1 className="text-2xl font-bold">{product.name}</h1>
+    <div className="w-full space-y-4">
+      <select
+        className="w-full p-2 border rounded"
+        onChange={handleProvinceChange}
+      >
+        <option value="">Chọn tỉnh/thành phố</option>
+        {provinces.map((province) => (
+          <option key={province.code} value={province.code}>
+            {province.name}
+          </option>
+        ))}
+      </select>
 
-      <div className="flex gap-4 mt-4">
-        {product.ProductImages?.length > 0 ? (
-          product.ProductImages.map((img, index) => (
-            <img
-              key={index}
-              src={getDirectImageURL(img.img_url)}
-              alt={`Hình ảnh ${index + 1}`}
-              className="w-40 h-40 object-cover rounded-lg shadow-md"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "https://via.placeholder.com/150?text=No+Image";
-              }}
-            />
-          ))
-        ) : (
-          <img
-            src="https://via.placeholder.com/150?text=No+Image"
-            alt="Ảnh mặc định"
-            className="w-40 h-40 object-cover rounded-lg shadow-md"
-          />
-        )}
-      </div>
+      <select
+        className="w-full p-2 border rounded"
+        onChange={handleDistrictChange}
+        disabled={!selectedProvinceCode}
+      >
+        <option value="">Chọn quận/huyện</option>
+        {districts.map((district) => (
+          <option key={district.code} value={district.code}>
+            {district.name}
+          </option>
+        ))}
+      </select>
 
-      <p className="text-lg font-semibold mt-4">
-        Giá:{" "}
-        {product.retail_price
-          ? `${product.retail_price.toLocaleString("vi-VN")} VND`
-          : "Liên hệ"}
-      </p>
-      <p className="text-md mt-2">Trạng thái: {product.status}</p>
-      <p className="mt-2">{product.description}</p>
+      <select
+        className="w-full p-2 border rounded"
+        onChange={handleWardChange}
+        disabled={!selectedDistrictCode}
+      >
+        <option value="">Chọn phường/xã</option>
+        {wards.map((ward) => (
+          <option key={ward.code} value={ward.code}>
+            {ward.name}
+          </option>
+        ))}
+      </select>
 
-      <div className="mt-4">
-        <h2 className="text-lg font-semibold">Danh mục:</h2>
-        <ul className="list-disc list-inside">
-          {product.ProductCategories?.map((category) => (
-            <li key={category._id}>{category.name}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-4">
-        <label className="block text-lg font-semibold">Số lượng:</label>
-        <input
-          type="number"
-          value={quantity}
-          min="1"
-          onChange={(e) =>
-            setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-          }
-          className="w-20 p-2 border rounded-lg text-center"
-        />
-      </div>
-
-      <div className="flex space-x-4 mt-4">
-        <button
-          onClick={handleAddToCart}
-          className="px-6 py-3 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700"
-        >
-          Thêm {quantity} sản phẩm vào giỏ hàng
-        </button>
-      </div>
-
-      {message && (
-        <p className="mt-4 text-green-600 font-semibold">{message}</p>
-      )}
+      <button
+        className="w-full p-2 bg-blue-500 text-white rounded"
+        onClick={handleSubmit}
+      >
+        Gửi
+      </button>
     </div>
   );
 }
