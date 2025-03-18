@@ -130,11 +130,11 @@ const PaymentPage = () => {
       note: customerInfo.note,
       address: customerInfo.address,
       province_name: customerInfo.province_name,
-      province_code: customerInfo.province_code, // ✅ Thêm code tỉnh
+      province_code: customerInfo.province_code,
       district_name: customerInfo.district_name,
-      district_code: customerInfo.district_code, // ✅ Thêm code quận
+      district_code: customerInfo.district_code,
       ward_name: customerInfo.ward_name,
-      ward_code: customerInfo.ward_code, // ✅ Thêm code phường
+      ward_code: customerInfo.ward_code,
       products: selectedProducts.map((product) => ({
         _id: product._id,
         retail_price: product.retail_price,
@@ -142,7 +142,7 @@ const PaymentPage = () => {
       })),
     };
 
-    console.log("Dữ liệu gửi đi:", dataToSend); // Kiểm tra dữ liệu trong console
+    console.log("Dữ liệu gửi đi:", dataToSend);
 
     localStorage.setItem("customerInfo", JSON.stringify(dataToSend));
 
@@ -169,7 +169,7 @@ const PaymentPage = () => {
       }
     } else {
       alert("Đặt hàng thành công, chờ thanh toán khi nhận hàng!");
-      navigate("/");
+      // navigate("/");
     }
   };
 

@@ -1,27 +1,20 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-// Tạo Context cho giỏ hàng
 const CartContext = createContext();
 
-// Hook để sử dụng giỏ hàng trong các component
 export const useCart = () => useContext(CartContext);
 
-// Component Provider để bọc toàn bộ ứng dụng
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-  // Load giỏ hàng từ localStorage khi mở trang
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
-    console.log("📥 Giỏ hàng tải từ localStorage:", storedCart);
   }, []);
 
-  // Lưu giỏ hàng vào localStorage mỗi khi `cart` thay đổi
   useEffect(() => {
     if (cart.length > 0) {
       localStorage.setItem("cart", JSON.stringify(cart));
-      console.log("💾 Giỏ hàng đã lưu vào localStorage:", cart);
     }
   }, [cart]);
 
@@ -62,7 +55,7 @@ export const CartProvider = ({ children }) => {
         .map((item) =>
           item.slug === slug ? { ...item, quantity: item.quantity - 1 } : item
         )
-        .filter((item) => item.quantity > 0) // Xóa sản phẩm nếu số lượng về 0
+        .filter((item) => item.quantity > 0)
     );
   };
   
