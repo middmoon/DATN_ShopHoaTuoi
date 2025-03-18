@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { getCategories } from "../../../APIs/categoryAPI";
 import { useCart } from "../../../context/cartContext";
+import { useCategory } from "../../../context/categoryContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Navbar() {
   const { getTotalItems } = useCart();
+  const { setSelectedCategory } = useCategory();
   const cartCount = getTotalItems();
-
+  const [searchTerm, setSearchTerm] = useState("");
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const [openSubmenu, setOpenSubmenu] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -24,106 +25,85 @@ export default function Navbar() {
       } catch (err) {
         setError("Failed to fetch categories");
       }
-      setLoading(false);
     };
-
     fetchCategories();
   }, []);
 
-  const groupedCategories =
-    categories?.reduce((acc, category) => {
-      const { parent_id } = category;
-      if (!acc[parent_id]) acc[parent_id] = [];
-      acc[parent_id].push(category);
-      return acc;
-    }, {}) || {};
+  const groupedCategories = categories.reduce((acc, category) => {
+    const { parent_id } = category;
+    if (!acc[parent_id]) acc[parent_id] = [];
+    acc[parent_id].push(category);
+    return acc;
+  }, {});
 
-  const mainCategories = ["Đối Tượng", "Kiểu Dáng", "Chủ Đề"];
+  const mainCategories = ["Đối Tượng", "Kiểu Dáng", "Hoa Tươi"];
   const filteredCategories =
     groupedCategories[null]?.filter((category) =>
       mainCategories.includes(category.name)
     ) || [];
+
   const otherCategories =
     groupedCategories[null]?.filter(
       (category) => !mainCategories.includes(category.name)
     ) || [];
+
+  const handleCategoryClick = (categoryId) => {
+    setSelectedCategory(categoryId);
+    navigate(`/mastershop`);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter" && searchTerm.trim() !== "") {
+      navigate(`/mastershop?search=${encodeURIComponent(searchTerm)}`);
+    }
+  };
 
   return (
     <nav className="flex items-center justify-between text-black px-10 rounded-3xl bg-color-custom-4 z-50 border text-[10px] sm:text-xs md:text-sm lg:text-[10px] xl:text-sm">
       <div className="flex justify-between w-full">
         <ul className="flex font-font2 items-center justify-between w-1/2 mr-10 relative z-50">
           {filteredCategories.map((parent) => (
-            <li key={parent._id} className="relative py-6">
+            <li key={parent._id} className="relative group py-6">
               <button
                 className="cursor-pointer flex items-center"
-                onClick={() =>
-                  setOpenDropdown(
-                    openDropdown === parent._id ? null : parent._id
-                  )
-                }
+                onClick={() => handleCategoryClick(parent._id)}
               >
                 {parent.name}
               </button>
-              {openDropdown === parent._id && (
-                <ul className="absolute left-0 mt-2 w-52 bg-white text-black border border-gray-300 shadow-lg rounded-lg">
-                  {groupedCategories[parent._id]?.map((child) => (
+              {groupedCategories[parent._id] && (
+                <ul className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 transform translate-y-2 grid">
+                  {groupedCategories[parent._id].map((child) => (
                     <li
                       key={child._id}
-                      className="px-4 py-2 hover:bg-gray-100"
-                      onClick={() => setOpenDropdown(null)}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition"
                     >
-                      {child.name}
+                      <button onClick={() => handleCategoryClick(child._id)}>
+                        {child.name}
+                      </button>
                     </li>
                   ))}
                 </ul>
               )}
             </li>
           ))}
+
           {otherCategories.length > 0 && (
-            <li className="relative">
-              <button
-                className="hover:underline cursor-pointer flex items-center"
-                onClick={() =>
-                  setOpenDropdown(openDropdown === "more" ? null : "more")
-                }
-              >
+            <li className="relative group">
+              <button className="px-4 py-2 font-medium text-gray-800 hover:text-gray-600 transition-colors">
                 Xem Thêm
               </button>
-              {openDropdown === "more" && (
-                <ul className="absolute left-0 mt-2 w-52 bg-white text-black border border-gray-300 shadow-lg rounded-lg">
-                  {otherCategories.map((parent) => (
-                    <li key={parent._id} className="relative">
-                      <button
-                        className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                        onClick={() =>
-                          setOpenSubmenu(
-                            openSubmenu === parent._id ? null : parent._id
-                          )
-                        }
-                      >
-                        {parent.name} {groupedCategories[parent._id] ? "" : ""}
-                      </button>
-                      {openSubmenu === parent._id &&
-                        groupedCategories[parent._id] && (
-                          <ul className="absolute left-full top-0 mt-0 w-48 bg-white text-black border border-gray-300 shadow-lg rounded-lg">
-                            {groupedCategories[parent._id].map((child) => (
-                              <li
-                                key={child._id}
-                                className="px-4 py-2 hover:bg-gray-100"
-                                onClick={() => {
-                                  setOpenDropdown(null);
-                                  setOpenSubmenu(null);
-                                }}
-                              >
-                                {child.name}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                    </li>
-                  ))}
-                </ul>
-              )}
+              <ul className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 transform translate-y-2 grid">
+                {otherCategories.map((category) => (
+                  <li
+                    key={category._id}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition"
+                  >
+                    <button onClick={() => handleCategoryClick(category._id)}>
+                      {category.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
             </li>
           )}
         </ul>
@@ -132,11 +112,13 @@ export default function Navbar() {
           <input
             type="text"
             placeholder="Tìm Kiếm..."
-            className="bg-color-custom-4 px-4 font-font2 py-2 rounded-lg text-black border outline-none w-20 sm:w-32 md:w-48 lg:w-64 xl:w-80 2xl:w-96"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleSearch} // Nhấn "Enter" để tìm kiếm
+            className="bg-color-custom-4 px-4 py-2 rounded-lg text-black border outline-none w-64"
           />
 
           <div className="flex items-center justify-center space-x-4 sm:space-x-6">
-            {/* Giỏ Hàng */}
             <div
               className="flex items-center cursor-pointer hover:text-gray-500 justify-center relative 
                   w-20 sm:w-24 md:w-28 lg:w-32 xl:w-36"
@@ -167,7 +149,6 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Tài Khoản */}
             <div
               className="flex items-center cursor-pointer hover:text-gray-500 justify-center 
                   w-20 sm:w-24 md:w-28 lg:w-32 xl:w-36"

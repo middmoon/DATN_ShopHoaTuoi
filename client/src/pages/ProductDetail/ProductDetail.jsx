@@ -96,31 +96,36 @@ export default function ProductDetail() {
                 </ul>
               </div>
               <Divider />
-              <div className="mt-4">
+              <div className="mt-4 space-y-4">
                 <label className="block text-lg font-semibold">Số lượng:</label>
-                <input
-                  type="number"
-                  value={quantity}
-                  min="1"
-                  onChange={(e) =>
-                    setQuantity(Math.max(1, parseInt(e.target.value) || 1))
-                  }
-                  className="w-20 p-2 border rounded-lg text-center"
-                />
-                <button
-                  onClick={handleAddToCart}
-                  className="px-6 py-3 bg-purple-600 text-white rounded-lg shadow hover:bg-purple-700 mt-4"
-                >
-                  Thêm {quantity} sản phẩm vào giỏ hàng
-                </button>
+
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="number"
+                    value={quantity}
+                    min="1"
+                    onChange={(e) =>
+                      setQuantity(Math.max(1, parseInt(e.target.value) || 1))
+                    }
+                    className="w-24 p-2 border rounded-lg text-center focus:ring-2 focus:ring-purple-500"
+                  />
+
+                  <button
+                    onClick={handleAddToCart}
+                    className="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition duration-300"
+                  >
+                    Thêm {quantity} sản phẩm
+                  </button>
+                </div>
+
                 {message && (
-                  <p className="mt-4 text-green-600 font-semibold">{message}</p>
+                  <p className="text-green-600 font-semibold">{message}</p>
                 )}
               </div>
             </div>
           </div>
           <Divider />
-          <div className="bg-white container mx-auto pb-10">
+          <div className="bg-white ">
             <WhyChoiceMe />
           </div>
           <Divider />

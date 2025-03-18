@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { CartProvider } from "./context/cartContext";
+import { CategoryProvider } from "./context/categoryContext";
 
 import Home from "./pages/home/home";
 import Test from "./pages/Test/test";
@@ -19,6 +20,7 @@ const HomeWithLayout = WithLayout(Home);
 function App() {
   return (
     <CartProvider>
+      <CategoryProvider>
       <Routes>
         <Route path="/" element={<HomeWithLayout />} />
         <Route path="/test" element={<Test />} />
@@ -29,6 +31,7 @@ function App() {
         <Route path="cart" element={<CartPage />} />
         <Route path="payment" element={<PaymentPage />} />
       </Routes>
+      </CategoryProvider>
     </CartProvider>
   );
 }
