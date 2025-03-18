@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { getCategories } from "../../APIs/categoryAPI";
+import { useCategory } from "../../context/categoryContext";
 
 export default function CategoryList() {
   const [categories, setCategories] = useState([]);
-  const [price, setPrice] = useState(500000);
+  const { selectedCategory, setSelectedCategory } = useCategory();
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -15,81 +16,62 @@ export default function CategoryList() {
           const categoryMap = {};
           categoryData.forEach((cat) => {
             if (!cat.parent_id) {
-              categoryMap[cat._id] = { parent: cat.name, children: [] };
+              categoryMap[cat._id] = { parent: cat, children: [] };
             }
           });
 
           categoryData.forEach((cat) => {
             if (cat.parent_id && categoryMap[cat.parent_id]) {
-              categoryMap[cat.parent_id].children.push(cat.name);
+              categoryMap[cat.parent_id].children.push(cat);
             }
           });
 
           setCategories(Object.values(categoryMap));
         }
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Lỗi khi lấy danh mục:", error);
       }
     };
 
     fetchCategories();
   }, []);
 
-  const handlePriceChange = (event) => {
-    setPrice(event.target.value);
-  };
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("vi-VN").format(value);
-  };
-
   return (
-    <div className="category-list p-4 border rounded-xl">
+    <div className="category-list p-4 border rounded-xl bg-white">
       <h2 className="text-xl font-bold mb-4">Danh mục</h2>
 
-      {categories.map((category, index) => (
-        <div key={index} className="mb-4">
-          <h3 className="font-semibold">{category.parent}</h3>
-          <ul>
-            {category.children.map((child, childIndex) => (
-              <li key={childIndex}>
+      {/* Nút chọn tất cả sản phẩm */}
+      <button
+        className={`px-4 py-2 mb-3 rounded w-full ${
+          !selectedCategory ? "bg-blue-500 text-white" : "bg-gray-200"
+        }`}
+        onClick={() => setSelectedCategory(null)}
+      >
+        Tất cả sản phẩm
+      </button>
+
+      {categories.map((category) => (
+        <div key={category.parent._id} className="mb-4">
+          <h3 className="font-semibold">{category.parent.name}</h3>
+          <ul className="ml-2">
+            {category.children.map((child) => (
+              <li key={child._id} className="flex items-center">
                 <input
-                  type="checkbox"
-                  id={`category-${index}-${childIndex}`}
-                  className="round-checkbox"
+                  type="radio"
+                  name="category"
+                  checked={selectedCategory === child._id}
+                  onChange={() => {
+                    setSelectedCategory(child._id);
+                    console.log("Danh mục đã chọn:", child._id);
+                  }}
+                  className="mr-2"
                 />
-                <label
-                  htmlFor={`category-${index}-${childIndex}`}
-                  className="ml-2"
-                >
-                  {child}
-                </label>
+                <label>{child.name}</label>
               </li>
             ))}
           </ul>
         </div>
       ))}
-
-      <div className="mb-4">
-        <h3 className="font-semibold">Mức giá</h3>
-        <div className="flex items-center">
-          <span className="mr-2">0</span>
-          <input
-            type="range"
-            min="0"
-            max="10000000"
-            step="50000"
-            value={price}
-            onChange={handlePriceChange}
-            className="flex-grow"
-          />
-          <span className="ml-2">10.000.000</span>
-        </div>
-        <div className="mt-2 text-sm">
-          Giá hiện tại:{" "}
-          <span className="font-bold">{formatCurrency(price)} VND</span>
-        </div>
-      </div>
     </div>
   );
 }

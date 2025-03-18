@@ -1,7 +1,6 @@
 import React from "react";
-import ButtonAddToCard from "../common/Button/buttonAddToCard";
 
-const ProductCard = ({ image, name, price, isSale, link }) => {
+const ProductCard = ({ image, name, price, isSale, link, category }) => {
   return (
     <a href={link} className="w-full">
       <div className="bg-white rounded-2xl shadow-md p-4 w-full flex flex-col items-center transition-transform transform hover:-translate-y-2 hover:shadow-lg border">
@@ -17,16 +16,15 @@ const ProductCard = ({ image, name, price, isSale, link }) => {
             </div>
           )}
         </div>
-        <p
-          className="mt-3 font-font3 text-center text-sm font-semibold text-gray-800 
-          overflow-hidden whitespace-nowrap w-full"
-        >
+
+        <p className="mt-3 font-font3 text-center text-sm font-semibold text-gray-800 overflow-hidden whitespace-nowrap w-full">
           {name}
         </p>
 
         <p className="font-font3 text-center text-ml text-gray-800 mb-4">
           {price}
         </p>
+
         <button className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-all w-full">
           Mua ngay
         </button>
