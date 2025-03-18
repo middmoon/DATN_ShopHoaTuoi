@@ -29,8 +29,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      entity_id: {
-        type: DataTypes.UUID,
+      // entity_id: {
+      //   type: DataTypes.UUID,
+      //   allowNull: true,
+      // },
+      request_params: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+      request_query: {
+        type: DataTypes.JSON,
         allowNull: true,
       },
       request_data: {
@@ -54,7 +62,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "AuditLog",
       tableName: "audit_logs",
-      timestamps: true, // Vì đã có `created_at`
+      timestamps: true,
     }
   );
 

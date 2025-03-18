@@ -74,7 +74,7 @@ class ProductService {
   //   return deletedProduct;
   // };
 
-  static updateProduct = async (productId, payload) => {
+  static updateProduct = async (productId, payload, images) => {
     const foundProduct = await Product.findByPk(productId);
 
     if (!foundProduct) {
@@ -82,8 +82,6 @@ class ProductService {
     }
 
     const { changedProductFields, categoryChanges, imageChanges } = payload;
-
-    console.log(imageChanges);
 
     try {
       const result = await sequelize.transaction(async (t) => {
@@ -126,25 +124,22 @@ class ProductService {
         }
 
         if (imageChanges.removedImageIds.length > 0) {
-          const deletedImageIds = imageChanges.removedImageIds.map((imageId) => ({
-            productId,
-            imageId,
-          }));
+          console.log("imageChanges.removedImageIds.length");
 
-          const deletedImageIdsData = deletedImageIds.map((imageId) => ({
-            product_id: productId,
-            img_url: imageId,
-          }));
+          console.log(imageChanges.removedImageIds.length);
+          console.log("imageChanges.removedImageIds");
 
-          await ProductImage.destroy({
+          console.log(imageChanges.removedImageIds);
+
+          const deletedImageCount = await ProductImage.destroy({
             where: {
               product_id: productId,
-              img_url: deletedImageIds,
+              _id: { [Op.in]: imageChanges.removedImageIds },
             },
             transaction: t,
           });
 
-          if (deletedImageIdsData.length !== deletedImageIds.length) {
+          if (deletedImageCount !== imageChanges.removedImageIds.length) {
             throw new BAD_REQUEST("Can not delete product image");
           }
         }
@@ -183,6 +178,20 @@ class ProductService {
 
           if (count.length === 0) {
             throw new BAD_REQUEST("Can not update product avatar");
+          }
+        }
+
+        if (images.length > 0) {
+          const uploadedUrls = await this.uploadImages(images);
+          const productImagesData = uploadedUrls.map((url) => ({
+            product_id: productId,
+            img_url: url,
+          }));
+
+          const uploadedImages = await ProductImage.bulkCreate(productImagesData, { transaction: t });
+
+          if (uploadedImages.length !== productImagesData.length) {
+            throw new BAD_REQUEST("Can not upload product images");
           }
         }
 
@@ -323,37 +332,44 @@ class ProductService {
   };
 
   // Images
-  static addProductImages = async (productId, imageFiles, avatarIndex) => {
+  static addProductImages = async (productId, imageFiles, avatarIndex = null) => {
     const numberAvatarIndex = Number(avatarIndex);
-
     if (isNaN(numberAvatarIndex)) {
       throw new Error("Invalid avatarIndex: Must be a number or a string that can be converted to a number.");
     }
 
-    const uploadResults = await Promise.all(
-      imageFiles.map(async (imageFile) => {
-        try {
-          return await cloudinary.uploader.upload(imageFile.path, {
-            folder: "product_images",
-            use_filename: true,
-            unique_filename: false,
-          });
-        } catch (error) {
-          throw new Error("Error uploading images to Cloudinary.");
-        }
-      })
-    );
-
-    const productImagesData = uploadResults.map((result, index) => ({
+    const uploadedUrls = await this.uploadImages(imageFiles);
+    const productImagesData = uploadedUrls.map((url, index) => ({
       product_id: productId,
-      img_url: result.url,
+      img_url: url,
       is_avatar: index === numberAvatarIndex,
     }));
 
     const createdImages = await ProductImage.bulkCreate(productImagesData);
-
     return { uploadedImages: createdImages };
   };
+
+  static async uploadImageToCloudinary(imageFile) {
+    try {
+      const result = await cloudinary.uploader.upload(imageFile.path, {
+        folder: "product_images",
+        use_filename: true,
+        unique_filename: false,
+      });
+      return result.url;
+    } catch (error) {
+      throw new Error("Error uploading image to Cloudinary.");
+    }
+  }
+
+  static async uploadImages(imageFiles) {
+    try {
+      const uploadPromises = imageFiles.map((file) => this.uploadImageToCloudinary(file));
+      return await Promise.all(uploadPromises);
+    } catch (error) {
+      throw new Error("Error uploading multiple images.");
+    }
+  }
 
   static deleteProductImages = async (productId, imageIds) => {};
 

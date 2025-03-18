@@ -31,6 +31,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "order_id",
         as: "payment",
       });
+
+      Order.belongsTo(models.OrderStatus, {
+        foreignKey: "status_id",
+      });
     }
   }
 
@@ -51,9 +55,10 @@ module.exports = (sequelize, DataTypes) => {
       note: {
         type: DataTypes.TEXT,
       },
-      status: {
-        type: DataTypes.ENUM("Chờ xác nhận", "Đang xử lý", "Hoàn thành", "Đơn bị hủy", "Đang giao hàng"),
-        defaultValue: "Chờ xác nhận",
+      status_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 1,
       },
       delivery_day: {
         type: DataTypes.DATE,
@@ -85,9 +90,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(20),
         allowNull: true,
       },
-      // some: {
-      //   type: DataTypes.STRING,
-      // },
     },
     {
       sequelize,

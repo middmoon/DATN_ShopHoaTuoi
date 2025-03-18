@@ -28,10 +28,10 @@ class ProductController {
   static updateProduct = async (req, res) => {
     const { data } = req.body;
     const parsedData = JSON.parse(data);
-
+    // console.log(parsedData);
     new OK({
       message: "Product updated successfully",
-      data: await ProductService.updateProduct(req.params.productId, parsedData),
+      data: await ProductService.updateProduct(req.params.productId, parsedData, req.files),
     }).send(res);
   };
 

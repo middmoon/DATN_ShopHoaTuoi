@@ -8,7 +8,7 @@ class OrderController {
   static createOrder = async (req, res) => {
     new CREATED({
       message: "Order created successfully",
-      data: await OrderService.createOrder(req.body),
+      data: await OrderService.createOrder(req.body, req._id),
     }).send(res);
   };
 

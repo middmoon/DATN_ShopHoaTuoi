@@ -1,35 +1,34 @@
 "use strict";
 
-const { sequelize, Order, OrderProduct, Product, Payment } = require("../models");
+const { sequelize, Order, OrderProduct, Product, Payment, PaymentHistory } = require("../models");
 const payment = require("../models/payment");
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
+const moment = require("moment");
 
 const { Op } = require("sequelize");
 
 class OrderService {
-  static createOrder = async (payload) => {
-    const { products, payment_method, ...order } = payload;
+  static createOrder = async (payload, customer_id = null) => {
+    const { products, payment_method_id, ...order } = payload;
+
+    const product_ids = products.map((product) => product._id);
 
     if (Array.isArray(products) && products.length > 0) {
       const foundProducts = await Product.findAll({
         where: {
           _id: {
-            [Op.in]: products.map((product) => product._id),
+            [Op.in]: product_ids,
           },
         },
         attributes: ["_id"],
       });
 
-      if (!foundProducts || foundProducts.length === 0) {
-        throw new BAD_REQUEST("Can not find product");
-      }
-
-      const foundProductIds = foundProducts.map((product) => product._id);
-
-      const diff = products.filter((product) => !foundProductIds.includes(product._id));
-
-      if (diff.length > 0) {
-        throw new BAD_REQUEST(`Can not find product: ${diff.map((product) => product._id + " - " + product.name).join(", ")}`);
+      if (foundProducts.length !== products.length) {
+        const foundProductIds = foundProducts.map((p) => p._id);
+        const diff = products.filter((product) => !foundProductIds.includes(product._id));
+        if (diff.length > 0) {
+          throw new BAD_REQUEST(`Can not find products: ${diff.map((p) => p._id).join(", ")}`);
+        }
       }
     }
 
@@ -45,12 +44,12 @@ class OrderService {
       const result = await sequelize.transaction(async (t) => {
         const newOrder = await Order.create(
           {
+            customer_id: customer_id,
             customer_name: order.customer_name,
             customer_phone: order.customer_phone,
             note: order.note,
             total_price: total_price,
             delivery_address: delivery_address,
-            user_id: order.user_id || null,
             ward_code: order.ward_code,
             district_code: order.district_code,
             province_code: order.province_code,
@@ -73,7 +72,7 @@ class OrderService {
                 quantity: product.quantity,
               };
             }),
-            { transaction: t, returning: true }
+            { transaction: t }
           );
 
           if (!newOrderProducts || newOrderProducts.length === 0 || newOrderProducts.length != products.length) {
@@ -82,18 +81,37 @@ class OrderService {
         }
 
         let newPayment;
-        if (payment_method) {
+
+        const info = this.initOrderInfo(payment_method_id, newOrder._id, order.total_price);
+        info.vnp_OrderInfo = `Thanh toan cho don hang: ${info.vnp_TxnRef}`;
+
+        if (payment_method_id) {
           newPayment = await Payment.create(
             {
               amount: order.total_price,
-              method: payment_method,
+              method_id: payment_method_id,
               order_id: newOrder._id,
+              status: "Chờ xác nhận",
+              info: info,
             },
-            { transaction: t, returning: true }
+            { transaction: t }
           );
 
           if (!newPayment) {
-            throw new BAD_REQUEST("Can not create payment");
+            throw new BAD_REQUEST("Can not create payment, do not have payment method");
+          }
+
+          const newPaymentHistory = await PaymentHistory.create(
+            {
+              payment_id: newPayment._id,
+              order_id: newOrder._id,
+              status: "Chờ xác nhận",
+            },
+            { transaction: t }
+          );
+
+          if (!newPaymentHistory) {
+            throw new BAD_REQUEST("Can not create payment history");
           }
         }
 
@@ -106,10 +124,83 @@ class OrderService {
     }
   };
 
+  static initOrderInfo = (payment_method_id, orderId, total_price) => {
+    // { _id: 2, name: "Momo" },
+    // { _id: 3, name: "ZaloPay" },
+    // { _id: 5, name: "Thẻ tín dụng" },
+    // { _id: 6, name: "Chuyển khoản ngân hàng" },
+
+    switch (payment_method_id) {
+      case 1: // { _id: 1, name: "VNPay" },
+        return {
+          vnp_TxnRef: orderId + "_" + moment().format("YYYYMMDDHHmmss"),
+          // vnp_OrderInfo: `Thanh toan cho don hang: ${newOrder._id}`,
+          language: "vn",
+        };
+      case 4: // { _id: 4, name: "Tiền mặt" },
+        return {};
+      case 7: // { _id: 7, name: "Thanh toán khi nhận hàng (COD)" },
+        return {};
+      case 2:
+        return {};
+      case 3:
+        return {};
+      case 5:
+        return {};
+      case 6:
+        return {};
+      default:
+        return {};
+    }
+  };
+
+  static updateOrderInfo = async (orderId, { paymentStatus, paymentInfo = {} }) => {
+    const t = await sequelize.transaction();
+
+    try {
+      // Tìm Payment dựa trên orderId
+      const payment = await Payment.findOne({
+        where: { order_id: orderId },
+        transaction: t,
+      });
+
+      if (!payment) {
+        throw new BAD_REQUEST(`Payment not found for order ${orderId}`);
+      }
+
+      await payment.update(
+        {
+          status: paymentStatus,
+          info: {
+            ...payment.info,
+            ...paymentInfo,
+          },
+        },
+        { transaction: t }
+      );
+
+      // Tạo PaymentHistory
+      await PaymentHistory.create(
+        {
+          payment_id: payment._id,
+          order_id: orderId,
+          status: paymentStatus,
+        },
+        { transaction: t }
+      );
+
+      await t.commit();
+      return payment; // Trả về Payment đã cập nhật
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
+  };
+
   static getPendingOrdersCount = async () => {
     const count = await Order.count({
       where: {
-        status: "Chờ xác nhận",
+        status_id: 1,
       },
     });
 

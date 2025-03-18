@@ -52,7 +52,7 @@ app.use(compression());
 
 app.use(
   cors({
-    origin: [`http://localhost:${process.env.CIENT_PORT}`, `http://localhost:${process.env.ADMIN_PORT}`],
+    origin: [`http://localhost:${process.env.CIENT_PORT}`, `http://localhost:${process.env.ADMIN_PORT}`, "http://localhost:4001"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     credentials: true,
   })

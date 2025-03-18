@@ -22,6 +22,7 @@ initializeRabbitMQ();
 const auditLogger = async (req, res, next) => {
   res.on("finish", async () => {
     let userId = null;
+    const url = new URL(req.originalUrl, `http://${req.headers.host}`);
 
     if (req.cookies.accessToken) {
       try {
@@ -34,9 +35,10 @@ const auditLogger = async (req, res, next) => {
 
     const logData = {
       user_id: userId,
-      action: `${req.method} ${req.originalUrl}`,
+      action: `${req.method} ${url.pathname}`,
       entity: req.originalUrl.split("/")[3] || "unknown",
-      entity_id: req.params._id || null,
+      request_params: req.params,
+      request_query: req.query,
       request_data: req.body ? omitSensitiveData(req.body) : null,
       response_status: res.statusCode,
       ip_address: req.ip,

@@ -88,7 +88,10 @@ const verifyToken = async (req, res, next) => {
 const flexVerifyToken = async (req, res, next) => {
   const token = req.cookies[COOKIE.AUTHORIZATION];
 
-  if (!token) return next();
+  if (!token) {
+    req._id = null;
+    return next();
+  }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return next(new UNAUTHORIZED("Invalid token"));

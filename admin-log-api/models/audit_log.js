@@ -29,8 +29,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      entity_id: {
-        type: DataTypes.UUID,
+      // entity_id: {
+      //   type: DataTypes.UUID,
+      //   allowNull: true,
+      // },
+      request_params: {
+        type: DataTypes.JSON,
+        allowNull: true,
+      },
+      request_query: {
+        type: DataTypes.JSON,
         allowNull: true,
       },
       request_data: {

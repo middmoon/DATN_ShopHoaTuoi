@@ -9,6 +9,7 @@ router.use("/product", require("./product.route"));
 router.use("/product-categories", require("./product_category.route"));
 router.use("/inventory", require("./inventory.route"));
 router.use("/order", require("./order.route"));
+router.use("/payment", require("./payment"));
 
 router.get("/", (req, res) => {
   res.send("TEST API V1");
