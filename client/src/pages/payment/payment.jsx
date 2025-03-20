@@ -3,9 +3,12 @@ import { useNavigate } from "react-router-dom";
 import HeaderIn4 from "../../components/layout/header/headerin4";
 import Navbar from "../../components/layout/header/navbar";
 import { fetchProvinces, fetchDistricts, fetchWards } from "../../APIs/adress";
+import apiv1 from "../../utils/axiosClient";
 
 const PaymentPage = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
+  const [amount, setAmount] = useState(0);
+
   const [customerInfo, setCustomerInfo] = useState({
     customer_name: "",
     customer_phone: "",
@@ -17,14 +20,23 @@ const PaymentPage = () => {
     district_code: "",
     province_name: "",
     province_code: "",
+    payment_method: 1,
   });
-  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [paymentMethod, setPaymentMethod] = useState(1);
 
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const totalAmount = selectedProducts.reduce(
+      (total, product) => total + product.quantity * product.retail_price,
+      0
+    );
+    setAmount(totalAmount);
+  }, [selectedProducts]);
 
   useEffect(() => {
     const getProvinces = async () => {
@@ -140,37 +152,84 @@ const PaymentPage = () => {
         retail_price: product.retail_price,
         quantity: product.quantity,
       })),
+      payment_method_id: paymentMethod,
     };
 
     console.log("Dữ liệu gửi đi:", dataToSend);
 
     localStorage.setItem("customerInfo", JSON.stringify(dataToSend));
 
-    if (paymentMethod === "vnpay") {
-      try {
-        const response = await fetch("http://localhost:3000/test", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataToSend),
-        });
+    switch (paymentMethod) {
+      case 1:
+        try {
+          // 1: Create order
+          const createOrderResponse = await apiv1.post("/order", dataToSend);
 
-        if (response.ok) {
-          alert("Dữ liệu đã được gửi đi thành công!");
-          localStorage.removeItem("selectedProducts");
-          navigate("/");
-        } else {
-          alert("Có lỗi xảy ra khi gửi dữ liệu.");
+          const orderData = createOrderResponse.data.data;
+
+          // 2: Create payment url
+          const vnpayPaymentResponse = await apiv1.post(
+            "/payment/vnpay/create_payment_url",
+            {
+              orderId: orderData.order._id,
+              amount: orderData.order.total_price,
+              language: orderData.payment.info.language,
+              bankCode: "VNBANK",
+              txnRef: orderData.payment.info.vnp_TxnRef,
+              orderInfo: orderData.payment.info.vnp_OrderInfo,
+            }
+          );
+
+          const data = vnpayPaymentResponse.data;
+          window.location.href = data.paymentUrl;
+        } catch (error) {
+          console.error("Lỗi khi gửi dữ liệu:", error);
+          alert("Không thể gửi dữ liệu. Vui lòng thử lại.");
         }
-      } catch (error) {
-        console.error("Lỗi khi gửi dữ liệu:", error);
-        alert("Không thể gửi dữ liệu. Vui lòng thử lại.");
-      }
-    } else {
-      alert("Đặt hàng thành công, chờ thanh toán khi nhận hàng!");
-      // navigate("/");
+        break;
+      case "cod":
+        alert(JSON.stringify(dataToSend));
+        break;
+      default:
+        break;
     }
+
+    // if (paymentMethod === "vnpay") {
+    //   try {
+    //     // amount,
+    //     // language: "vn",
+    //     // bankCode: "VNBANK",
+    //     // orderInfo, // Lưu database
+    //     const response = await fetch("http://localhost:3000/api/v1/payment/vnpay/create_payment_url", {
+    //       method: "POST",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       body: {
+    //         amount,
+    //         language: "vn",
+    //         bankCode: "VNBANK",
+    //         orderInfo: dataToSend,
+    //       },
+    //     });
+
+    //     if (response.ok) {
+    //       alert("Dữ liệu đã được gửi đi thành công!");
+    //       localStorage.removeItem("selectedProducts");
+    //       // navigate("/");
+    //     } else {
+    //       alert("Có lỗi xảy ra khi gửi dữ liệu.");
+    //     }
+    //   } catch (error) {
+    //     console.error("Lỗi khi gửi dữ liệu:", error);
+    //     alert("Không thể gửi dữ liệu. Vui lòng thử lại.");
+    //   }
+    // } else {
+    //   // create new order cod
+
+    //   alert("Đặt hàng thành công, chờ thanh toán khi nhận hàng!");
+    //   // navigate("/");
+    // }
   };
 
   return (
@@ -300,14 +359,7 @@ const PaymentPage = () => {
               <div className="mt-4 pt-3 border-t border-gray-300 flex justify-between text-lg font-bold text-gray-800">
                 <span>Tổng tiền:</span>
                 <span className="text-red-500">
-                  {selectedProducts
-                    .reduce(
-                      (total, product) =>
-                        total + product.quantity * product.retail_price,
-                      0
-                    )
-                    .toLocaleString()}{" "}
-                  VNĐ
+                  {amount.toLocaleString()} VNĐ
                 </span>
               </div>
             </div>
@@ -322,8 +374,8 @@ const PaymentPage = () => {
               onChange={(e) => setPaymentMethod(e.target.value)}
               className="w-full p-2 border rounded"
             >
-              <option value="cod">Thanh toán khi nhận hàng (COD)</option>
-              <option value="vnpay">Thanh toán qua VNPay</option>
+              <option value="7">Thanh toán khi nhận hàng (COD)</option>
+              <option value="1">Thanh toán qua VNPay</option>
             </select>
           </div>
 
