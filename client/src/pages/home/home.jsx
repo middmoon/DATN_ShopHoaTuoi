@@ -1,14 +1,14 @@
 import React from "react";
 import ReviewService from "../../components/page/home/reviewshop";
-import PLSale from "../../components/Listcard/PLSale";
 import IntroduceShop from "../../components/page/home/introduce";
 import ProductList from "../../components/Listcard/ProductList";
+import ProductListNew from "../../components/Listcard/ProductListNew";
 
 export default function Home() {
   return (
     <>
       <ReviewService></ReviewService>
-      {/* <PLSale></PLSale> */}
+      <ProductListNew />
       <IntroduceShop></IntroduceShop>
       <ProductList></ProductList>
     </>

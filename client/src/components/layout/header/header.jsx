@@ -8,7 +8,7 @@ import HeroSection from "./HeroSection";
 export default function Header() {
   return (
     <>
-      <div className="header w-full h-[100vh] bg-gray-100 flex flex-col bg-white">
+      <div className="header w-full h-[100vh] flex flex-col bg-color-custom-4">
         <div className="container w-full h-full sm:w-2/3 mx-auto py-10">
           <HeaderIn4 />
           <Navbar />

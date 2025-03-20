@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ProductCard from "../Card/ProductCard";
 import { getProduct } from "../../APIs/productAPI";
 
-const ProductList = () => {
+const ProductListNew = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const ProductList = () => {
   return (
     <div className="PlSale bg-cover bg-center mx-auto">
       <div className="container mx-auto py-10 text-center relative">
-        <h1 className="text-2xl font-bold font-font4">Danh Sách Sản Phẩm</h1>
+        <h1 className="text-2xl font-bold font-font4">Sản Phẩm Nổi Bật</h1>
       </div>
 
       <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 pb-10 relative max-w-5xl">
@@ -63,4 +63,4 @@ const ProductList = () => {
   );
 };
 
-export default ProductList;
+export default ProductListNew;

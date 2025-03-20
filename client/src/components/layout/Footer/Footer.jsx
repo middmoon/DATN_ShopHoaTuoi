@@ -6,16 +6,16 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
           <div className="col-span-1">
-            <h2 className="text-2xl font-semibold font-font1 text-color-custom-2">
+            <h2 className="text-2xl font-semibold font-font1 text-color-custom-4">
               PETACILIOUS
             </h2>
           </div>
 
           <div>
-            <h3 className="text-lg text-color-custom-2 font-semibold mb-2">
+            <h3 className="text-lg text-color-custom-4 font-semibold mb-2">
               Dịch Vụ
             </h3>
-            <ul className="space-y-1 text-color-custom-2">
+            <ul className="space-y-1 text-color-custom-4">
               <li>Trang Trí</li>
               <li>Cung Câp Hoa Tươi</li>
               <li>Đặt Hoa Theo Yêu Cầu</li>
@@ -23,10 +23,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-color-custom-2">
+            <h3 className="text-lg font-semibold mb-2 text-color-custom-4">
               Các Loại Hoa
             </h3>
-            <ul className="space-y-1 text-color-custom-2">
+            <ul className="space-y-1 text-color-custom-4">
               <li>Hoa Nhập Khẩu</li>
               <li>Hoa Tươi</li>
               <li>Hoa Khô</li>
@@ -34,10 +34,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-color-custom-2">
+            <h3 className="text-lg font-semibold mb-2 text-color-custom-4">
               Hỗ Trợ
             </h3>
-            <ul className="space-y-1 text-color-custom-2">
+            <ul className="space-y-1 text-color-custom-4">
               <li>Tư Vấn Chọn Hoa</li>
               <li>Hỗ Trợ Chăm Sóc</li>
               <li></li>
@@ -45,20 +45,23 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-color-custom-2">
+            <h3 className="text-lg font-semibold mb-2 text-color-custom-4">
               Company
             </h3>
-            <ul className="space-y-1 text-color-custom-2">
+            <ul className="space-y-1 text-color-custom-4">
               <li>Địa Chỉ: Số 1 Phù Đổng Thiên Vương</li>
               <li>Liên Hệ: 0123 456 789</li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-6 border-t border-gray-700 pt-4 flex justify-between items-center text-color-custom-2">
-          <p>PETACILIOUS Inc. © 2025</p>
+        <div className="mt-6 border-t border-text-color-custom-4 pt-4 flex justify-between items-center text-color-custom-4">
+          <p className="text-color-custom-2">PETACILIOUS Inc. © 2025</p>
           <div className="flex space-x-4">
-            <a href="#" className="text-gray-400 hover:text-color-custom-2">
+            <a
+              href="#"
+              className="text-color-custom-4 hover:text-color-custom-2"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -75,7 +78,10 @@ export default function Footer() {
                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
               </svg>
             </a>
-            <a href="#" className="text-gray-400 hover:text-color-custom-2">
+            <a
+              href="#"
+              className="text-color-custom-2 hover:text-color-custom-4"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -91,7 +97,10 @@ export default function Footer() {
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
               </svg>
             </a>
-            <a href="#" className="text-gray-400 hover:text-color-custom-2">
+            <a
+              href="#"
+              className="text-color-custom-2 hover:text-color-custom-4"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -110,7 +119,10 @@ export default function Footer() {
               </svg>
             </a>
 
-            <a href="#" className="text-gray-400 hover:text-color-custom-2">
+            <a
+              href="#"
+              className="text-color-custom-2 hover:text-color-custom-2"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"

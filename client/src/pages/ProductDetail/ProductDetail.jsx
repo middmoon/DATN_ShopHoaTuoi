@@ -56,8 +56,10 @@ export default function ProductDetail() {
         <div className="bg-cover bg-center">
           <div className="container mx-auto my-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
             <ProductImageGallery images={product.ProductImages} />
-            <div className="lg:col-span-7 space-y-6 p-5 bg-color-custom-1 rounded-xl border border-gray-200">
-              <h2 className="text-3xl font-bold">{product.name}</h2>
+            <div className="lg:col-span-7 space-y-6 p-5 bg-color-custom-4 rounded-xl border border-gray-200">
+              <h2 className="text-3xl font-bold text-color-custom-1">
+                {product.name}
+              </h2>
               <div className="flex items-center space-x-2 my-3">
                 <StarRating rating={product.rating || 4.5} />
                 <span className="text-gray-500">
@@ -67,7 +69,7 @@ export default function ProductDetail() {
               <p
                 className={`text-md font-medium py-1 rounded-lg w-fit ${
                   product.status === "Còn hàng"
-                    ? "text-green-500"
+                    ? "text-color-custom-1"
                     : "text-red-500"
                 }`}
               >
@@ -81,16 +83,16 @@ export default function ProductDetail() {
               <p className="text-gray-600 mt-4">{product.description}</p>
               <Divider />
               <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 shadow-sm">
-                <h2 className="text-lg font-semibold text-gray-700 mb-2">
+                <h2 className="text-lg font-semibold text-color-custom-1 mb-2">
                   Danh mục:
                 </h2>
-                <ul className="list-disc list-inside space-y-1 text-gray-600">
+                <ul className="list-disc list-inside space-y-1 text-color-custom-3">
                   {product.ProductCategories?.map((category) => (
                     <li
                       key={category._id}
-                      className="hover:text-purple-600 hover:font-semibold"
+                      className="hover:text-color-custom-1"
                     >
-                      {category.name}
+                      <a href="">{category.name}</a>
                     </li>
                   ))}
                 </ul>
@@ -107,12 +109,12 @@ export default function ProductDetail() {
                     onChange={(e) =>
                       setQuantity(Math.max(1, parseInt(e.target.value) || 1))
                     }
-                    className="w-24 p-2 border rounded-lg text-center focus:ring-2 focus:ring-purple-500"
+                    className="w-24 p-2 border rounded-lg text-center"
                   />
 
                   <button
                     onClick={handleAddToCart}
-                    className="px-6 py-3 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition duration-300"
+                    className="px-6 py-1.5 bg-color-custom-1 text-color-custom-4 rounded-lg shadow-md hover:bg-purple-700 transition duration-300"
                   >
                     Thêm {quantity} sản phẩm
                   </button>

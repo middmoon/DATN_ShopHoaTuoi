@@ -38,12 +38,13 @@ export default function CategoryList() {
 
   return (
     <div className="category-list p-4 border rounded-xl bg-white">
-      <h2 className="text-xl font-bold mb-4">Danh mục</h2>
+      <h2 className="text-xl font-bold mb-4 text-color-custom-1">Danh mục</h2>
 
-      {/* Nút chọn tất cả sản phẩm */}
       <button
         className={`px-4 py-2 mb-3 rounded w-full ${
-          !selectedCategory ? "bg-blue-500 text-white" : "bg-gray-200"
+          !selectedCategory
+            ? "bg-color-custom-1 text-color-custom-4"
+            : "bg-color-custom-2 text-color-custom-3"
         }`}
         onClick={() => setSelectedCategory(null)}
       >
@@ -52,10 +53,10 @@ export default function CategoryList() {
 
       {categories.map((category) => (
         <div key={category.parent._id} className="mb-4">
-          <h3 className="font-semibold">{category.parent.name}</h3>
+          <h3 className="font-font2">{category.parent.name}</h3>
           <ul className="ml-2">
             {category.children.map((child) => (
-              <li key={child._id} className="flex items-center">
+              <li key={child._id} className="flex items-center font-font2 p-1">
                 <input
                   type="radio"
                   name="category"

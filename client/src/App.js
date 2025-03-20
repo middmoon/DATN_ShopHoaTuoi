@@ -11,6 +11,7 @@ import MasterShop from "./pages/MasterShop/mastershop";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import CartPage from "./pages/shoppingCart/shoppingCart";
 import PaymentPage from "./pages/payment/payment";
+import PageNotFound from "./pages/PageNotFound/PageNotFound";
 
 import WithLayout from "./Layouts/WithLayout";
 
@@ -23,6 +24,7 @@ function App() {
       <CategoryProvider>
       <Routes>
         <Route path="/" element={<HomeWithLayout />} />
+        <Route path="*" element={<PageNotFound />} />
         <Route path="/test" element={<Test />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />

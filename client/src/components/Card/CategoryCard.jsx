@@ -8,7 +8,7 @@ const CategoryCard = ({ image, name }) => {
         alt={name}
         className="w-full h-60 object-cover rounded-xl"
       />
-      <p className="mt-3 font-font2 text-center text-lg font-semibold text-color-custom-2">
+      <p className="mt-3 font-font2 text-center text-lg font-semibold text-color-custom-3">
         {name}
       </p>
     </div>

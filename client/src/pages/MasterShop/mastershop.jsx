@@ -16,7 +16,7 @@ export default function Mastershop() {
         <Navbar />
       </div>
       <div className="container mx-auto flex p-10">
-        <div className="w-1/5 bg-gray-100 p-4 rounded-xl">
+        <div className="w-1/5 rounded-xl">
           <CategoryList />
         </div>
         <div className="w-4/5 px-4">

@@ -21,11 +21,11 @@ export default function HeroSection() {
               className="h-full w-full rounded-lg"
             >
               {[
-                "Img/Page/p1.webp",
-                "Img/Page/p2.webp",
-                "Img/Page/p3.webp",
-                "Img/Page/p4.webp",
-                "Img/Page/p5.webp",
+                "Img/Page/p7.webp",
+                "Img/Page/p7.webp",
+                "Img/Page/p7.webp",
+                "Img/Page/p7.webp",
+                "Img/Page/p7.webp",
               ].map((src, index) => (
                 <SwiperSlide key={index}>
                   <img
@@ -43,11 +43,18 @@ export default function HeroSection() {
               <FlowerConsultation></FlowerConsultation>
             </div>
 
-            <div className="flex-1 bg-green-100 p-4 rounded-lg flex flex-col justify-center h-0 flex-grow-[3]">
-              <h3 className="text-xl font-bold mb-4">Ưu đãi đặc biệt</h3>
-              <p className="text-lg">
-                Giảm giá lên đến 20% cho đơn hàng đầu tiên của bạn.
-              </p>
+            <div
+              className="relative flex-1 p-4 rounded-lg flex flex-col justify-center h-0 flex-grow-[3] bg-cover bg-center"
+              style={{ backgroundImage: "url('/Img/Page/p5.webp')" }}
+            >
+              <div className="absolute inset-0 bg-white bg-opacity-50 rounded-lg"></div>
+
+              <div className="relative z-10">
+                <h3 className="text-xl font-bold mb-4">Ưu đãi đặc biệt</h3>
+                <p className="text-lg">
+                  Giảm giá lên đến 20% cho đơn hàng đầu tiên của bạn.
+                </p>
+              </div>
             </div>
           </div>
         </div>

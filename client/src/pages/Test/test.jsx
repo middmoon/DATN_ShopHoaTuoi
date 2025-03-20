@@ -1,100 +1,73 @@
-import { useEffect, useState } from "react";
-import { fetchProvinces, fetchDistricts, fetchWards } from "../../APIs/adress";
+import React, { useState } from "react";
 
-export default function AddressSelect() {
-  const [provinces, setProvinces] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
-  const [selectedProvinceCode, setSelectedProvinceCode] = useState("");
-  const [selectedDistrictCode, setSelectedDistrictCode] = useState("");
-  const [selectedWardCode, setSelectedWardCode] = useState("");
+const Test = () => {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
 
-  useEffect(() => {
-    const getProvinces = async () => {
-      const data = await fetchProvinces();
-      setProvinces(data);
-    };
-    getProvinces();
-  }, []);
+  const [message, setMessage] = useState("");
 
-  const handleProvinceChange = async (event) => {
-    const provinceCode = event.target.value;
-    setSelectedProvinceCode(provinceCode);
-    setSelectedDistrictCode("");
-    setSelectedWardCode("");
-    setWards([]);
-
-    const data = await fetchDistricts(provinceCode);
-    setDistricts(data);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleDistrictChange = async (event) => {
-    const districtCode = event.target.value;
-    setSelectedDistrictCode(districtCode);
-    setSelectedWardCode("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/v1/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
-    const data = await fetchWards(districtCode);
-    setWards(data);
-  };
-
-  const handleWardChange = (event) => {
-    setSelectedWardCode(event.target.value);
-  };
-
-  const handleSubmit = () => {
-    console.log("Dữ liệu gửi đi:", {
-      province: selectedProvinceCode,
-      district: selectedDistrictCode,
-      ward: selectedWardCode,
-    });
+      const data = await response.json();
+      if (response.ok) {
+        setMessage(data.message); // Hiển thị thông báo đăng ký thành công
+      } else {
+        setMessage(data.message || "Lỗi đăng ký"); // Hiển thị lỗi từ server
+      }
+    } catch (error) {
+      setMessage("Lỗi kết nối đến server!");
+    }
   };
 
   return (
-    <div className="w-full space-y-4">
-      <select
-        className="w-full p-2 border rounded"
-        onChange={handleProvinceChange}
-      >
-        <option value="">Chọn tỉnh/thành phố</option>
-        {provinces.map((province) => (
-          <option key={province.code} value={province.code}>
-            {province.name}
-          </option>
-        ))}
-      </select>
-
-      <select
-        className="w-full p-2 border rounded"
-        onChange={handleDistrictChange}
-        disabled={!selectedProvinceCode}
-      >
-        <option value="">Chọn quận/huyện</option>
-        {districts.map((district) => (
-          <option key={district.code} value={district.code}>
-            {district.name}
-          </option>
-        ))}
-      </select>
-
-      <select
-        className="w-full p-2 border rounded"
-        onChange={handleWardChange}
-        disabled={!selectedDistrictCode}
-      >
-        <option value="">Chọn phường/xã</option>
-        {wards.map((ward) => (
-          <option key={ward.code} value={ward.code}>
-            {ward.name}
-          </option>
-        ))}
-      </select>
-
-      <button
-        className="w-full p-2 bg-blue-500 text-white rounded"
-        onClick={handleSubmit}
-      >
-        Gửi
-      </button>
+    <div className="register-container">
+      <h2>Đăng ký</h2>
+      {message && <p>{message}</p>}
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Mật khẩu"
+          onChange={handleChange}
+          required
+        />
+        <button type="submit">Đăng ký</button>
+      </form>
     </div>
   );
-}
+};
+
+export default Test;

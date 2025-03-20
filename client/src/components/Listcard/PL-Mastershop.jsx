@@ -54,7 +54,6 @@ const PLMastershop = () => {
       : url;
   };
 
-  // 🔹 Lọc sản phẩm theo danh mục và tìm kiếm
   const filteredProducts = products.filter((product) => {
     const matchesCategory = selectedCategory
       ? product.ProductCategories?.some((cat) => cat._id === selectedCategory)
@@ -94,6 +93,7 @@ const PLMastershop = () => {
                       ? `${product.retail_price.toLocaleString("vi-VN")} VND`
                       : "Liên hệ"
                   }
+                  link={`/productdetail/${product.slug}`}
                 />
               );
             })}
