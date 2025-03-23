@@ -40,24 +40,33 @@ class OrderController {
     }).send(res);
   };
 
+  // await queryInterface.bulkInsert("order_statuses", [
+  //   { _id: 1, name: "Chờ xác nhận", description: "Đơn hàng đang chờ xác nhận" },
+  //   { _id: 2, name: "Đang xử lý", description: "Đơn hàng đang được chuẩn bị" },
+  //   { _id: 3, name: "Đang giao hàng", description: "Shipper đang giao đơn hàng" },
+  //   { _id: 4, name: "Hoàn thành", description: "Đơn hàng đã được giao thành công" },
+  //   { _id: 5, name: "Đơn bị hủy", description: "Đơn hàng đã bị hủy" },
+  //   { _id: 6, name: "Đơn bị hoàn", description: "Khách hàng trả lại hàng" },
+  // ]);
+
   static getPendingOrders = async (req, res) => {
     new OK({
       message: "get pending orders successfully",
-      data: await OrderService.getOrdersByStatus("Chờ xác nhận"),
-    }).send(res);
-  };
-
-  static getFinishedOrders = async (req, res) => {
-    new OK({
-      message: "get finished orders successfully",
-      data: await OrderService.getOrdersByStatus("Hoàn thành"),
+      data: await OrderService.getOrdersByStatus(1),
     }).send(res);
   };
 
   static getComfirmedOrders = async (req, res) => {
     new OK({
       message: "get comfirmed orders successfully",
-      data: await OrderService.getOrdersByStatus("Đang xử lý"),
+      data: await OrderService.getOrdersByStatus(2),
+    }).send(res);
+  };
+
+  static getFinishedOrders = async (req, res) => {
+    new OK({
+      message: "get finished orders successfully",
+      data: await OrderService.getOrdersByStatus(4),
     }).send(res);
   };
 

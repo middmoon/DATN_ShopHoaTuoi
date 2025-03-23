@@ -142,4 +142,3 @@ dist
 .yarn/install-state.gz
 .pnp.*
 /vnpay_nodejs/config
-/client/src/utils

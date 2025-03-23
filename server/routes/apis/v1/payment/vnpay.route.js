@@ -166,7 +166,7 @@ router.post(
         vnp_TxnRef: txnRef,
         vnp_Amount: amount * 100, // Lưu giá trị đã nhân 100 để khớp với VNPay
         vnp_CreateDate: createDate,
-        vnp_OrderInfo: "Thanh toan cho ma GD:" + orderId, // Đồng bộ với vnp_Params
+        vnp_OrderInfo: "Thanh toan cho ma GD:" + txnRef, // Đồng bộ với vnp_Params
         vnp_IpAddr: ipAddr,
       },
     });

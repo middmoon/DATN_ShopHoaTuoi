@@ -18,10 +18,16 @@ router.get("/", (req, res) => {
 const upload = require("../../../config/multer.config");
 
 router.post("/test", upload.any(), function (req, res, next) {
-  console.log("Body:", req.body); // Dữ liệu text (JSON string của productData)
-  console.log("Files:", req.files); // Các file được upload
+  console.log("Body:", req.body);
+  console.log("Files:", req.files);
 
   res.status(200).json({ message: "Test post OK", data: req.body });
+});
+
+router.post("/test2", function (req, res, next) {
+  console.log("Body:", req.body);
+
+  res.status(201).json({ message: "Test post OK", data: req.body });
 });
 
 router.patch("/test", upload.any("images"), async function (req, res, next) {

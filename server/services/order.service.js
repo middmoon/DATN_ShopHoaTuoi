@@ -1,6 +1,6 @@
 "use strict";
 
-const { sequelize, Order, OrderProduct, Product, Payment, PaymentHistory } = require("../models");
+const { sequelize, Order, OrderProduct, Product, Payment, PaymentHistory, OrderStatus, PaymentMethod } = require("../models");
 const payment = require("../models/payment");
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 const moment = require("moment");
@@ -50,6 +50,7 @@ class OrderService {
             note: order.note,
             total_price: total_price,
             delivery_address: delivery_address,
+            status_id: order.status_id ? order.status_id : 1,
             ward_code: order.ward_code,
             district_code: order.district_code,
             province_code: order.province_code,
@@ -82,20 +83,10 @@ class OrderService {
 
         let newPayment;
 
-        const info = this.initOrderInfo(payment_method_id, newOrder._id, order.total_price);
-        info.vnp_OrderInfo = `Thanh toan cho don hang: ${info.vnp_TxnRef}`;
-
         if (payment_method_id) {
-          newPayment = await Payment.create(
-            {
-              amount: order.total_price,
-              method_id: payment_method_id,
-              order_id: newOrder._id,
-              status: "Chờ xác nhận",
-              info: info,
-            },
-            { transaction: t }
-          );
+          const { payment, paymentHistory } = this.initOrderInfo(payment_method_id, newOrder._id, order.total_price);
+
+          newPayment = await Payment.create(payment, { transaction: t });
 
           if (!newPayment) {
             throw new BAD_REQUEST("Can not create payment, do not have payment method");
@@ -104,8 +95,8 @@ class OrderService {
           const newPaymentHistory = await PaymentHistory.create(
             {
               payment_id: newPayment._id,
-              order_id: newOrder._id,
-              status: "Chờ xác nhận",
+              order_id: paymentHistory.order_id,
+              status: paymentHistory.status,
             },
             { transaction: t }
           );
@@ -129,29 +120,60 @@ class OrderService {
     // { _id: 3, name: "ZaloPay" },
     // { _id: 5, name: "Thẻ tín dụng" },
     // { _id: 6, name: "Chuyển khoản ngân hàng" },
+    let payment = {};
+    let paymentHistory = {};
 
     switch (payment_method_id) {
       case 1: // { _id: 1, name: "VNPay" },
-        return {
-          vnp_TxnRef: orderId + "_" + moment().format("YYYYMMDDHHmmss"),
-          // vnp_OrderInfo: `Thanh toan cho don hang: ${newOrder._id}`,
-          language: "vn",
+        const vnp_TxnRef = orderId + "_" + moment().format("YYYYMMDDHHmmss");
+        payment = {
+          amount: total_price,
+          method_id: payment_method_id,
+          order_id: orderId,
+          status: "Chờ xác nhận",
+          info: {
+            vnp_TxnRef: vnp_TxnRef,
+            vnp_OrderInfo: `Thanh toan cho don hang: ${vnp_TxnRef}`,
+            language: "vn",
+          },
         };
+
+        paymentHistory = {
+          order_id: newOrder._id,
+          status: "Chờ xác nhận",
+        };
+        break;
       case 4: // { _id: 4, name: "Tiền mặt" },
-        return {};
+        payment = {
+          amount: total_price,
+          method_id: payment_method_id,
+          order_id: orderId,
+          status: "Hoàn thành",
+          info: {
+            shop_order: `Thanh toan cho don hang: ${orderId}`,
+          },
+        };
+
+        paymentHistory = {
+          order_id: newOrder._id,
+          status: "Hoàn thành",
+        };
+        break;
       case 7: // { _id: 7, name: "Thanh toán khi nhận hàng (COD)" },
-        return {};
+        break;
       case 2:
-        return {};
+        break;
       case 3:
-        return {};
+        break;
       case 5:
-        return {};
+        break;
       case 6:
-        return {};
+        break;
       default:
-        return {};
+        break;
     }
+
+    return { payment, paymentHistory };
   };
 
   static updateOrderInfo = async (orderId, { paymentStatus, paymentInfo = {} }) => {
@@ -224,6 +246,25 @@ class OrderService {
           },
           attributes: ["_id", "name", "retail_price"],
         },
+        {
+          model: OrderStatus,
+          attributes: ["name"],
+        },
+        {
+          model: Payment,
+          as: "payment",
+          attributes: ["_id", "amount", "status", "info"],
+          include: [
+            {
+              model: PaymentMethod,
+              attributes: ["name"],
+            },
+            {
+              model: PaymentHistory,
+              attributes: ["status", "createdAt"],
+            },
+          ],
+        },
       ],
     });
 
@@ -255,9 +296,9 @@ class OrderService {
     return orders;
   };
 
-  static getOrdersByStatus = async (status) => {
+  static getOrdersByStatus = async (statusId) => {
     const orders = await Order.findAll({
-      where: { status: status },
+      where: { status_id: statusId },
       include: [
         {
           model: Product,

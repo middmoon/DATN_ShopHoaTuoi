@@ -1,11 +1,10 @@
 "use strict";
 
 const { OK, CREATED } = require("../utils/success.response");
-const { BAD_REQUEST } = require("../utils/error.response");
 
 const ProductService = require("../services/product.service");
 
-const { Product } = require("../models");
+const { buildQueryOptions, buildQueryOptionsForShopOrder } = require("../utils/query_option_builder");
 
 const redis = require("../config/redis.config");
 
@@ -37,11 +36,24 @@ class ProductController {
 
   static getProducts = async (req, res) => {
     const isManageRoute = req.originalUrl.includes("/manage");
-    const conditions = isManageRoute ? {} : { is_public: true };
+
+    if (!isManageRoute) {
+      req.query.is_public = true;
+    }
+
+    const queryOptions = buildQueryOptions(req.query);
+    new OK({
+      message: "Products retrieved successfully",
+      data: await ProductService.getProducts(queryOptions),
+    }).send(res);
+  };
+
+  static getProductsForShopOrder = async (req, res) => {
+    const queryOptions = buildQueryOptionsForShopOrder(req.query);
 
     new OK({
       message: "Products retrieved successfully",
-      data: await ProductService.getProducts(conditions),
+      data: await ProductService.getProductsForShopOrder(queryOptions),
     }).send(res);
   };
 

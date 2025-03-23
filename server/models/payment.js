@@ -19,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       Payment.belongsTo(models.PaymentMethod, {
         foreignKey: "method_id",
       });
+
+      Payment.hasMany(models.PaymentHistory, {
+        foreignKey: "payment_id",
+      });
     }
   }
 

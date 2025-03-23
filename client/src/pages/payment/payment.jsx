@@ -187,43 +187,6 @@ const PaymentPage = () => {
       default:
         break;
     }
-
-    // if (paymentMethod === "vnpay") {
-    //   try {
-    //     // amount,
-    //     // language: "vn",
-    //     // bankCode: "VNBANK",
-    //     // orderInfo, // Lưu database
-    //     const response = await fetch("http://localhost:3000/api/v1/payment/vnpay/create_payment_url", {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: {
-    //         amount,
-    //         language: "vn",
-    //         bankCode: "VNBANK",
-    //         orderInfo: dataToSend,
-    //       },
-    //     });
-
-    //     if (response.ok) {
-    //       alert("Dữ liệu đã được gửi đi thành công!");
-    //       localStorage.removeItem("selectedProducts");
-    //       // navigate("/");
-    //     } else {
-    //       alert("Có lỗi xảy ra khi gửi dữ liệu.");
-    //     }
-    //   } catch (error) {
-    //     console.error("Lỗi khi gửi dữ liệu:", error);
-    //     alert("Không thể gửi dữ liệu. Vui lòng thử lại.");
-    //   }
-    // } else {
-    //   // create new order cod
-
-    //   alert("Đặt hàng thành công, chờ thanh toán khi nhận hàng!");
-    //   // navigate("/");
-    // }
   };
 
   return (

@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       Review.belongsTo(models.User, {
-        foreignKey: "user_id",
+        foreignKey: "customer_id",
       });
     }
   }
@@ -50,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      user_id: {
+      customer_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
