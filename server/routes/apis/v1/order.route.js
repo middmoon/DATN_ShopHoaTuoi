@@ -6,9 +6,11 @@ const asyncHandler = require("express-async-handler");
 
 const OrderController = require("../../../controllers/order.controller");
 
+const { flexVerifyToken } = require("../../../middlewares/auth.middleware");
+
 router
   // Tạo đơn hàng
-  .post("/", asyncHandler(OrderController.createOrder))
+  .post("/", flexVerifyToken, asyncHandler(OrderController.createOrder))
 
   // Lấy số lượng đơn hàng đang chờ xử lý
   .get("/pending-orders-count", asyncHandler(OrderController.getPendingOrdersCount))

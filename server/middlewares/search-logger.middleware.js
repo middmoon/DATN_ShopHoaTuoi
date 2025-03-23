@@ -24,6 +24,8 @@ const searchLogger = async (req, res, next) => {
     let userId = null;
     const data = JSON.parse(req.resData).data;
 
+    if (!data) next();
+
     // console.log(data);
 
     if (req.cookies.accessToken) {
@@ -36,6 +38,7 @@ const searchLogger = async (req, res, next) => {
     }
 
     let product_list_ids = [];
+
     if (data.length > 0) {
       product_list_ids = data.map((p) => p._id);
     }

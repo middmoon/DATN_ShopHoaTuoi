@@ -1,6 +1,6 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -10,7 +10,7 @@ import FlowerConsultation from "./FlowerConsultation";
 export default function HeroSection() {
   return (
     <>
-      <div className="mx-auto h-[70%] my-10 overflow-hidden ">
+      <div className="mx-auto h-[70%] my-10 overflow-hidden">
         <div className="flex h-full gap-4">
           <div className="basis-3/5 min-w-0 h-full">
             <Swiper

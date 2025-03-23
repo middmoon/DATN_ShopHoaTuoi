@@ -11,10 +11,8 @@ import MasterShop from "./pages/MasterShop/mastershop";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import CartPage from "./pages/shoppingCart/shoppingCart";
 import PaymentPage from "./pages/payment/payment";
-import PageNotFound from "./pages/PageNotFound/PageNotFound";
-
+import PaymentResult from "./components/PaymentResult/PaymentResult";
 import WithLayout from "./Layouts/WithLayout";
-
 
 const HomeWithLayout = WithLayout(Home);
 
@@ -24,7 +22,6 @@ function App() {
       <CategoryProvider>
       <Routes>
         <Route path="/" element={<HomeWithLayout />} />
-        <Route path="*" element={<PageNotFound />} />
         <Route path="/test" element={<Test />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
@@ -32,6 +29,8 @@ function App() {
         <Route path="productdetail/:slug" element={<ProductDetail />} />
         <Route path="cart" element={<CartPage />} />
         <Route path="payment" element={<PaymentPage />} />
+        <Route path="/payment-success" element={<PaymentResult />} />
+        {/* <Route path="/payment-failure" element={<PaymentResult />} /> */}
       </Routes>
       </CategoryProvider>
     </CartProvider>

@@ -31,14 +31,6 @@ const PaymentPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const totalAmount = selectedProducts.reduce(
-      (total, product) => total + product.quantity * product.retail_price,
-      0
-    );
-    setAmount(totalAmount);
-  }, [selectedProducts]);
-
-  useEffect(() => {
     const getProvinces = async () => {
       const data = await fetchProvinces();
       setProvinces(data);
@@ -159,77 +151,31 @@ const PaymentPage = () => {
 
     localStorage.setItem("customerInfo", JSON.stringify(dataToSend));
 
-    switch (paymentMethod) {
-      case 1:
-        try {
-          // 1: Create order
-          const createOrderResponse = await apiv1.post("/order", dataToSend);
+    if (paymentMethod === "vnpay") {
+      try {
+        const response = await fetch("http://localhost:3000/test", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToSend),
+        });
 
-          const orderData = createOrderResponse.data.data;
-
-          // 2: Create payment url
-          const vnpayPaymentResponse = await apiv1.post(
-            "/payment/vnpay/create_payment_url",
-            {
-              orderId: orderData.order._id,
-              amount: orderData.order.total_price,
-              language: orderData.payment.info.language,
-              bankCode: "VNBANK",
-              txnRef: orderData.payment.info.vnp_TxnRef,
-              orderInfo: orderData.payment.info.vnp_OrderInfo,
-            }
-          );
-
-          const data = vnpayPaymentResponse.data;
-          window.location.href = data.paymentUrl;
-        } catch (error) {
-          console.error("Lỗi khi gửi dữ liệu:", error);
-          alert("Không thể gửi dữ liệu. Vui lòng thử lại.");
+        if (response.ok) {
+          alert("Dữ liệu đã được gửi đi thành công!");
+          localStorage.removeItem("selectedProducts");
+          navigate("/");
+        } else {
+          alert("Có lỗi xảy ra khi gửi dữ liệu.");
         }
-        break;
-      case "cod":
-        alert(JSON.stringify(dataToSend));
-        break;
-      default:
-        break;
+      } catch (error) {
+        console.error("Lỗi khi gửi dữ liệu:", error);
+        alert("Không thể gửi dữ liệu. Vui lòng thử lại.");
+      }
+    } else {
+      alert("Đặt hàng thành công, chờ thanh toán khi nhận hàng!");
+      // navigate("/");
     }
-
-    // if (paymentMethod === "vnpay") {
-    //   try {
-    //     // amount,
-    //     // language: "vn",
-    //     // bankCode: "VNBANK",
-    //     // orderInfo, // Lưu database
-    //     const response = await fetch("http://localhost:3000/api/v1/payment/vnpay/create_payment_url", {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: {
-    //         amount,
-    //         language: "vn",
-    //         bankCode: "VNBANK",
-    //         orderInfo: dataToSend,
-    //       },
-    //     });
-
-    //     if (response.ok) {
-    //       alert("Dữ liệu đã được gửi đi thành công!");
-    //       localStorage.removeItem("selectedProducts");
-    //       // navigate("/");
-    //     } else {
-    //       alert("Có lỗi xảy ra khi gửi dữ liệu.");
-    //     }
-    //   } catch (error) {
-    //     console.error("Lỗi khi gửi dữ liệu:", error);
-    //     alert("Không thể gửi dữ liệu. Vui lòng thử lại.");
-    //   }
-    // } else {
-    //   // create new order cod
-
-    //   alert("Đặt hàng thành công, chờ thanh toán khi nhận hàng!");
-    //   // navigate("/");
-    // }
   };
 
   return (
@@ -359,7 +305,14 @@ const PaymentPage = () => {
               <div className="mt-4 pt-3 border-t border-gray-300 flex justify-between text-lg font-bold text-gray-800">
                 <span>Tổng tiền:</span>
                 <span className="text-red-500">
-                  {amount.toLocaleString()} VNĐ
+                  {selectedProducts
+                    .reduce(
+                      (total, product) =>
+                        total + product.quantity * product.retail_price,
+                      0
+                    )
+                    .toLocaleString()}{" "}
+                  VNĐ
                 </span>
               </div>
             </div>
@@ -374,8 +327,8 @@ const PaymentPage = () => {
               onChange={(e) => setPaymentMethod(e.target.value)}
               className="w-full p-2 border rounded"
             >
-              <option value="7">Thanh toán khi nhận hàng (COD)</option>
-              <option value="1">Thanh toán qua VNPay</option>
+              <option value="cod">Thanh toán khi nhận hàng (COD)</option>
+              <option value="vnpay">Thanh toán qua VNPay</option>
             </select>
           </div>
 

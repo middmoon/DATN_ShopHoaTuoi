@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useFieldArray } from "react-hook-form";
-import { CalendarIcon, Loader2, Plus, Trash2 } from "lucide-react";
+import { CalendarIcon, Loader2, Plus, Trash2, Check, ChevronsUpDown, Search } from "lucide-react";
 import { format } from "date-fns";
-
+import { vi } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,57 +14,127 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
+import { debounce } from "lodash";
+import { api } from "@/utils/api";
 
 // Define the form values type
 interface FormValues {
   type: "Đơn online" | "Đơn cửa hàng" | "Đơn bán sĩ";
   total_price: number;
-  note?: string;
-  status: "Chờ xác nhận" | "Đang xử lý" | "Hoàn thành" | "Đơn bị hủy" | "Đang giao hàng";
-  delivery_day?: Date;
+  note: string;
+  status_id: string;
+  delivery_day: Date;
   delivery_address: string;
-  customer_id?: number;
+  customer_id: number;
   customer_name: string;
   customer_phone: string;
-  ward_code?: string;
-  district_code?: string;
-  province_code?: string;
+  ward_code: string;
+  district_code: string;
+  province_code: string;
   products: {
-    product_id: number;
+    _id: number;
     quantity: number;
-    price: number;
+    retail_price: number;
   }[];
+  payment_method_id: number;
 }
 
-// Mock data for dropdowns - replace with actual API calls
-const mockProvinces = [
-  { code: "01", name: "Hà Nội" },
-  { code: "02", name: "Hồ Chí Minh" },
-  { code: "03", name: "Đà Nẵng" },
-];
+interface Province {
+  code: string;
+  full_name: string;
+}
 
-const mockDistricts = [
-  { code: "001", name: "Quận Ba Đình", province_code: "01" },
-  { code: "002", name: "Quận Hoàn Kiếm", province_code: "01" },
-  { code: "003", name: "Quận 1", province_code: "02" },
-  { code: "004", name: "Quận 2", province_code: "02" },
-  { code: "005", name: "Quận Hải Châu", province_code: "03" },
-];
+interface District {
+  code: string;
+  full_name: string;
+  province_code: string;
+}
 
-const mockWards = [
-  { code: "00001", name: "Phường Phúc Xá", district_code: "001" },
-  { code: "00002", name: "Phường Trúc Bạch", district_code: "001" },
-  { code: "00003", name: "Phường Hàng Bạc", district_code: "002" },
-  { code: "00004", name: "Phường Bến Nghé", district_code: "003" },
-  { code: "00005", name: "Phường Thảo Điền", district_code: "004" },
-  { code: "00006", name: "Phường Thanh Bình", district_code: "005" },
-];
+interface Ward {
+  code: string;
+  full_name: string;
+  district_code: string;
+}
+
+// Define interface for product data
+interface Product {
+  _id: number;
+  name: string;
+  retail_price: number;
+}
+
+// Add this interface after the Product interface
+interface Customer {
+  id: number;
+  name: string;
+  phone: string;
+}
+
+// Update the searchUser function to match the provided signature
+const searchUser = async (searchTerm: string): Promise<Customer[]> => {
+  try {
+    if (!searchTerm || searchTerm.trim() === "") {
+      return mockCustomers; // Return mock customers if search term is empty
+    }
+
+    const response = await api.get(`/customer?q=${encodeURIComponent(searchTerm)}`);
+    return response.data.data.customers;
+  } catch (error) {
+    console.error("Error searching customers:", error);
+    return mockCustomers; // Fallback to mock customers on error
+  }
+};
+
+const getProvinces = async () => {
+  try {
+    const response = await api.get("/address/procince");
+    return response.data.data.province as Province[];
+  } catch (error) {
+    console.error("Error fetching provinces:", error);
+    return [];
+  }
+};
+
+const getDistricts = async (province_code: string) => {
+  try {
+    const response = await api.get(`/address/district/${province_code}`);
+    return response.data.data.district as District[];
+  } catch (error) {
+    console.error("Error fetching districts:", error);
+    return [];
+  }
+};
+
+const getWards = async (district_code: string) => {
+  try {
+    const response = await api.get(`/address/ward/${district_code}`);
+    return response.data.data.ward as Ward[];
+  } catch (error) {
+    console.error("Error fetching wards:", error);
+    return [];
+  }
+};
+
+const searchProducts = async (searchTerm: string): Promise<Product[]> => {
+  try {
+    if (!searchTerm || searchTerm.trim() === "") {
+      return []; // Return empty array if search term is empty
+    }
+
+    const response = await api.get(`/product/for-shop-order?q=${encodeURIComponent(searchTerm)}`);
+    return response.data.data;
+  } catch (error) {
+    console.error("Error searching products:", error);
+    return []; // Fallback to empty array on error
+  }
+};
 
 const mockProducts = [
   { id: 1, name: "Product 1", price: 100000 },
-  { id: 2, name: "Product 2", price: 200000 },
-  { id: 3, name: "Product 3", price: 300000 },
-  { id: 4, name: "Product 4", price: 400000 },
+  { id: 2, name: "Product 2", phone: "0987654321" },
+  { id: 3, name: "Lê Văn C", phone: "0369852147" },
 ];
 
 const mockCustomers = [
@@ -73,25 +143,66 @@ const mockCustomers = [
   { id: 3, name: "Lê Văn C", phone: "0369852147" },
 ];
 
+// Store address details
+const StoreAddress = {
+  ward_code: "24772",
+  ward_name: "Phường 8",
+  district_code: "672",
+  district_name: "Thành phố Đà Lạt",
+  province_code: "68",
+  province_name: "Tỉnh Lâm Đồng",
+  address: "1 - Phù Đổng Thiên Vương",
+};
+
 const ShopAddress = {};
 
 export function NewOrderForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [filteredDistricts, setFilteredDistricts] = useState(mockDistricts);
-  const [filteredWards, setFilteredWards] = useState(mockWards);
+
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
+  const [wards, setWards] = useState<any[]>([]);
+
+  const [openProvince, setOpenProvince] = useState(false);
+  const [openDistrict, setOpenDistrict] = useState(false);
+  const [openWard, setOpenWard] = useState(false);
+
+  // Product search state
+  const [productSearchResults, setProductSearchResults] = useState<Product[]>([]);
+  const [openProductSearch, setOpenProductSearch] = useState<number | null>(null);
+  const [isSearchingProducts, setIsSearchingProducts] = useState(false);
+
+  // Add these state variables in the NewOrderForm component after the other state variables
+  const [customerSearchTerm, setCustomerSearchTerm] = useState("");
+  const [customerSearchResults, setCustomerSearchResults] = useState<Customer[]>(mockCustomers);
+  const [isSearchingCustomers, setIsSearchingCustomers] = useState(false);
+  const [isCustomerDialogOpen, setIsCustomerDialogOpen] = useState(false);
+
+  // Add this state variable after the other state variables
+  const [selectedProducts, setSelectedProducts] = useState<Record<number, Product>>({});
+
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      const data = await getProvinces();
+      setProvinces(data);
+    };
+    fetchProvinces();
+  }, []);
 
   const form = useForm<FormValues>({
     defaultValues: {
-      type: "Đơn online",
+      type: "Đơn cửa hàng",
       total_price: 0,
       note: "",
-      status: "Chờ xác nhận",
+      status_id: "4",
       delivery_address: "",
       customer_name: "",
       customer_phone: "",
-      products: [{ product_id: 0, quantity: 1, price: 0 }],
+      products: [{ _id: 0, quantity: 1, retail_price: 0 }],
+      payment_method_id: 4,
     },
+    mode: "onSubmit",
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -99,27 +210,61 @@ export function NewOrderForm() {
     control: form.control,
   });
 
-  // Handle province change
-  const handleProvinceChange = (provinceCode: string) => {
-    form.setValue("province_code", provinceCode);
-    form.setValue("district_code", undefined);
-    form.setValue("ward_code", undefined);
+  const handleProvinceChange = async (province_code: string) => {
+    form.setValue("province_code", province_code);
+    form.setValue("district_code", ""); // Reset district when province changes
+    form.setValue("ward_code", ""); // Reset ward when province changes
+    setDistricts([]);
+    setWards([]);
 
-    const districts = mockDistricts.filter((district) => district.province_code === provinceCode);
-    setFilteredDistricts(districts);
-    setFilteredWards([]);
+    if (province_code) {
+      const data = await getDistricts(province_code);
+      setDistricts(data);
+    }
+
+    setOpenProvince(false);
   };
 
-  // Handle district change
-  const handleDistrictChange = (districtCode: string) => {
-    form.setValue("district_code", districtCode);
-    form.setValue("ward_code", undefined);
+  const handleDistrictChange = async (district_code: string) => {
+    form.setValue("district_code", district_code);
+    form.setValue("ward_code", ""); // Reset ward when district changes
+    setWards([]);
 
-    const wards = mockWards.filter((ward) => ward.district_code === districtCode);
-    setFilteredWards(wards);
+    if (district_code) {
+      const data = await getWards(district_code);
+      setWards(data);
+    }
+
+    setOpenDistrict(false);
   };
 
-  // Handle customer selection
+  const handleWardChange = (ward_code: string) => {
+    form.setValue("ward_code", ward_code);
+    setOpenWard(false);
+  };
+
+  // Add this function after the handleDistrictChange function
+  const handleUseStoreAddress = async () => {
+    try {
+      const { province_code, district_code, ward_code, address } = StoreAddress;
+
+      form.setValue("province_code", province_code);
+
+      const [districtsData, wardsData] = await Promise.all([getDistricts(province_code), getWards(district_code)]);
+
+      setDistricts(districtsData);
+      setWards(wardsData);
+
+      form.setValue("district_code", district_code);
+      form.setValue("ward_code", ward_code);
+      form.setValue("delivery_address", address);
+    } catch (error) {
+      console.error("Error setting store address:", error);
+      alert("Failed to set store address. Please try again.");
+    }
+  };
+
+  // Update the handleCustomerSelect function
   const handleCustomerSelect = (customerId: number) => {
     const customer = mockCustomers.find((c) => c.id === customerId);
     if (customer) {
@@ -129,43 +274,134 @@ export function NewOrderForm() {
     }
   };
 
-  // Handle product selection
+  // Updated handleProductSelect function to work with your API response structure
   const handleProductSelect = (index: number, productId: number) => {
-    const product = mockProducts.find((p) => p.id === productId);
+    const product = productSearchResults.find((p) => p._id === productId);
     if (product) {
-      form.setValue(`products.${index}.product_id`, product.id);
-      form.setValue(`products.${index}.price`, product.price);
+      // Store the selected product in state for display purposes
+      setSelectedProducts((prev) => ({
+        ...prev,
+        [index]: product,
+      }));
+
+      // Update form values
+      form.setValue(`products.${index}._id`, product._id);
+      form.setValue(`products.${index}.retail_price`, product.retail_price);
 
       // Recalculate total price
       calculateTotalPrice();
     }
+
+    setOpenProductSearch(null);
+  };
+
+  // Add this function after debouncedCustomerSearch
+  const debouncedProductSearch = debounce(async (searchTerm: string) => {
+    setIsSearchingProducts(true);
+    const results = await searchProducts(searchTerm);
+    setProductSearchResults(results);
+    setIsSearchingProducts(false);
+  }, 300);
+
+  // Handle product search input change
+  const handleProductSearch = (searchTerm: string) => {
+    debouncedProductSearch(searchTerm);
   };
 
   // Calculate total price based on products
   const calculateTotalPrice = () => {
     const products = form.getValues("products");
-    const total = products.reduce((sum, product) => sum + (product.price * product.quantity || 0), 0);
+    const total = products.reduce((sum, product) => sum + (product.retail_price * product.quantity || 0), 0);
     form.setValue("total_price", total);
   };
 
   // Handle form submission
   async function onSubmit(data: FormValues) {
     try {
+      // Validate required fields
+      if (!data.customer_name) {
+        form.setError("customer_name", {
+          type: "required",
+          message: "Tên khách hàng là bắt buộc",
+        });
+        return;
+      }
+
+      if (!data.customer_phone) {
+        form.setError("customer_phone", {
+          type: "required",
+          message: "Số điện thoại khách hàng là bắt buộc",
+        });
+        return;
+      }
+
+      if (!data.province_code) {
+        form.setError("province_code", {
+          type: "required",
+          message: "Tỉnh/Thành phố là bắt buộc",
+        });
+        return;
+      }
+
+      if (!data.district_code) {
+        form.setError("district_code", {
+          type: "required",
+          message: "Quận/Huyện là bắt buộc",
+        });
+        return;
+      }
+
+      if (!data.ward_code) {
+        form.setError("ward_code", {
+          type: "required",
+          message: "Xã/Phường là bắt buộc",
+        });
+        return;
+      }
+
+      if (!data.delivery_address) {
+        form.setError("delivery_address", {
+          type: "required",
+          message: "Địa chỉ giao nhận là bắt buộc",
+        });
+        return;
+      }
+
+      // Validate products
+      const invalidProductIndex = data.products.findIndex((p) => !p._id || p._id === 0);
+      if (invalidProductIndex >= 0) {
+        form.setError(`products.${invalidProductIndex}._id`, {
+          type: "required",
+          message: "Sản phẩm là bắt buộc",
+        });
+        return;
+      }
+
       setIsSubmitting(true);
 
-      // In a real application, you would call your API here
-      console.log("Form data:", data);
+      const formattedData = {
+        ...data,
+        status: Number(data.status_id),
+        products: data.products.map((product) => ({
+          ...product,
+          quantity: Number(product.quantity),
+        })),
+      };
+
+      console.log("Form data:", formattedData);
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await api.post("/test2", formattedData);
 
-      // Call the server action to create the order
-      // await createOrder(data);
+      if (response.status !== 201) {
+        throw new Error("Failed to create order. Please try again.");
+      }
+
+      console.log("Data response:", response.data);
 
       // Show success message and redirect
-      alert("Order created successfully!");
-      router.push("/orders");
-      router.refresh();
+      alert("Đơn hàng đã được tạo thành công!");
     } catch (error) {
       console.error("Error creating order:", error);
       alert("Failed to create order. Please try again.");
@@ -184,7 +420,7 @@ export function NewOrderForm() {
             name="type"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Loại hóa đơn</FormLabel>
+                <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Loại hóa đơn</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
@@ -192,8 +428,8 @@ export function NewOrderForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Đơn online">Đơn online</SelectItem>
                     <SelectItem value="Đơn cửa hàng">Đơn cửa hàng</SelectItem>
+                    <SelectItem value="Đơn online">Đơn online</SelectItem>
                     <SelectItem value="Đơn bán sĩ">Đơn bán sĩ</SelectItem>
                   </SelectContent>
                 </Select>
@@ -205,22 +441,22 @@ export function NewOrderForm() {
           {/* Order Status */}
           <FormField
             control={form.control}
-            name="status"
+            name="status_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Trạng thái đơn hàng</FormLabel>
+                <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Trạng thái đơn hàng</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select status" />
+                      <SelectValue placeholder="Chọn trạng thái" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="Chờ xác nhận">Chờ xác nhận</SelectItem>
-                    <SelectItem value="Đang xử lý">Đang xử lý</SelectItem>
-                    <SelectItem value="Đang giao hàng">Đang giao hàng</SelectItem>
-                    <SelectItem value="Hoàn thành">Hoàn thành</SelectItem>
-                    <SelectItem value="Đơn bị hủy">Đơn bị hủy</SelectItem>
+                    <SelectItem value="1">Chờ xác nhận</SelectItem>
+                    <SelectItem value="2">Đang xử lý</SelectItem>
+                    <SelectItem value="3">Đang giao hàng</SelectItem>
+                    <SelectItem value="4">Hoàn thành</SelectItem>
+                    <SelectItem value="5">Đơn bị hủy</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -234,12 +470,12 @@ export function NewOrderForm() {
             name="delivery_day"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Ngày giao nhận</FormLabel>
+                <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Ngày giao nhận</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button variant={"outline"} className={`w-full pl-3 text-left font-normal ${!field.value ? "text-muted-foreground" : ""}`}>
-                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                        {field.value ? format(field.value, "PPP", { locale: vi }) : <span>Chọn ngày giao nhận</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
@@ -259,9 +495,9 @@ export function NewOrderForm() {
             name="total_price"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Total Price</FormLabel>
+                <FormLabel>Tổng đơn hàng</FormLabel>
                 <FormControl>
-                  <Input type="number" placeholder="0" {...field} disabled />
+                  <Input type="number" placeholder="0" {...field} disabled required />
                 </FormControl>
                 <FormDescription>Tự động cộng thêm khi có sản phẩm</FormDescription>
                 <FormMessage />
@@ -271,46 +507,25 @@ export function NewOrderForm() {
         </div>
 
         <div className="bg-muted/50 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Thông tin khách hàng</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Customer Selection */}
-            {/* Customer Selection */}
-            {/* Customer Selection */}
-            {/* Customer Selection */}
-            {/* Customer Selection */}
-            {/* Customer Selection */}
-            {/* Customer Selection */}
-            {/* Customer Selection */}
-            {/* Customer Selection */}
-            {/* 
-            <FormItem>
-              <FormLabel>Select Existing Customer</FormLabel>
-              <Select onValueChange={(value) => handleCustomerSelect(Number(value))}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a customer" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {mockCustomers.map((customer) => (
-                    <SelectItem key={customer.id} value={customer.id.toString()}>
-                      {customer.name} ({customer.phone})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormDescription>Or fill in customer details below</FormDescription>
-            </FormItem> */}
+          <h2 className="text-xl font-semibold">Thông tin khách hàng</h2>
 
+          {/* <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Thông tin khách hàng</h2>
+            <Button type="button" variant="outline" onClick={searchUser}>
+              Tìm kiếm khách hàng
+              <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </div> */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Customer Name */}
             <FormField
               control={form.control}
               name="customer_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tên khách hàng</FormLabel>
+                  <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Tên khách hàng</FormLabel>
                   <FormControl>
-                    <Input placeholder="Customer name" {...field} />
+                    <Input placeholder="Tên khách hàng" {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -323,9 +538,9 @@ export function NewOrderForm() {
               name="customer_phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Số điện thoại</FormLabel>
+                  <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Số điện thoại</FormLabel>
                   <FormControl>
-                    <Input placeholder="Customer phone" {...field} />
+                    <Input placeholder="Số điện thoại khách hàng" {...field} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -335,81 +550,134 @@ export function NewOrderForm() {
         </div>
 
         <div className="bg-muted/50 p-6 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4">Địa chỉ giao nhận</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Địa chỉ giao nhận</h2>
+            <Button type="button" variant="outline" onClick={handleUseStoreAddress}>
+              Lấy địa chỉ cửa hàng
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            {/* Province */}
+            {/* Province - Searchable Combobox */}
             <FormField
               control={form.control}
               name="province_code"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tỉnh / Thành phố</FormLabel>
-                  <Select onValueChange={(value) => handleProvinceChange(value)} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select province" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {mockProvinces.map((province) => (
-                        <SelectItem key={province.code} value={province.code}>
-                          {province.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <FormItem className="flex flex-col">
+                  <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Tỉnh / Thành phố</FormLabel>
+                  <Popover open={openProvince} onOpenChange={setOpenProvince}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button variant="outline" role="combobox" aria-expanded={openProvince} className="w-full justify-between">
+                          {field.value ? provinces.find((province) => province.code === field.value)?.full_name : "Chọn tỉnh"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Tìm tỉnh..." />
+                        <CommandList>
+                          <CommandEmpty>Không tìm thấy tỉnh.</CommandEmpty>
+                          <CommandGroup className="max-h-[300px] overflow-y-auto">
+                            {provinces.map((province) => (
+                              <CommandItem key={province.code} value={province.full_name} onSelect={() => handleProvinceChange(province.code)}>
+                                <Check className={cn("mr-2 h-4 w-4", field.value === province.code ? "opacity-100" : "opacity-0")} />
+                                {province.full_name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* District */}
+            {/* District - Searchable Combobox */}
             <FormField
               control={form.control}
               name="district_code"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Huyện / Thành phố</FormLabel>
-                  <Select onValueChange={(value) => handleDistrictChange(value)} value={field.value} disabled={!form.getValues("province_code")}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select district" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {filteredDistricts.map((district) => (
-                        <SelectItem key={district.code} value={district.code}>
-                          {district.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <FormItem className="flex flex-col">
+                  <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Huyện / Thành phố</FormLabel>
+                  <Popover open={openDistrict} onOpenChange={setOpenDistrict}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openDistrict}
+                          className="w-full justify-between"
+                          disabled={!form.getValues("province_code")}
+                        >
+                          {field.value ? districts.find((district) => district.code === field.value)?.full_name : "Chọn huyện / thành phố"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Tìm huyện..." />
+                        <CommandList>
+                          <CommandEmpty>Không tìm thấy huyện.</CommandEmpty>
+                          <CommandGroup className="max-h-[300px] overflow-y-auto">
+                            {districts.map((district) => (
+                              <CommandItem key={district.code} value={district.full_name} onSelect={() => handleDistrictChange(district.code)}>
+                                <Check className={cn("mr-2 h-4 w-4", field.value === district.code ? "opacity-100" : "opacity-0")} />
+                                {district.full_name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Ward */}
+            {/* Ward - Searchable Combobox */}
             <FormField
               control={form.control}
               name="ward_code"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Xã / Phường</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value} disabled={!form.getValues("district_code")}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select ward" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {filteredWards.map((ward) => (
-                        <SelectItem key={ward.code} value={ward.code}>
-                          {ward.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <FormItem className="flex flex-col">
+                  <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Xã / Phường</FormLabel>
+                  <Popover open={openWard} onOpenChange={setOpenWard}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openWard}
+                          className="w-full justify-between"
+                          disabled={!form.getValues("district_code")}
+                        >
+                          {field.value ? wards.find((ward) => ward.code === field.value)?.full_name : "Chọn xã phường / thị trấn"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Tìm xã phường..." />
+                        <CommandList>
+                          <CommandEmpty>Không tìm thấy xã phường.</CommandEmpty>
+                          <CommandGroup className="max-h-[300px] overflow-y-auto">
+                            {wards.map((ward) => (
+                              <CommandItem key={ward.code} value={ward.full_name} onSelect={() => handleWardChange(ward.code)}>
+                                <Check className={cn("mr-2 h-4 w-4", field.value === ward.code ? "opacity-100" : "opacity-0")} />
+                                {ward.full_name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
@@ -422,9 +690,9 @@ export function NewOrderForm() {
             name="delivery_address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Số nhà - Tên đường</FormLabel>
+                <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Số nhà - Tên đường</FormLabel>
                 <FormControl>
-                  <Input placeholder="Street address, building, etc." {...field} />
+                  <Input placeholder="Số nhà - tên đường" {...field} required />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -433,57 +701,90 @@ export function NewOrderForm() {
         </div>
 
         {/* Note */}
-        <FormField
-          control={form.control}
-          name="note"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Ghi chú</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Add any special instructions or notes for this order" className="min-h-[100px]" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="bg-muted/50 p-6 rounded-lg">
+          <FormField
+            control={form.control}
+            name="note"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-xl font-semibold">Ghi chú</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Ghi chú đơn hàng....." className="min-h-[100px]" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
+        {/* Danh sách sản phẩm */}
         <div className="bg-muted/50 p-6 rounded-lg">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Products</h2>
-            <Button type="button" variant="outline" size="sm" onClick={() => append({ product_id: 0, quantity: 1, price: 0 })}>
+            <h2 className="text-xl font-semibold">Danh sách mua sản phẩm</h2>
+            <Button type="button" variant="outline" size="sm" onClick={() => append({ _id: 0, quantity: 1, retail_price: 0 })}>
               <Plus className="h-4 w-4 mr-2" />
-              Add Product
+              Thêm sản phẩm
             </Button>
           </div>
-
           {fields.map((field, index: number) => (
             <Card key={field.id} className="mb-4">
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Product Selection */}
+                  {/* Product Selection - Searchable Combobox */}
                   <FormField
                     control={form.control}
-                    name={`products.${index}.product_id`}
+                    name={`products.${index}._id`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Product</FormLabel>
-                        <Select
-                          onValueChange={(value) => handleProductSelect(index, Number(value))}
-                          value={field.value ? field.value.toString() : ""}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select product" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {mockProducts.map((product) => (
-                              <SelectItem key={product.id} value={product.id.toString()}>
-                                {product.name} - {product.price.toLocaleString()} VND
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Sản phẩm</FormLabel>
+                        <Popover open={openProductSearch === index} onOpenChange={(open) => setOpenProductSearch(open ? index : null)}>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={openProductSearch === index}
+                                className="w-full justify-between"
+                              >
+                                {field.value && selectedProducts[index] ? selectedProducts[index].name : "Chọn sản phẩm"}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-full p-0">
+                            <Command>
+                              <div className="flex items-center border-b px-3">
+                                <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                                <CommandInput
+                                  placeholder="Tìm sản phẩm..."
+                                  onValueChange={handleProductSearch}
+                                  className="flex-1 border-0 focus:ring-0"
+                                />
+                              </div>
+                              <CommandList>
+                                <CommandEmpty>
+                                  {isSearchingProducts ? (
+                                    <div className="flex items-center justify-center p-4">
+                                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                      Đang tìm kiếm...
+                                    </div>
+                                  ) : (
+                                    "Không tìm thấy sản phẩm."
+                                  )}
+                                </CommandEmpty>
+                                <CommandGroup className="max-h-[300px] overflow-y-auto">
+                                  {productSearchResults.map((product) => (
+                                    <CommandItem key={product._id} value={product.name} onSelect={() => handleProductSelect(index, product._id)}>
+                                      <Check className={cn("mr-2 h-4 w-4", field.value === product._id ? "opacity-100" : "opacity-0")} />
+                                      <span className="flex-1">{product.name}</span>
+                                      <span className="text-muted-foreground">{product.retail_price.toLocaleString()} VND</span>
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -495,16 +796,20 @@ export function NewOrderForm() {
                     name={`products.${index}.quantity`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Quantity</FormLabel>
+                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Số lượng</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             min="1"
                             {...field}
+                            value={field.value}
                             onChange={(e) => {
-                              field.onChange(e);
+                              // Convert string value to number
+                              const value = Number.parseInt(e.target.value, 10);
+                              field.onChange(isNaN(value) ? 1 : value);
                               calculateTotalPrice();
                             }}
+                            required
                           />
                         </FormControl>
                         <FormMessage />
@@ -515,10 +820,10 @@ export function NewOrderForm() {
                   {/* Price */}
                   <FormField
                     control={form.control}
-                    name={`products.${index}.price`}
+                    name={`products.${index}.retail_price`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Price</FormLabel>
+                        <FormLabel>Giá</FormLabel>
                         <div className="flex items-center gap-2">
                           <FormControl>
                             <Input
@@ -529,6 +834,7 @@ export function NewOrderForm() {
                                 field.onChange(e);
                                 calculateTotalPrice();
                               }}
+                              required
                             />
                           </FormControl>
                           {index > 0 && (
@@ -559,10 +865,10 @@ export function NewOrderForm() {
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating Order...
+              Đang tạo đơn hàng...
             </>
           ) : (
-            "Create Order"
+            "Tạo đơn hàng"
           )}
         </Button>
       </form>

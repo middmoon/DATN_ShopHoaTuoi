@@ -1,11 +1,10 @@
 "use strict";
 
 const { OK, CREATED } = require("../utils/success.response");
-const { BAD_REQUEST } = require("../utils/error.response");
 
 const ProductService = require("../services/product.service");
 
-const { Product } = require("../models");
+const { buildQueryOptions, buildQueryOptionsForShopOrder } = require("../utils/query_option_builder");
 
 const redis = require("../config/redis.config");
 
@@ -28,20 +27,33 @@ class ProductController {
   static updateProduct = async (req, res) => {
     const { data } = req.body;
     const parsedData = JSON.parse(data);
-
+    // console.log(parsedData);
     new OK({
       message: "Product updated successfully",
-      data: await ProductService.updateProduct(req.params.productId, parsedData),
+      data: await ProductService.updateProduct(req.params.productId, parsedData, req.files),
     }).send(res);
   };
 
   static getProducts = async (req, res) => {
     const isManageRoute = req.originalUrl.includes("/manage");
-    const conditions = isManageRoute ? {} : { is_public: true };
+
+    if (!isManageRoute) {
+      req.query.is_public = true;
+    }
+
+    const queryOptions = buildQueryOptions(req.query);
+    new OK({
+      message: "Products retrieved successfully",
+      data: await ProductService.getProducts(queryOptions),
+    }).send(res);
+  };
+
+  static getProductsForShopOrder = async (req, res) => {
+    const queryOptions = buildQueryOptionsForShopOrder(req.query);
 
     new OK({
       message: "Products retrieved successfully",
-      data: await ProductService.getProducts(conditions),
+      data: await ProductService.getProductsForShopOrder(queryOptions),
     }).send(res);
   };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import CategoryCard from "../../Card/CategoryCard";
 
 const fakeFlowers = [
@@ -29,11 +29,12 @@ export default function ReviewService() {
 
       <div className="container mx-auto pb-10">
         <Swiper
-          modules={[Navigation, Pagination]}
+          modules={[Navigation, Pagination, Autoplay]}
           spaceBetween={20}
           slidesPerView={5}
           pagination={{ clickable: true }}
           loop={true}
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
           breakpoints={{
             1024: { slidesPerView: 5 },
             768: { slidesPerView: 3 },

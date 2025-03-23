@@ -13,6 +13,15 @@ module.exports = (sequelize, DataTypes) => {
 
       Payment.belongsTo(models.Order, {
         foreignKey: "order_id",
+        onDelete: "CASCADE",
+      });
+
+      Payment.belongsTo(models.PaymentMethod, {
+        foreignKey: "method_id",
+      });
+
+      Payment.hasMany(models.PaymentHistory, {
+        foreignKey: "payment_id",
       });
     }
   }
@@ -28,28 +37,23 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BIGINT.UNSIGNED,
         allowNull: false,
       },
-      method: {
-        type: DataTypes.ENUM(
-          "Tiền mặt",
-          "Thẻ tín dụng",
-          "Paypal",
-          "Momo",
-          "VN Pay",
-          "Zalo Pay",
-          "Chuyển khoản ngân hàng",
-          "Thanh toán khi nhận hàng"
-        ),
+      method_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 4,
       },
       status: {
         type: DataTypes.ENUM("Chờ xác nhận", "Đang xử lý", "Hoàn thành", "Thất bại"),
         defaultValue: "Chờ xác nhận",
       },
-      delivery_day: {
-        type: DataTypes.DATE,
-      },
       order_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      info: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: null,
       },
     },
     {

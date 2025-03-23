@@ -17,11 +17,11 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       User.hasMany(models.Order, {
-        foreignKey: "user_id",
+        foreignKey: "customer_id",
       });
 
       User.hasMany(models.Review, {
-        foreignKey: "user_id",
+        foreignKey: "customer_id",
       });
     }
   }
