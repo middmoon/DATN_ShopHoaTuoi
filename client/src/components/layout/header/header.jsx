@@ -14,7 +14,7 @@ export default function Header() {
   const [error, setError] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isTop, setIsTop] = useState(true); // Theo dõi vị trí cuộn
+  const [isTop, setIsTop] = useState(true);
 
   const navigate = useNavigate();
 
@@ -90,16 +90,14 @@ export default function Header() {
   return (
     <div
       className={`header w-full h-[10vh] fixed top-0 flex flex-col transition-all duration-300 z-50 ${
-        isTop
-          ? "bg-transparent text-black"
-          : "bg-color-custom-4 text-white shadow-lg"
+        isTop ? "bg-transparent" : "bg-color-custom-1 text-white shadow-lg"
       }`}
     >
       <div className="w-full h-full mx-auto">
         <div className="flex items-center w-full h-full px-10">
           <div className="flex-[1]">
             <div className="flex items-center justify-between px-4 sm:px-6 md:px-10 py-3 md:py-4">
-              <div className="flex-1 font-font1 text-center font-bold whitespace-nowrap">
+              <div className="flex-1 font-font2 text-center font-bold whitespace-nowrap">
                 <a
                   href="/"
                   className={`text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl ${
@@ -121,7 +119,7 @@ export default function Header() {
                       className="relative group py-6 text-color-custom-4"
                     >
                       <button
-                        className={`cursor-pointer flex items-center ${
+                        className={`cursor-pointer flex items-center text-base ${
                           isTop ? "text-color-custom-1" : "text-color-custom-4"
                         }`}
                         onClick={() => handleCategoryClick(parent._id)}
@@ -129,7 +127,7 @@ export default function Header() {
                         {parent.name}
                       </button>
                       {groupedCategories[parent._id] && (
-                        <ul className="absolute text-color-custom-3 left-0 mt-2 w-48 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 transform translate-y-2 grid">
+                        <ul className="absolute text-base text-color-custom-3 left-0 mt-2 w-48 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 transform translate-y-2 grid">
                           {groupedCategories[parent._id].map((child) => (
                             <li
                               key={child._id}
@@ -150,13 +148,13 @@ export default function Header() {
                   {otherCategories.length > 0 && (
                     <li className="relative group">
                       <button
-                        className={`px-4 py-2  font-medium transition-colors ${
+                        className={`px-4 py-2  font-font2 text-base transition-colors ${
                           isTop ? "text-color-custom-1" : "text-color-custom-4"
                         }`}
                       >
                         Xem Thêm
                       </button>
-                      <ul className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 transform translate-y-2 grid">
+                      <ul className="absolute left-0 mt-2 w-48 bg-white text-color-custom-3 shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 transform translate-y-2 grid">
                         {otherCategories.map((category) => (
                           <li
                             key={category._id}
@@ -199,14 +197,25 @@ export default function Header() {
                         strokeWidth="1.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className="lucide lucide-shopping-cart"
+                        className={`lucide lucide-shopping-cart ${
+                          isTop ? "text-color-custom-1" : "text-color-custom-4"
+                        }`}
                       >
                         <circle cx="8" cy="21" r="1" />
                         <circle cx="19" cy="21" r="1" />
                         <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
                       </svg>
-                      <span className="ml-2 font-font2 text-color-custom-4">
-                        <a href="/cart">Giỏ Hàng</a>
+                      <span className="ml-2 font-font2 text-color-custom-4 text-base">
+                        <a
+                          className={`${
+                            isTop
+                              ? "text-color-custom-1"
+                              : "text-color-custom-4"
+                          }`}
+                          href="/cart"
+                        >
+                          Giỏ Hàng
+                        </a>
                       </span>
                       {cartCount > 0 && (
                         <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -230,19 +239,31 @@ export default function Header() {
                           strokeWidth="1.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className="lucide lucide-user-round"
+                          className={`lucide lucide-user-round ${
+                            isTop
+                              ? "text-color-custom-1"
+                              : "text-color-custom-4"
+                          }`}
                         >
                           <circle cx="12" cy="8" r="5" />
                           <path d="M20 21a8 8 0 0 0-16 0" />
                         </svg>
 
                         <span
-                          className="ml-2 font-font2 text-color-custom-4 cursor-pointer"
+                          className="ml-2 font-font2 text-color-custom-4 cursor-pointer text-color-custom-1"
                           onClick={() => {
                             if (!userEmail) navigate("/login");
                           }}
                         >
-                          {userEmail ? userEmail : "Đăng Nhập"}
+                          <div
+                            className={`text-base ${
+                              isTop
+                                ? "text-color-custom-1"
+                                : "text-color-custom-4"
+                            }`}
+                          >
+                            {userEmail ? userEmail : "Đăng Nhập"}
+                          </div>
                         </span>
                       </div>
 

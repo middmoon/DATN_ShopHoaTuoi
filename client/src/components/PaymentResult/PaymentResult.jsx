@@ -16,10 +16,17 @@ function PaymentResult() {
       ) : (
         <div>
           <h2 style={{ color: "red" }}>Thanh toán thất bại!</h2>
-          <p>{error === "checksum" ? "Dữ liệu không hợp lệ, vui lòng thử lại." : "Thanh toán không thành công, vui lòng kiểm tra lại."}</p>
+          <p>
+            {error === "checksum"
+              ? "Dữ liệu không hợp lệ, vui lòng thử lại."
+              : "Thanh toán không thành công, vui lòng kiểm tra lại."}
+          </p>
         </div>
       )}
-      <button onClick={() => (window.location.href = "/")} style={{ padding: "10px 20px", marginTop: "20px" }}>
+      <button
+        onClick={() => (window.location.href = "/")}
+        style={{ padding: "10px 20px", marginTop: "20px" }}
+      >
         Quay lại trang chủ
       </button>
     </div>

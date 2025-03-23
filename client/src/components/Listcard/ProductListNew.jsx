@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "../Card/ProductCard";
 import { getProduct } from "../../APIs/productAPI";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import Divider from "../common/Divider/Divider";
 
 const ProductListNew = () => {
   const [products, setProducts] = useState([]);
@@ -32,32 +38,50 @@ const ProductListNew = () => {
   };
 
   return (
-    <div className="PlSale bg-cover bg-center mx-auto">
-      <div className="container mx-auto py-10 text-center relative">
-        <h1 className="text-2xl font-bold font-font4">Sản Phẩm Nổi Bật</h1>
-      </div>
+    <div className="pt-20">
+      <Divider />
+      <div className="PlSale bg-cover bg-center mx-auto">
+        <div className="container mx-auto py-10 text-center relative">
+          <h1 className="text-2xl font-bold font-font4">Sản Phẩm Nổi Bật</h1>
+        </div>
 
-      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 pb-10 relative max-w-5xl">
-        {products.slice(0, 9).map((product) => {
-          const avatarImage = getDirectImageURL(
-            product.ProductImages?.find((img) => img.is_avatar)?.img_url ||
-              product.ProductImages?.[0]?.img_url
-          );
+        <div className="container mx-auto pb-10 relative">
+          <Swiper
+            modules={[Autoplay]}
+            spaceBetween={20}
+            slidesPerView={1}
+            breakpoints={{
+              640: { slidesPerView: 1 },
+              768: { slidesPerView: 2 },
+              1024: { slidesPerView: 4 },
+            }}
+            loop={true}
+            autoplay={{ delay: 3000, disableOnInteraction: false }}
+            className="mySwiper"
+          >
+            {products.slice(0, 9).map((product) => {
+              const avatarImage = getDirectImageURL(
+                product.ProductImages?.find((img) => img.is_avatar)?.img_url ||
+                  product.ProductImages?.[0]?.img_url
+              );
 
-          return (
-            <ProductCard
-              key={product._id}
-              image={avatarImage}
-              name={product.name}
-              price={
-                product.retail_price
-                  ? `${product.retail_price.toLocaleString("vi-VN")} VND`
-                  : "Liên hệ"
-              }
-              link={`/productdetail/${product.slug}`}
-            />
-          );
-        })}
+              return (
+                <SwiperSlide key={product._id}>
+                  <ProductCard
+                    image={avatarImage}
+                    name={product.name}
+                    price={
+                      product.retail_price
+                        ? `${product.retail_price.toLocaleString("vi-VN")} VND`
+                        : "Liên hệ"
+                    }
+                    link={`/productdetail/${product.slug}`}
+                  />
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
+        </div>
       </div>
     </div>
   );

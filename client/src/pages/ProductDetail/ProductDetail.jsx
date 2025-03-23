@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import HeaderIn4 from "../../components/layout/header/headerin4";
-import Navbar from "../../components/layout/header/navbar";
+
 import ProductImageGallery from "../../components/ProductImageGallery/ProductImageGallery";
 import WhyChoiceMe from "../../components/WCM/whychoiceme";
 import PLProductDetail from "../../components/Listcard/PL-ProductDetail";
@@ -14,7 +13,6 @@ import { useCart } from "../../context/cartContext";
 export default function ProductDetail() {
   const { slug } = useParams();
   const [product, setProduct] = useState(null);
-  const [cart, setCart] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState("");
   const { addToCart } = useCart();
@@ -49,11 +47,7 @@ export default function ProductDetail() {
   return (
     <>
       <div className="relative">
-        <div className="container mx-auto relative pb-10">
-          <HeaderIn4 />
-          <Navbar />
-        </div>
-        <div className="bg-cover bg-center">
+        <div className="pt-10">
           <div className="container mx-auto my-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
             <ProductImageGallery images={product.ProductImages} />
             <div className="lg:col-span-7 space-y-6 p-5 bg-color-custom-4 rounded-xl border border-gray-200">
@@ -136,7 +130,6 @@ export default function ProductDetail() {
           </div>
         </div>
         <Divider />
-        <Footer />
       </div>
     </>
   );

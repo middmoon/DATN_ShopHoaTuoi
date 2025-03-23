@@ -3,8 +3,6 @@ import "./shoppingCart.css";
 import { useCart } from "../../context/cartContext";
 import { useNavigate } from "react-router-dom";
 
-import HeaderIn4 from "../../components/layout/header/headerin4";
-import Navbar from "../../components/layout/header/navbar";
 import Divider from "../../components/common/Divider/Divider";
 
 const getDirectImageURL = (url) => {
@@ -61,8 +59,6 @@ const CartPage = () => {
 
   return (
     <div className="container mx-auto p-5">
-      <HeaderIn4 />
-      <Navbar />
       <div className="pt-10">
         {mergedCart.length === 0 ? (
           <div class="flex flex-col bg-color-custom-2 w-full h-[50vh] animate-pulse rounded-xl p-4 gap-4">

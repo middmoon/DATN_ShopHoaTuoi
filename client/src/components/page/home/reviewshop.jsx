@@ -22,7 +22,7 @@ export default function ReviewService() {
   }, []);
 
   return (
-    <div className="ReviewService">
+    <div className="ReviewService bg-color-custom-4">
       <div className="container mx-auto py-10 text-center">
         <h1 className="text-2xl font-bold font-font4">Dịch Vụ Cung Cấp</h1>
       </div>

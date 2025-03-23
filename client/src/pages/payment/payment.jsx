@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import HeaderIn4 from "../../components/layout/header/headerin4";
-import Navbar from "../../components/layout/header/navbar";
 import { fetchProvinces, fetchDistricts, fetchWards } from "../../APIs/adress";
 import apiv1 from "../../utils/axiosClient";
 
@@ -180,8 +178,6 @@ const PaymentPage = () => {
 
   return (
     <div className="container mx-auto p-5">
-      <HeaderIn4 />
-      <Navbar />
       <div className="bg-white p-5 border shadow-lg rounded-lg">
         <h2 className="text-xl font-bold mb-3">Thanh toán</h2>
 

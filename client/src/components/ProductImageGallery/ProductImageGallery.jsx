@@ -3,7 +3,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 
-// Hàm chuyển đổi URL Google Drive (đặt lên đầu)
 const getDirectImageURL = (url) => {
   const match = url.match(/id=([^&]+)/);
   return match ? `https://lh3.googleusercontent.com/d/${match[1]}=s1000` : url;
