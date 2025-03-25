@@ -16,7 +16,7 @@ type Payment = {
   amount: number;
   status: string;
   info: Record<string, any>;
-  PaymentMethod: {
+  PaymentMethod?: {
     name: string;
   };
   PaymentHistories: PaymentHistory[];
@@ -48,7 +48,7 @@ type Order = {
   createdAt: string;
   updatedAt: string;
   Products: OrderProduct[];
-  OrderStatus: {
+  OrderStatus?: {
     name: string;
   };
   payment: Payment;
@@ -92,25 +92,27 @@ export const OrdersPage = ({ queryRoute }: { queryRoute: string }) => {
             <CardTitle className="flex justify-between items-center">
               <span>Đơn hàng #{order._id}</span>
               <div className="flex gap-2">
-                <span className="text-sm font-normal px-2 py-1 rounded-full bg-primary/10 text-primary">{order.OrderStatus.name}</span>
+                <span className="text-sm font-normal px-2 py-1 rounded-full bg-primary/10 text-primary">
+                  {order.OrderStatus?.name || "Chưa xác định"}
+                </span>
                 <span
                   className={`text-sm font-normal px-2 py-1 rounded-full ${
-                    order.payment.status === "Hoàn thành"
+                    order.payment?.status === "Hoàn thành"
                       ? "bg-[hsl(var(--success)_/_0.1)] text-[hsl(var(--create))]"
-                      : order.payment.status === "Thất bại"
+                      : order.payment?.status === "Thất bại"
                       ? "bg-[hsl(var(--failure)_/_0.1)] text-[hsl(var(--failure))]"
-                      : order.payment.status === "Đang xử lý"
+                      : order.payment?.status === "Đang xử lý"
                       ? "bg-[hsl(var(--update)_/_0.1)] text-[hsl(var(--update))]"
                       : "bg-[hsl(var(--actions)_/_0.1)] text-[hsl(var(--actions))]"
                   }`}
                 >
-                  {order.payment.status === "Hoàn thành"
+                  {order.payment?.status === "Hoàn thành"
                     ? "Đã thanh toán"
-                    : order.payment.status === "Thất bại"
+                    : order.payment?.status === "Thất bại"
                     ? "Thanh toán lỗi"
-                    : order.payment.status === "Đang xử lý"
+                    : order.payment?.status === "Đang xử lý" || order.payment?.status === "Chờ xác nhận"
                     ? "Chờ thanh toán"
-                    : order.payment.status}
+                    : order.payment?.status || "Chưa xác định"}
                 </span>
               </div>
             </CardTitle>
@@ -127,7 +129,7 @@ export const OrdersPage = ({ queryRoute }: { queryRoute: string }) => {
                   <strong>SĐT:</strong> {order.customer_phone}
                 </p>
                 <p>
-                  <strong>Thanh toán:</strong> {order.payment.PaymentMethod.name} - {order.payment.status}
+                  <strong>Thanh toán:</strong> {order.payment.PaymentMethod?.name || "Chưa xác định"} - {order.payment.status || "Chưa xác định"}
                 </p>
                 <p>
                   <strong>Ngày tạo:</strong> {new Date(order.createdAt).toLocaleDateString("vi-VN")}

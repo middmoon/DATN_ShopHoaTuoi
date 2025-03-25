@@ -5,6 +5,24 @@ import { motion } from "framer-motion";
 export default function MainBanner() {
   const text =
     "Hoa không chỉ là một món quà, mà còn là một cách để thể hiện tình cảm của bạn. Một bó hoa tươi thắm có thể nói lên hàng ngàn lời yêu thương, sự trân trọng và lòng biết ơn. Tại cửa hàng hoa của chúng tôi, mỗi bông hoa đều được chọn lựa kỹ lưỡng, được chăm chút tỉ mỉ để mang đến cho bạn những sản phẩm chất lượng nhất. Chúng tôi hiểu rằng, mỗi dịp tặng hoa đều mang một ý nghĩa đặc biệt, vì vậy, chúng tôi luôn cố gắng để giúp bạn gửi gắm những thông điệp yêu thương một cách trọn vẹn nhất.";
+
+  const smoothScrollTo = (targetY, duration = 800) => {
+    const startY = window.scrollY;
+    const difference = targetY - startY;
+    const startTime = performance.now();
+
+    const step = (currentTime) => {
+      const elapsedTime = currentTime - startTime;
+      const progress = Math.min(elapsedTime / duration, 1);
+      window.scrollTo(0, startY + difference * progress);
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
+  };
   return (
     <>
       {" "}
@@ -68,7 +86,7 @@ export default function MainBanner() {
         </div>
 
         <div className="w-full md:w-1/2 text-center md:text-left mt-8 md:mt-0">
-          <div className="text-5xl md:text-6xl font-bold leading-tight">
+          <div className="text-5xl md:text-6xl font-bold font-font2 leading-tight">
             <div className="">
               PETA
               <span className="animated-gradient">CILIOUS</span>
@@ -85,7 +103,7 @@ export default function MainBanner() {
                 staggerDuration={0.025}
                 splitLevelClassName="overflow-hidden pb-0.5 sm:pb-3 md:pb-3"
                 transition={{ type: "spring", damping: 30, stiffness: 400 }}
-                rotationInterval={3000}
+                rotationInterval={5000}
               />
             </div>
           </div>
@@ -106,11 +124,17 @@ export default function MainBanner() {
 
           {/* Buttons */}
           <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-4">
-            <button className="bg-gray-200 text-gray-800 px-6 py-3 rounded-full font-semibold">
+            <button
+              className="bg-gray-200 text-gray-800 px-6 py-3 rounded-full font-semibold transition-transform duration-300 hover:scale-105"
+              onClick={() => smoothScrollTo(window.innerHeight * 0.9)}
+            >
               Giới Thiệu
             </button>
+
             <button className="bg-color-custom-1 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2">
-              Mua Ngay <span className="text-xl">+</span>
+              <a href="/mastershop">
+                Mua Ngay <span className="text-xl">+</span>
+              </a>
             </button>
           </div>
 

@@ -24,9 +24,9 @@ interface FormValues {
   type: "Đơn online" | "Đơn cửa hàng" | "Đơn bán sĩ";
   total_price: number;
   note: string;
-  status_id: string;
+  status_id: number; // Changed from string to number
   delivery_day: Date;
-  delivery_address: string;
+  address: string;
   customer_id: number;
   customer_name: string;
   customer_phone: string;
@@ -195,8 +195,8 @@ export function NewOrderForm() {
       type: "Đơn cửa hàng",
       total_price: 0,
       note: "",
-      status_id: "4",
-      delivery_address: "",
+      status_id: 4, // Changed from "4" to 4
+      address: "",
       customer_name: "",
       customer_phone: "",
       products: [{ _id: 0, quantity: 1, retail_price: 0 }],
@@ -257,7 +257,7 @@ export function NewOrderForm() {
 
       form.setValue("district_code", district_code);
       form.setValue("ward_code", ward_code);
-      form.setValue("delivery_address", address);
+      form.setValue("address", address);
     } catch (error) {
       console.error("Error setting store address:", error);
       alert("Failed to set store address. Please try again.");
@@ -359,8 +359,8 @@ export function NewOrderForm() {
         return;
       }
 
-      if (!data.delivery_address) {
-        form.setError("delivery_address", {
+      if (!data.address) {
+        form.setError("address", {
           type: "required",
           message: "Địa chỉ giao nhận là bắt buộc",
         });
@@ -379,9 +379,16 @@ export function NewOrderForm() {
 
       setIsSubmitting(true);
 
+      // Get province, district, and ward names
+      const province = provinces.find((p) => p.code === data.province_code);
+      const district = districts.find((d) => d.code === data.district_code);
+      const ward = wards.find((w) => w.code === data.ward_code);
+
       const formattedData = {
         ...data,
-        status: Number(data.status_id),
+        province_name: province?.full_name || "",
+        district_name: district?.full_name || "",
+        ward_name: ward?.full_name || "",
         products: data.products.map((product) => ({
           ...product,
           quantity: Number(product.quantity),
@@ -392,15 +399,11 @@ export function NewOrderForm() {
 
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const response = await api.post("/test2", formattedData);
+      const response = await api.post("/order", formattedData);
 
       if (response.status !== 201) {
         throw new Error("Failed to create order. Please try again.");
       }
-
-      console.log("Data response:", response.data);
-
-      // Show success message and redirect
       alert("Đơn hàng đã được tạo thành công!");
     } catch (error) {
       console.error("Error creating order:", error);
@@ -445,7 +448,7 @@ export function NewOrderForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Trạng thái đơn hàng</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={String(field.value)}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Chọn trạng thái" />
@@ -687,7 +690,7 @@ export function NewOrderForm() {
           {/* Delivery Address */}
           <FormField
             control={form.control}
-            name="delivery_address"
+            name="address"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Số nhà - Tên đường</FormLabel>
@@ -729,13 +732,13 @@ export function NewOrderForm() {
           {fields.map((field, index: number) => (
             <Card key={field.id} className="mb-4">
               <CardContent className="pt-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Product Selection - Searchable Combobox */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                  {/* Product Selection - Searchable Combobox - Wider (6 columns) */}
                   <FormField
                     control={form.control}
                     name={`products.${index}._id`}
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="md:col-span-7">
                         <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Sản phẩm</FormLabel>
                         <Popover open={openProductSearch === index} onOpenChange={(open) => setOpenProductSearch(open ? index : null)}>
                           <PopoverTrigger asChild>
@@ -746,7 +749,11 @@ export function NewOrderForm() {
                                 aria-expanded={openProductSearch === index}
                                 className="w-full justify-between"
                               >
-                                {field.value && selectedProducts[index] ? selectedProducts[index].name : "Chọn sản phẩm"}
+                                <span className="flex-1 text-left break-words whitespace-normal m-1">
+                                  {field.value && selectedProducts[index]
+                                    ? selectedProducts[index].name + " - " + selectedProducts[index].retail_price.toLocaleString()
+                                    : "Chọn sản phẩm"}
+                                </span>
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
                             </FormControl>
@@ -790,13 +797,13 @@ export function NewOrderForm() {
                     )}
                   />
 
-                  {/* Quantity */}
+                  {/* Quantity - Narrower (2 columns) */}
                   <FormField
                     control={form.control}
                     name={`products.${index}.quantity`}
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Số lượng</FormLabel>
+                      <FormItem className="md:col-span-1">
+                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">SL</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -817,12 +824,12 @@ export function NewOrderForm() {
                     )}
                   />
 
-                  {/* Price */}
+                  {/* Price - Remaining space (4 columns) */}
                   <FormField
                     control={form.control}
                     name={`products.${index}.retail_price`}
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="md:col-span-4">
                         <FormLabel>Giá</FormLabel>
                         <div className="flex items-center gap-2">
                           <FormControl>

@@ -171,9 +171,7 @@ router.post(
       },
     });
 
-    console.log(vnpUrl);
-
-    res.json({ paymentUrl: vnpUrl });
+    res.status(201).json({ paymentUrl: vnpUrl });
   })
 );
 

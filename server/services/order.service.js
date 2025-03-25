@@ -5,7 +5,7 @@ const payment = require("../models/payment");
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 const moment = require("moment");
 
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 class OrderService {
   static createOrder = async (payload, customer_id = null) => {
@@ -54,6 +54,8 @@ class OrderService {
             ward_code: order.ward_code,
             district_code: order.district_code,
             province_code: order.province_code,
+            delivery_day: order.delivery_day ? new Date(order.delivery_day) : null,
+            type: order.type ? order.type : "Đơn online",
           },
           { transaction: t }
         );
@@ -95,7 +97,7 @@ class OrderService {
           const newPaymentHistory = await PaymentHistory.create(
             {
               payment_id: newPayment._id,
-              order_id: paymentHistory.order_id,
+              order_id: newOrder._id,
               status: paymentHistory.status,
             },
             { transaction: t }
@@ -139,7 +141,6 @@ class OrderService {
         };
 
         paymentHistory = {
-          order_id: newOrder._id,
           status: "Chờ xác nhận",
         };
         break;
@@ -150,16 +151,28 @@ class OrderService {
           order_id: orderId,
           status: "Hoàn thành",
           info: {
-            shop_order: `Thanh toan cho don hang: ${orderId}`,
+            shop_order: `Thanh toán cho đơn hàng tại shop: ${orderId}`,
           },
         };
 
         paymentHistory = {
-          order_id: newOrder._id,
           status: "Hoàn thành",
         };
         break;
       case 7: // { _id: 7, name: "Thanh toán khi nhận hàng (COD)" },
+        payment = {
+          amount: total_price,
+          method_id: payment_method_id,
+          order_id: orderId,
+          status: "Chờ xác nhận",
+          info: {
+            cod_order: `Thanh toán cho đơn hàng COD: ${orderId}`,
+          },
+        };
+
+        paymentHistory = {
+          status: "Chờ xác nhận",
+        };
         break;
       case 2:
         break;
@@ -266,6 +279,7 @@ class OrderService {
           ],
         },
       ],
+      order: [["createdAt", "DESC"]],
     });
 
     if (!orders) {
@@ -307,7 +321,27 @@ class OrderService {
           },
           attributes: ["_id", "name", "retail_price"],
         },
+        {
+          model: OrderStatus,
+          attributes: ["name"],
+        },
+        {
+          model: Payment,
+          as: "payment",
+          attributes: ["_id", "amount", "status", "info"],
+          include: [
+            {
+              model: PaymentMethod,
+              attributes: ["name"],
+            },
+            {
+              model: PaymentHistory,
+              attributes: ["status", "createdAt"],
+            },
+          ],
+        },
       ],
+      order: [["createdAt", "DESC"]],
     });
 
     if (!orders) {

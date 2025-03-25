@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect } from "react";
 
 import { BookOpen, Box, Command, Frame, SquareTerminal, NotebookPen, Bitcoin } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
@@ -18,6 +18,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import useGetPendingOrdersCount from "@/hooks/getPendingCountOrders";
+
+import { initSocket, getSocket, requestOrderCount } from "@/lib/socket";
 
 const data = {
   user: {
@@ -116,7 +118,21 @@ const data = {
 };
 
 export function AppSidebar({ roles, ...props }: { roles: string[] }) {
-  const { pendingOrdersCount, loading, error } = useGetPendingOrdersCount();
+  // const { pendingOrdersCount, loading, error } = useGetPendingOrdersCount();
+  const [orderCount, setOrderCount] = useState<number>(1);
+  useEffect(() => {
+    const socket = initSocket();
+    socket.on("orderCount", (data) => {
+      setOrderCount(data.count);
+    });
+
+    requestOrderCount();
+
+    return () => {
+      const socket = getSocket();
+      if (socket) socket.off("orderCount");
+    };
+  }, []);
 
   const isOwner = roles.includes("owner");
   const isSysAdmin = roles.includes("sys_admin");
@@ -144,7 +160,7 @@ export function AppSidebar({ roles, ...props }: { roles: string[] }) {
 
       {/* Content */}
       <SidebarContent>
-        {isOwner && <NavMain items={data.navMain} pendingOrdersCount={pendingOrdersCount} />}
+        {isOwner && <NavMain items={data.navMain} pendingOrdersCount={orderCount} />}
         {isSysAdmin && <NavMain items={data.projects} pendingOrdersCount={0} />}
         {!isOwner && !isSysAdmin && <p className="text-center text-sm text-gray-500">Không có quyền truy cập</p>}
       </SidebarContent>

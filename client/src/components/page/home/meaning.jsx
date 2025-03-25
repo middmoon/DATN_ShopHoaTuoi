@@ -1,99 +1,94 @@
-import { useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import { Pagination, Navigation } from "swiper/modules";
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
-const slides = [
+const images = [
   {
-    image: "/Img/Page/p7.webp",
-    title: "Hoa Hồng",
-    text: "Loài hoa quyến rũ với vẻ đẹp kiêu sa và hương thơm nồng nàn...",
+    src: "/Img/Page/p7.webp",
+    title: "Nature is beautiful",
+    author: "John Doe",
   },
-  { image: "/Img/Page/p7.webp", title: "Slide 2", text: "Nội dung slide 2" },
-  { image: "/Img/Page/p7.webp", title: "Slide 3", text: "Nội dung slide 3" },
-  { image: "/Img/Page/p7.webp", title: "Slide 4", text: "Nội dung slide 4" },
-  { image: "/Img/Page/p7.webp", title: "Slide 5", text: "Nội dung slide 5" },
-  { image: "/Img/Page/p7.webp", title: "Slide 6", text: "Nội dung slide 6" },
-  { image: "/Img/Page/p7.webp", title: "Slide 7", text: "Nội dung slide 7" },
-  { image: "/Img/Page/p7.webp", title: "Slide 8", text: "Nội dung slide 8" },
+  {
+    src: "/Img/Page/p7.webp",
+    title: "The city never sleeps",
+    author: "Jane Smith",
+  },
+  { src: "/Img/Page/p7.webp", title: "Future is now", author: "Josh Gray" },
+  { src: "/Img/Page/p7.webp", title: "The Art of Life", author: "Sarah Doe" },
+  { src: "/Img/Page/p7.webp", title: "Technology & You", author: "Tom Brix" },
+  {
+    src: "/Img/Page/p7.webp",
+    title: "Innovation at Heart",
+    author: "Emily Clark",
+  },
+  {
+    src: "/Img/Page/p7.webp",
+    title: "Beyond Imagination",
+    author: "Lucas Reed",
+  },
 ];
 
-export default function Meaning() {
-  const [selectedSlide, setSelectedSlide] = useState(slides[0]);
+const ImageSlider = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev >= images.length - 1 ? 0 : prev + 1));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="container mx-auto">
-      <div className="w-full bg-color-custom-2 p-5 flex">
-        {/* Phần danh sách bên trái với thanh cuộn */}
-        <div
-          className="w-1/4 p-4 border-gray-300 custom-scrollbar"
-          style={{
-            overflowY: "auto",
-            maxHeight: "300px",
-          }}
-        >
-          <style>
-            {`
-              .custom-scrollbar::-webkit-scrollbar {
-                width: 6px;
-              }
-              .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: #888;
-                border-radius: 4px;
-              }
-              .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: #555;
-              }
-              .custom-scrollbar::-webkit-scrollbar-track {
-                background: transparent;
-              }
-            `}
-          </style>
-          <ul className="space-y-4">
-            {slides.map((slide, index) => (
-              <li
-                key={index}
-                className={`cursor-pointer p-2 rounded-lg transition-all duration-300 ${
-                  selectedSlide === slide ? "bg-gray-300" : "bg-white"
-                }`}
-                onClick={() => setSelectedSlide(slide)}
-              >
-                <div className="relative">
-                  <img
-                    src={slide.image}
-                    alt={slide.title}
-                    className="w-full h-16 object-cover rounded mb-2"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded">
-                    <p className="text-white text-sm font-medium">
-                      {slide.title}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+    <div className="w-full bg-white flex flex-col gap-2 mt-[100px] items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        viewport={{ once: true, amount: 0.3 }}
+        className="mt-[100px] flex flex-col items-center justify-center gap-2"
+      >
+        <p className="!mb-0 text-[15px] font-[300] bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 text-transparent bg-clip-text">
+          CEO và người có ảnh hưởng
+        </p>
+        <h1 className="!mb-0 text-[45px] font-[500] max-w-[900px] text-center">
+          Top những CEO và người có ảnh hưởng đã có mặt trên nền tảng của chúng
+          tôi
+        </h1>
+      </motion.div>
 
-        {/* Phần hiển thị nội dung bên phải */}
-        <div className="w-3/4 p-4 flex flex-col items-center relative">
-          <div className="relative">
-            <img
-              src={selectedSlide.image}
-              alt={selectedSlide.title}
-              className="w-[500px] h-64 object-cover rounded-lg"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-              <h2 className="text-white text-xl font-bold text-center">
-                {selectedSlide.title}
-              </h2>
-            </div>
-          </div>
-          <p className="mt-2 text-lg text-center">{selectedSlide.text}</p>
-        </div>
+      <div className="flex justify-center items-center overflow-hidden w-full h-[700px] relative">
+        {images.map((image, index) => {
+          const position =
+            (index - currentIndex + images.length) % images.length; // Đảm bảo vị trí lặp
+
+          if (position >= 5) return null; // Chỉ hiển thị tối đa 5 ảnh
+
+          return (
+            <motion.div
+              key={index}
+              className="absolute w-[350px] h-[550px] rounded-xl overflow-hidden"
+              animate={{
+                x: (position - 2) * 250, // Giữ khoảng cách giữa các ảnh
+                scale: position === 2 ? 1 : 0.8, // Ảnh trung tâm lớn hơn
+                opacity: position > 4 ? 0 : 1, // Giảm opacity nếu ngoài phạm vi
+                rotateY: position === 2 ? 0 : (position - 2) * -20, // Quay nhẹ ảnh hai bên
+              }}
+              transition={{ type: "spring", stiffness: 100, damping: 20 }}
+            >
+              <img
+                src={image.src}
+                className="w-full h-full object-cover"
+                alt={image.title}
+              />
+              <div className="absolute bottom-0 bg-black/50 text-white w-full text-center p-2">
+                <p className="text-lg">{image.title}</p>
+                <p className="text-sm">{image.author}</p>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
-}
+};
+
+export default ImageSlider;

@@ -232,7 +232,7 @@ async function buildQueryOptions2(query) {
 
     whereProductConditions[Op.and] = [
       Sequelize.literal(`
-        MATCH(name, description, slug) AGAINST ('${keyword}*' IN BOOLEAN MODE)
+        MATCH(name, description) AGAINST ('${keyword}*' IN BOOLEAN MODE)
       `),
     ];
 
