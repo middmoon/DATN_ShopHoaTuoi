@@ -149,40 +149,69 @@ const PaymentPage = () => {
         retail_price: product.retail_price,
         quantity: product.quantity,
       })),
-      payment_method_id: paymentMethod,
+      payment_method_id: Number(paymentMethod),
     };
-
-    console.log("Dữ liệu gửi đi:", dataToSend);
 
     localStorage.setItem("customerInfo", JSON.stringify(dataToSend));
 
-    switch (paymentMethod) {
+    switch (dataToSend.payment_method_id) {
       case 1:
         try {
-          // 1: Create order
+          // 1: Tạo đơn hàng
           const createOrderResponse = await apiv1.post("/order", dataToSend);
+
+          if (createOrderResponse.status !== 201) {
+            throw new Error("Không thể tạo đơn hàng");
+          }
 
           const orderData = createOrderResponse.data.data;
 
-          // 2: Create payment url
-          const vnpayPaymentResponse = await apiv1.post("/payment/vnpay/create_payment_url", {
+          // 2: Tạo URL thanh toán
+          const paymentData = {
             orderId: orderData.order._id,
             amount: orderData.order.total_price,
             language: orderData.payment.info.language,
             bankCode: "VNBANK",
             txnRef: orderData.payment.info.vnp_TxnRef,
             orderInfo: orderData.payment.info.vnp_OrderInfo,
-          });
+          };
+          const vnpayPaymentResponse = await apiv1.post("/payment/vnpay/create_payment_url", paymentData);
+
+          if (vnpayPaymentResponse.status !== 201) {
+            throw new Error("Không thể tạo URL thanh toán");
+          }
 
           const data = vnpayPaymentResponse.data;
+
           window.location.href = data.paymentUrl;
         } catch (error) {
           console.error("Lỗi khi gửi dữ liệu:", error);
-          alert("Không thể gửi dữ liệu. Vui lòng thử lại.");
+          if (error.message === "Dữ liệu không hợp lệ") {
+            alert("Vui lòng kiểm tra lại thông tin đơn hàng.");
+          } else {
+            alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
+          }
         }
         break;
-      case "cod":
-        alert(JSON.stringify(dataToSend));
+      case 7:
+        try {
+          const createOrderResponse = await apiv1.post("/order", dataToSend);
+
+          if (createOrderResponse.status !== 201) {
+            throw new Error("Không thể tạo đơn hàng");
+          }
+
+          alert("Cảm ơn bạn đã đặt hàng hãy chờ nhân viên liên hệ.");
+
+          navigate("/");
+        } catch (error) {
+          console.error("Lỗi khi gửi dữ liệu:", error);
+          if (error.message === "Dữ liệu không hợp lệ") {
+            alert("Vui lòng kiểm tra lại thông tin đơn hàng.");
+          } else {
+            alert("Có lỗi xảy ra. Vui lòng thử lại sau.");
+          }
+        }
         break;
       default:
         break;

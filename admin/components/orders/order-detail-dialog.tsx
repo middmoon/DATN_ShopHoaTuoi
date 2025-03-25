@@ -28,7 +28,7 @@ export function OrderDetailDialog({
     try {
       setIsUpdating(true);
       // Replace with your actual API endpoint
-      await api.put(`/orders/${order._id}/status`, { status_id: newStatusId });
+      // await api.put(`/orders/${order._id}/status`, { status_id: newStatusId });
 
       // Map status ID to status name (you may need to adjust this based on your status mapping)
       const statusMap: Record<number, string> = {
@@ -37,6 +37,8 @@ export function OrderDetailDialog({
         3: "Hoàn thành",
         4: "Đơn bị hủy",
       };
+
+      alert("Đơn hàng đã được thay đổi thành " + statusMap[newStatusId]);
 
       onUpdateStatus(order._id, statusMap[newStatusId]);
     } catch (error) {
@@ -54,12 +56,14 @@ export function OrderDetailDialog({
             <span>Chi tiết đơn hàng #{order._id}</span>
             <Badge
               variant={
-                order.OrderStatus.name === "Chờ xác nhận"
+                order.OrderStatus?.name === "Chờ xác nhận"
                   ? "outline"
-                  : order.OrderStatus.name === "Đang xử lý"
+                  : order.OrderStatus?.name === "Đang xử lý"
                   ? "secondary"
-                  : order.OrderStatus.name === "Hoàn thành"
+                  : order.OrderStatus?.name === "Hoàn thành"
                   ? "default"
+                  : order.OrderStatus?.name === "Đang giao hàng"
+                  ? "secondary"
                   : "destructive"
               }
             >
@@ -169,24 +173,43 @@ export function OrderDetailDialog({
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2 mt-6">
-          {order.OrderStatus.name === "Chờ xác nhận" && (
+          {order.OrderStatus?.name === "Chờ xác nhận" && (
             <>
               <Button variant="default" onClick={() => handleStatusUpdate(2)} disabled={isUpdating}>
                 {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Xác nhận đơn hàng
               </Button>
-              <Button variant="destructive" onClick={() => handleStatusUpdate(4)} disabled={isUpdating}>
+              <Button variant="destructive" onClick={() => handleStatusUpdate(5)} disabled={isUpdating}>
                 {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Hủy đơn hàng
               </Button>
             </>
           )}
 
-          {order.OrderStatus.name === "Đang xử lý" && (
-            <Button variant="default" onClick={() => handleStatusUpdate(3)} disabled={isUpdating}>
-              {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Hoàn thành đơn hàng
-            </Button>
+          {order.OrderStatus?.name === "Đang xử lý" && (
+            <>
+              <Button variant="default" onClick={() => handleStatusUpdate(3)} disabled={isUpdating}>
+                {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Chuyển sang giao hàng
+              </Button>
+              <Button variant="destructive" onClick={() => handleStatusUpdate(5)} disabled={isUpdating}>
+                {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Hủy đơn hàng
+              </Button>
+            </>
+          )}
+
+          {order.OrderStatus?.name === "Đang giao hàng" && (
+            <>
+              <Button variant="default" onClick={() => handleStatusUpdate(4)} disabled={isUpdating}>
+                {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Giao hàng thành công
+              </Button>
+              <Button variant="secondary" onClick={() => handleStatusUpdate(6)} disabled={isUpdating}>
+                {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Khách hoàn trả
+              </Button>
+            </>
           )}
 
           <Button variant="outline" onClick={onClose}>

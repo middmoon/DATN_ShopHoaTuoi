@@ -2,13 +2,19 @@
 
 const OrderService = require("../services/order.service");
 const { OK, CREATED } = require("../utils/success.response");
-const { BAD_REQUEST } = require("../utils/error.response");
 
 class OrderController {
   static createOrder = async (req, res) => {
+    const orderData = await OrderService.createOrder(req.body, req._id);
+
+    const io = req.app.get("io");
+
+    const orderCount = await OrderService.getPendingOrdersCount();
+    io.emit("orderCount", { count: orderCount });
+
     new CREATED({
       message: "Order created successfully",
-      data: await OrderService.createOrder(req.body, req._id),
+      data: orderData,
     }).send(res);
   };
 
@@ -40,15 +46,6 @@ class OrderController {
     }).send(res);
   };
 
-  // await queryInterface.bulkInsert("order_statuses", [
-  //   { _id: 1, name: "Chờ xác nhận", description: "Đơn hàng đang chờ xác nhận" },
-  //   { _id: 2, name: "Đang xử lý", description: "Đơn hàng đang được chuẩn bị" },
-  //   { _id: 3, name: "Đang giao hàng", description: "Shipper đang giao đơn hàng" },
-  //   { _id: 4, name: "Hoàn thành", description: "Đơn hàng đã được giao thành công" },
-  //   { _id: 5, name: "Đơn bị hủy", description: "Đơn hàng đã bị hủy" },
-  //   { _id: 6, name: "Đơn bị hoàn", description: "Khách hàng trả lại hàng" },
-  // ]);
-
   static getPendingOrders = async (req, res) => {
     new OK({
       message: "get pending orders successfully",
@@ -63,10 +60,31 @@ class OrderController {
     }).send(res);
   };
 
+  static getShippingOrders = async (req, res) => {
+    new OK({
+      message: "get comfirmed orders successfully",
+      data: await OrderService.getOrdersByStatus(3),
+    }).send(res);
+  };
+
   static getFinishedOrders = async (req, res) => {
     new OK({
       message: "get finished orders successfully",
       data: await OrderService.getOrdersByStatus(4),
+    }).send(res);
+  };
+
+  static getCanceledOrders = async (req, res) => {
+    new OK({
+      message: "get comfirmed orders successfully",
+      data: await OrderService.getOrdersByStatus(5),
+    }).send(res);
+  };
+
+  static getRefundOrders = async (req, res) => {
+    new OK({
+      message: "get comfirmed orders successfully",
+      data: await OrderService.getOrdersByStatus(6),
     }).send(res);
   };
 

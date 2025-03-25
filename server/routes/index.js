@@ -1,8 +1,6 @@
 "use strict";
 
 const express = require("express");
-const { head } = require("../app");
-const { api } = require("../config/cloudinary.config");
 const router = express.Router();
 const { checkRole } = require("../middlewares/auth.middleware");
 

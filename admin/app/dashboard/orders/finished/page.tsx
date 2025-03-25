@@ -1,6 +1,5 @@
-import { notFound } from "next/navigation";
-import { api } from "@/utils/api";
 import { PageHeader } from "@/components/page-header";
+import { OrdersPage } from "@/components/orders/order-page";
 
 // export async function getOrderDetail(params: string) {
 //   const res = await api.get(`/order/${params}`);
@@ -24,9 +23,7 @@ export default async function finishedOrdersPage() {
   return (
     <>
       <PageHeader items={breadcrumbItems}></PageHeader>
-      <div className="container mx-auto p-10">
-        <p>finished</p>
-      </div>
+      <OrdersPage queryRoute={"/order/finished"} />
     </>
   );
 }
