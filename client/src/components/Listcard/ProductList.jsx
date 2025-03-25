@@ -10,7 +10,10 @@ const ProductList = () => {
       try {
         const response = await getProduct();
         if (response.status === 200) {
-          setProducts(response.data);
+          const shuffledProducts = response.data.sort(
+            () => Math.random() - 0.5
+          );
+          setProducts(shuffledProducts);
         }
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -20,7 +23,6 @@ const ProductList = () => {
     fetchProducts();
   }, []);
 
-  // Chuyển đổi URL Google Drive
   const getDirectImageURL = (url) => {
     if (!url) return "/Img/Page/p3.webp";
     const match = url.match(/(?:id=|\/d\/)([^/&?]+)/);
@@ -35,8 +37,8 @@ const ProductList = () => {
         <h1 className="text-2xl font-bold font-font4">Danh Sách Sản Phẩm</h1>
       </div>
 
-      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-10 pb-10 relative max-w-5xl">
-        {products.slice(0, 9).map((product) => {
+      <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-20 pb-10 relative">
+        {products.slice(0, 12).map((product) => {
           const avatarImage = getDirectImageURL(
             product.ProductImages?.find((img) => img.is_avatar)?.img_url ||
               product.ProductImages?.[0]?.img_url

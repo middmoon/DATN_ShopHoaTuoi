@@ -2,12 +2,12 @@ import React from "react";
 
 const IntroduceShop = () => {
   return (
-    <div className="introduce px-11 min-h-50vh flex items-center justify-center py-10 bg-cover bg-center relative">
-      <div className="absolute top-0 left-0 w-full h-full bg-white"></div>
+    <div className="introduce min-h-50vh flex items-center justify-center py-20 bg-cover bg-center relative">
+      <div className="absolute top-0 left-0 w-full h-full"></div>
 
       <div className="container mx-auto flex flex-col md:flex-row items-center gap-8 relative">
         <div className="flex-1 text-center md:text-left">
-          <h2 className="text-2xl md:text-4xl font-bold text-color-custom-2 font-font3 mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold text-color-custom-1 font-font3 mb-4">
             Chào Mừng Đến Với Petacilious
           </h2>
           <p className="text-gray-700 font-font4 text-sm md:text-base leading-relaxed">
@@ -23,14 +23,14 @@ const IntroduceShop = () => {
         </div>
         <div className="flex-1 relative">
           <img
-            src="/Img/Petacilious.png"
+            src="/Img/Page/p7.webp"
             alt="Large Flower"
             className="w-full rounded-lg shadow-lg border-4 border-white"
             style={{ height: "50%" }}
           />
 
           <img
-            src="/Img/Petacilious.png"
+            src="/Img/Page/p7.webp"
             alt="Small Flower"
             className="w-1/2 absolute bottom-0 right-0 transform translate-x-1/3 translate-y-1/3 rounded-lg shadow-lg border-4 border-white"
             style={{ height: "50%" }}

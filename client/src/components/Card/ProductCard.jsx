@@ -25,7 +25,7 @@ const ProductCard = ({ image, name, price, isSale, link, category }) => {
           {price}
         </p>
 
-        <button className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-all w-full">
+        <button className="bg-color-custom-1 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-all w-full">
           Mua ngay
         </button>
       </div>

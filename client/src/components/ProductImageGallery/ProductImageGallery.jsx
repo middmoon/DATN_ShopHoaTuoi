@@ -3,7 +3,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/navigation";
 
-// Hàm chuyển đổi URL Google Drive (đặt lên đầu)
 const getDirectImageURL = (url) => {
   const match = url.match(/id=([^&]+)/);
   return match ? `https://lh3.googleusercontent.com/d/${match[1]}=s1000` : url;
@@ -18,8 +17,7 @@ export default function ProductImageGallery({ images = [] }) {
 
   return (
     <div className="lg:col-span-5 flex flex-col items-center">
-      {/* Ảnh chính */}
-      <div className="flex w-full pt-5 bg-color-custom-1 justify-center items-center">
+      <div className="flex w-full bg-color-custom-4 justify-center items-center">
         <img
           src={mainImage}
           alt="Main product"
@@ -27,7 +25,6 @@ export default function ProductImageGallery({ images = [] }) {
         />
       </div>
 
-      {/* Slider ảnh nhỏ */}
       <div className="w-full py-10 px-4 bg-color-custom-4">
         <Swiper spaceBetween={10} slidesPerView={3} className="h-[100px]">
           {images.map((img, index) => (

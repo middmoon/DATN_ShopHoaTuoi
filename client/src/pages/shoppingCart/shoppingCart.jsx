@@ -1,9 +1,8 @@
 import React, { useState } from "react";
+import "./shoppingCart.css";
 import { useCart } from "../../context/cartContext";
 import { useNavigate } from "react-router-dom";
 
-import HeaderIn4 from "../../components/layout/header/headerin4";
-import Navbar from "../../components/layout/header/navbar";
 import Divider from "../../components/common/Divider/Divider";
 
 const getDirectImageURL = (url) => {
@@ -27,21 +26,16 @@ const CartPage = () => {
     }));
   };
   const handleCheckout = () => {
-    // Lọc các sản phẩm đã chọn
     const selectedProducts = mergedCart.filter(
       (item) => selectedItems[item.slug]
     );
 
-    // Lưu sản phẩm đã chọn vào localStorage
     localStorage.setItem("selectedProducts", JSON.stringify(selectedProducts));
 
-    // Xóa sản phẩm đã chọn khỏi giỏ hàng trong cartContext và localStorage
     selectedProducts.forEach((item) => {
-      // Gọi removeFromCart để xóa sản phẩm khỏi giỏ hàng (cartContext)
       removeFromCart(item.slug);
     });
 
-    // Điều hướng sang trang thanh toán
     navigate("/payment");
   };
 
@@ -65,14 +59,19 @@ const CartPage = () => {
 
   return (
     <div className="container mx-auto p-5">
-      <HeaderIn4 />
-      <Navbar />
       <div className="pt-10">
         {mergedCart.length === 0 ? (
-          <p className="text-gray-500">Giỏ hàng trống.</p>
+          <div class="flex flex-col bg-color-custom-2 w-full h-[50vh] animate-pulse rounded-xl p-4 gap-4">
+            <div class="bg-color-custom-1/50 w-full h-32 animate-pulse rounded-md"></div>
+            <div class="flex flex-col gap-2">
+              <div class="bg-color-custom-1/50 w-full h-[10vh] animate-pulse rounded-md"></div>
+              <div class="bg-color-custom-1/50 w-4/5 h-[10vh] animate-pulse rounded-md"></div>
+              <div class="bg-color-custom-1/50 w-full h-[5vh] animate-pulse rounded-md"></div>
+              <div class="bg-color-custom-1/50 w-2/4 h-[5vh] animate-pulse rounded-md"></div>
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-10 gap-4">
-            {/* Cột sản phẩm (70%) */}
             <div className="col-span-7 bg-color-custom-4 p-5 shadow-lg rounded-lg">
               <ul className="space-y-4">
                 {mergedCart.map((item, index) => (

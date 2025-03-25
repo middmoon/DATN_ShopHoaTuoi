@@ -1,34 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import CategoryCard from "../../Card/CategoryCard";
-import { getCategories } from "../../../APIs/categoryAPI";
+
+const fakeFlowers = [
+  { id: 1, name: "Hoa Hồng", image: "/Img/category/1.webp" },
+  { id: 2, name: "Hoa Cúc", image: "/Img/category/2.webp" },
+  { id: 3, name: "Hoa Lan", image: "/Img/category/3.webp" },
+  { id: 4, name: "Hoa Sen", image: "/Img/category/4.webp" },
+  { id: 5, name: "Hoa Tulip", image: "/Img/category/5.webp" },
+  { id: 6, name: "Hoa Hướng Dương", image: "/Img/category/6.webp" },
+  { id: 7, name: "Hoa Oải Hương", image: "/Img/category/7.webp" },
+  { id: 8, name: "Hoa Bỉ Ngạn", image: "/Img/category/8.webp" },
+];
 
 export default function ReviewService() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getCategories();
-        if (response.status === 200) {
-          const categoryData = response.data;
-
-          const parentCategories = categoryData
-            .filter((cat) => !cat.parent_id)
-            .map((cat) => ({
-              id: cat._id,
-              name: cat.name,
-            }));
-
-          setCategories(parentCategories);
-        }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
+    setCategories(fakeFlowers);
   }, []);
 
   return (
@@ -39,11 +29,12 @@ export default function ReviewService() {
 
       <div className="container mx-auto pb-10">
         <Swiper
-          modules={[Navigation, Pagination]}
+          modules={[Navigation, Pagination, Autoplay]}
           spaceBetween={20}
           slidesPerView={5}
           pagination={{ clickable: true }}
           loop={true}
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
           breakpoints={{
             1024: { slidesPerView: 5 },
             768: { slidesPerView: 3 },
@@ -53,7 +44,7 @@ export default function ReviewService() {
           className="!pb-10"
         >
           {categories.map((category) => (
-            <SwiperSlide key={category.id}>
+            <SwiperSlide key={category.id} className="text-center">
               <CategoryCard image={category.image} name={category.name} />
             </SwiperSlide>
           ))}

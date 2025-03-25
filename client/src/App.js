@@ -12,10 +12,13 @@ import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import CartPage from "./pages/shoppingCart/shoppingCart";
 import PaymentPage from "./pages/payment/payment";
 import PaymentResult from "./components/PaymentResult/PaymentResult";
-
 import WithLayout from "./Layouts/WithLayout";
 
 const HomeWithLayout = WithLayout(Home);
+const MasterShopWithLayout = WithLayout(MasterShop);
+const ProductDetailWithLayout = WithLayout(ProductDetail);
+const CartPageWithLayout = WithLayout(CartPage);
+const PaymentPageWithLayout = WithLayout(PaymentPage);
 
 function App() {
   return (
@@ -26,10 +29,10 @@ function App() {
         <Route path="/test" element={<Test />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
-        <Route path="mastershop" element={<MasterShop />} />
-        <Route path="productdetail/:slug" element={<ProductDetail />} />
-        <Route path="cart" element={<CartPage />} />
-        <Route path="payment" element={<PaymentPage />} />
+        <Route path="mastershop" element={<MasterShopWithLayout />} />
+        <Route path="productdetail/:slug" element={<ProductDetailWithLayout />} />
+        <Route path="cart" element={<CartPageWithLayout />} />
+        <Route path="payment" element={<PaymentPageWithLayout />} />
         <Route path="/payment-success" element={<PaymentResult />} />
         {/* <Route path="/payment-failure" element={<PaymentResult />} /> */}
       </Routes>

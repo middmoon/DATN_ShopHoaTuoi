@@ -11,11 +11,10 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
     <div className="flex min-h-screen">
-      {/* Left Section */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-white px-6">
         <div className="max-w-md w-full">
           <div className="flex justify-center mb-6">
-            <div className="flex-1 font-font1 text-3xl font-bold text-black text-center">
+            <div className="flex-1 font-font1 text-3xl font-bold text-color-custom-1 text-center">
               <a href="/">PETACILIOUS</a>
             </div>
           </div>
@@ -31,7 +30,7 @@ export default function Register() {
               <div className="relative">
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-color-custom-1"
                   placeholder="Nhập tên đăng nhập"
                 />
               </div>
@@ -40,17 +39,16 @@ export default function Register() {
               <label className="block text-gray-700 mb-2">Email</label>
               <input
                 type="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+                className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-color-custom-1"
                 placeholder="Nhập địa chỉ email"
               />
             </div>
-            {/* Trường Mật khẩu */}
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Mật khẩu</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-color-custom-1"
                   placeholder="Nhập mật khẩu"
                 />
                 <button
@@ -76,7 +74,6 @@ export default function Register() {
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                   ) : (
-                    // SVG icon for hidden password
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -100,7 +97,6 @@ export default function Register() {
               </div>
             </div>
 
-            {/* Trường Nhập lại mật khẩu */}
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">
                 Nhập Lại Mật khẩu
@@ -108,7 +104,7 @@ export default function Register() {
               <div className="relative">
                 <input
                   type={showConfirmPassword ? "text" : "password"}
-                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-color-custom-1"
                   placeholder="Nhập lại mật khẩu"
                 />
                 <button
@@ -117,7 +113,6 @@ export default function Register() {
                   className="absolute inset-y-0 right-3 flex items-center text-gray-500 focus:outline-none"
                 >
                   {showConfirmPassword ? (
-                    // SVG icon for visible password
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -134,7 +129,6 @@ export default function Register() {
                       <circle cx="12" cy="12" r="3" />
                     </svg>
                   ) : (
-                    // SVG icon for hidden password
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -164,20 +158,20 @@ export default function Register() {
                   Nhớ Tài Khoản
                 </label>
               </div>
-              <button className="text-blue-500 hover:underline">
+              <button className="text-color-custom-1 hover:underline">
                 Quên Mật Khẩu?
               </button>
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+              className="w-full bg-color-custom-3 text-color-custom-4 py-2 rounded hover:bg-color-custom-1"
             >
-              Đăng Nhập
+              Đăng Ký
             </button>
           </form>
           <p className="text-center mt-6">
             Tôi Đã Có Tài Khoản{" "}
-            <a href="/login" className="text-blue-500 hover:underline">
+            <a href="/login" className="text-color-custom-1 hover:underline">
               Đăng Nhập
             </a>
           </p>
@@ -196,7 +190,7 @@ export default function Register() {
           <SwiperSlide>
             <div className="h-full w-full">
               <img
-                src="/Img/Page/p4.jpg"
+                src="/Img/Page/p7.webp"
                 alt="Slide 1"
                 className="h-full w-full object-cover"
               />
@@ -206,17 +200,16 @@ export default function Register() {
           <SwiperSlide>
             <div className="h-full w-full">
               <img
-                src="/Img/Page/p5.jpg"
+                src="/Img/Page/p7.webp"
                 alt="Slide 2"
                 className="h-full w-full object-cover"
               />
             </div>
           </SwiperSlide>
-          {/* Slide 3 */}
           <SwiperSlide>
             <div className="h-full w-full">
               <img
-                src="/Img/Page/p6.jpg"
+                src="/Img/Page/p7.webp"
                 alt="Slide 3"
                 className="h-full w-full object-cover"
               />

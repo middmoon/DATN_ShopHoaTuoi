@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import HeaderIn4 from "../../components/layout/header/headerin4";
-import Navbar from "../../components/layout/header/navbar";
 import { fetchProvinces, fetchDistricts, fetchWards } from "../../APIs/adress";
 import apiv1 from "../../utils/axiosClient";
 
@@ -29,11 +27,6 @@ const PaymentPage = () => {
   const [wards, setWards] = useState([]);
 
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const totalAmount = selectedProducts.reduce((total, product) => total + product.quantity * product.retail_price, 0);
-    setAmount(totalAmount);
-  }, [selectedProducts]);
 
   useEffect(() => {
     const getProvinces = async () => {
@@ -175,7 +168,10 @@ const PaymentPage = () => {
             txnRef: orderData.payment.info.vnp_TxnRef,
             orderInfo: orderData.payment.info.vnp_OrderInfo,
           };
-          const vnpayPaymentResponse = await apiv1.post("/payment/vnpay/create_payment_url", paymentData);
+          const vnpayPaymentResponse = await apiv1.post(
+            "/payment/vnpay/create_payment_url",
+            paymentData
+          );
 
           if (vnpayPaymentResponse.status !== 201) {
             throw new Error("Không thể tạo URL thanh toán");
@@ -220,8 +216,6 @@ const PaymentPage = () => {
 
   return (
     <div className="container mx-auto p-5">
-      <HeaderIn4 />
-      <Navbar />
       <div className="bg-white p-5 border shadow-lg rounded-lg">
         <h2 className="text-xl font-bold mb-3">Thanh toán</h2>
 
@@ -260,10 +254,20 @@ const PaymentPage = () => {
         </div>
 
         <label>Địa chỉ cụ thể</label>
-        <input type="text" name="address" value={customerInfo.address} onChange={handleInputChange} className="w-full p-2 border rounded mb-4" />
+        <input
+          type="text"
+          name="address"
+          value={customerInfo.address}
+          onChange={handleInputChange}
+          className="w-full p-2 border rounded mb-4"
+        />
 
         <div className="grid grid-cols-3 gap-4">
-          <select value={customerInfo.province_code} onChange={handleProvinceChange} className="w-full p-2 border rounded">
+          <select
+            value={customerInfo.province_code}
+            onChange={handleProvinceChange}
+            className="w-full p-2 border rounded"
+          >
             <option value="">Chọn tỉnh/thành</option>
             {provinces.map((p) => (
               <option key={p.code} value={p.code}>
@@ -301,18 +305,32 @@ const PaymentPage = () => {
         <div className="bg-white p-5 border shadow-lg rounded-lg">
           <h2 className="text-xl font-bold mb-3">Thanh toán</h2>
 
-          <h3 className="text-lg font-semibold mt-5 pb-5">Danh sách sản phẩm</h3>
+          <h3 className="text-lg font-semibold mt-5 pb-5">
+            Danh sách sản phẩm
+          </h3>
           {selectedProducts.length === 0 ? (
-            <p className="text-gray-500 text-center py-4 text-lg">Không có sản phẩm để thanh toán</p>
+            <p className="text-gray-500 text-center py-4 text-lg">
+              Không có sản phẩm để thanh toán
+            </p>
           ) : (
             <div className="border p-5 rounded-lg bg-gray-100 shadow-md">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3">Sản phẩm đã chọn</h3>
+              <h3 className="text-lg font-semibold text-gray-700 mb-3">
+                Sản phẩm đã chọn
+              </h3>
               <ul>
                 {selectedProducts.map((product, index) => (
-                  <li key={index} className="flex justify-between items-center py-3">
-                    <span className="font-medium text-gray-800">{product.name}</span>
+                  <li
+                    key={index}
+                    className="flex justify-between items-center py-3"
+                  >
+                    <span className="font-medium text-gray-800">
+                      {product.name}
+                    </span>
                     <span className="text-gray-600">
-                      {product.quantity} x <span className="text-red-500 font-semibold">{product.retail_price.toLocaleString()} VNĐ</span>
+                      {product.quantity} x{" "}
+                      <span className="text-red-500 font-semibold">
+                        {product.retail_price.toLocaleString()} VNĐ
+                      </span>
                     </span>
                   </li>
                 ))}
@@ -320,20 +338,38 @@ const PaymentPage = () => {
 
               <div className="mt-4 pt-3 border-t border-gray-300 flex justify-between text-lg font-bold text-gray-800">
                 <span>Tổng tiền:</span>
-                <span className="text-red-500">{amount.toLocaleString()} VNĐ</span>
+                <span className="text-red-500">
+                  {selectedProducts
+                    .reduce(
+                      (total, product) =>
+                        total + product.quantity * product.retail_price,
+                      0
+                    )
+                    .toLocaleString()}{" "}
+                  VNĐ
+                </span>
               </div>
             </div>
           )}
 
           <div className="mb-4 pt-10">
-            <label className="block text-gray-700 font-semibold mb-2">Phương thức thanh toán</label>
-            <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full p-2 border rounded">
-              <option value="7">Thanh toán khi nhận hàng (COD)</option>
-              <option value="1">Thanh toán qua VNPay</option>
+            <label className="block text-gray-700 font-semibold mb-2">
+              Phương thức thanh toán
+            </label>
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              className="w-full p-2 border rounded"
+            >
+              <option value="cod">Thanh toán khi nhận hàng (COD)</option>
+              <option value="vnpay">Thanh toán qua VNPay</option>
             </select>
           </div>
 
-          <button onClick={handleSubmit} className="w-full mt-5 px-5 py-2 bg-blue-500 text-white rounded-lg">
+          <button
+            onClick={handleSubmit}
+            className="w-full mt-5 px-5 py-2 bg-blue-500 text-white rounded-lg"
+          >
             Xác nhận đặt hàng
           </button>
         </div>
