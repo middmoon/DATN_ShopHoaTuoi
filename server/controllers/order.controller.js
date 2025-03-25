@@ -5,16 +5,14 @@ const { OK, CREATED } = require("../utils/success.response");
 
 class OrderController {
   static createOrder = async (req, res) => {
-    const orderData = await OrderService.createOrder(req.body, req._id);
+    // const io = req.app.get("io");
 
-    const io = req.app.get("io");
-
-    const orderCount = await OrderService.getPendingOrdersCount();
-    io.emit("orderCount", { count: orderCount });
+    // const orderCount = await OrderService.getPendingOrdersCount();
+    // io.emit("orderCount", { count: orderCount });
 
     new CREATED({
       message: "Order created successfully",
-      data: orderData,
+      data: await OrderService.createOrder(req.body, req._id),
     }).send(res);
   };
 

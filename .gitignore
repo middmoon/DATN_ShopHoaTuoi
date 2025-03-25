@@ -142,3 +142,4 @@ dist
 .yarn/install-state.gz
 .pnp.*
 /vnpay_nodejs/config
+/server/config/default.json

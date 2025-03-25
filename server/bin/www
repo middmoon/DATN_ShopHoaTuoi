@@ -22,7 +22,7 @@ app.set("port", port);
  * Create HTTP server.
  */
 const server = http.createServer(app);
-// const io = require("../config/socket.config")(server);
+const io = require("../config/socket.config")(server);
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -45,7 +45,7 @@ const server = http.createServer(app);
         console.log("✅ Database connected successfully!");
       })
       .then(() => {
-        // app.set("io", io);
+        app.set("io", io);
         server.listen(port);
         console.log(`🚀 Starting server in ${process.env.NODE_ENV} mode`);
         server.on("error", onError);
