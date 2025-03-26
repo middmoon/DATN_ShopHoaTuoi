@@ -29,7 +29,7 @@ export function NavMain({
       url: string;
     }[];
   }[];
-  pendingOrdersCount: number;
+  pendingOrdersCount: any;
 }) {
   return (
     <SidebarGroup>

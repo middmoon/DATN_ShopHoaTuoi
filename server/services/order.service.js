@@ -233,13 +233,13 @@ class OrderService {
   };
 
   static getPendingOrdersCount = async () => {
-    const count = await Order.count({
+    const pendingOrdersCount = await Order.count({
       where: {
         status_id: 1,
       },
     });
 
-    return { pending_orders_count: count };
+    return { pendingOrdersCount };
   };
 
   static changeOrderStatus = async (orderId, order) => {
@@ -356,6 +356,16 @@ class OrderService {
       where: { _id: orderId },
     });
     return updatedOrder;
+  };
+
+  static countOrders = async () => {
+    const count = await Order.count();
+
+    if (!count) {
+      throw new NOTFOUND("Can not get orders");
+    }
+
+    return count;
   };
 }
 

@@ -1,8 +1,13 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
+const asyncHandler = require("express-async-handler");
 
-router.get("/", function (req, res, next) {
-  res.render("index", { title: "LOG API V1 - Audit logs" });
-});
+const AuditLogController = require("../../controller/audit_log.controller");
+
+router
+  .get("/", function (req, res, next) {
+    res.render("index", { title: "LOG API V1 - Audit logs" });
+  })
+  .get("/count", asyncHandler(AuditLogController.countAllAuditLogs));
 
 module.exports = router;
