@@ -32,6 +32,37 @@ function buildQueryOptions(query) {
   // --- Tìm kiếm cơ bản ---
   const keyword = q || search;
 
+  const andConditions = [];
+
+  // if (keyword) {
+  //   const keyword_slug = slugify(keyword, {
+  //     replacement: "-",
+  //     remove: undefined,
+  //     lower: true,
+  //     strict: false,
+  //     locale: "vi",
+  //     trim: true,
+  //   });
+
+  //   andConditions.push({
+  //     [Op.or]: [
+  //       { name: { [Op.like]: `%${keyword}%` } },
+  //       { description: { [Op.like]: `%${keyword}%` } },
+  //       { slug: { [Op.like]: `%${keyword_slug}%` } },
+  //     ],
+  //   });
+
+  //   whereCategoryConditions[Op.or] = [{ name: { [Op.like]: `%${keyword}%` } }];
+  // }
+
+  // if (is_public !== undefined) {
+  //   andConditions.push({ is_public: true });
+  // }
+
+  // if (andConditions.length > 0) {
+  //   whereProductConditions[Op.and] = andConditions;
+  // }
+
   if (keyword) {
     const keyword_slug = slugify(keyword, {
       replacement: "-",

@@ -11,11 +11,11 @@ const upload = require("../../../config/multer.config");
 
 const searchLogger = require("../../../middlewares/search-logger.middleware");
 const { getResData } = require("../../../middlewares/cature-response.middleware");
-const cacheMiddleware = require("../../../middlewares/cache-query.middleware");
+const cacheProduct = require("../../../middlewares/cache-query.middleware");
 
 router
   //getResData, searchLogger, cacheMiddleware
-  .get("/", getResData, searchLogger, cacheMiddleware, asyncHandler(ProductController.getProducts))
+  .get("/", getResData, searchLogger, cacheProduct, asyncHandler(ProductController.getProducts))
 
   .get("/manage", checkRole(["owner"]), asyncHandler(ProductController.getProducts))
 

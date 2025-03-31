@@ -58,7 +58,8 @@ const data = {
       icon: NotebookPen,
       items: [
         { title: "Logs hệ thống", url: "/dashboard/system/system-logs" },
-        { title: "Lỗi hệ thống", url: "/dashboard/system/system-errors" },
+        // { title: "Tìm kiếm người dùng", url: "/dashboard/system/system-logs" },
+        // { title: "Lỗi hệ thống", url: "/dashboard/system/system-errors" },
       ],
     },
   ],
@@ -99,7 +100,7 @@ export function AppSidebar({ roles, ...props }: { roles: string[] }) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/">
+              <Link href="/dashboard">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <Command className="size-4" />
                 </div>
@@ -115,8 +116,8 @@ export function AppSidebar({ roles, ...props }: { roles: string[] }) {
 
       {/* Content: hiển thị navigation với số đơn hàng pending */}
       <SidebarContent>
-        {isOwner && <NavMain items={data.navMain} pendingOrdersCount={orderCount} />}
-        {isSysAdmin && <NavMain items={data.projects} pendingOrdersCount={0} />}
+        {isOwner && <NavMain name={"Quản lý cửa hàng"} items={data.navMain} pendingOrdersCount={orderCount} />}
+        {isSysAdmin && <NavMain name={"Quản lý hệ thống"} items={data.projects} pendingOrdersCount={0} />}
         {!isOwner && !isSysAdmin && <p className="text-center text-sm text-gray-500">Không có quyền truy cập</p>}
       </SidebarContent>
 

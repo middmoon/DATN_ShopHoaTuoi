@@ -3,13 +3,12 @@ Searching logs by RabbitMQ: DONE
 Redis black list token: DONE
 Redis cache query: DONE
 Thanh toán VN Pay: DONE 
+Logs services - user searching: DONE
+admin dashboard for log - analysis: DONE
 
 -----------------------------
 
-Logs services - user searching: NOT DONE
-
------------------------------
------------------------------
+event implementation: NOT DONE
 
 Setup pm2 cluster: NOT DONE
 Setup Kong - API gateway, load balancer: NOT DONE

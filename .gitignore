@@ -143,3 +143,4 @@ dist
 .pnp.*
 /vnpay_nodejs/config
 /server/config/default.json
+/reusable/t.js

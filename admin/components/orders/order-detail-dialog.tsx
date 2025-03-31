@@ -175,7 +175,7 @@ export function OrderDetailDialog({
         <DialogFooter className="flex-col sm:flex-row gap-2 mt-6">
           {order.OrderStatus?.name === "Chờ xác nhận" && (
             <>
-              <Button variant="default" onClick={() => handleStatusUpdate(2)} disabled={isUpdating}>
+              <Button variant="create" onClick={() => handleStatusUpdate(2)} disabled={isUpdating}>
                 {isUpdating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Xác nhận đơn hàng
               </Button>

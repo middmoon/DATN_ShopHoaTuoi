@@ -242,27 +242,6 @@ class ProductService {
     return products;
   };
 
-  // static getProducts = async (conditions = {}) => {
-  //   const products = await Product.findAll({
-  //     where: conditions,
-  //     include: [
-  //       {
-  //         model: ProductCategory,
-  //         attributes: ["_id", "name"],
-  //         through: {
-  //           attributes: [],
-  //         },
-  //       },
-  //       {
-  //         model: ProductImage,
-  //         attributes: ["is_avatar", "img_url"],
-  //       },
-  //     ],
-  //   });
-
-  //   return products;
-  // };
-
   static getProductById = async (productId) => {
     const product = await Product.findByPk(productId);
 

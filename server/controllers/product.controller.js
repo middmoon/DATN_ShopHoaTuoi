@@ -35,13 +35,8 @@ class ProductController {
   };
 
   static getProducts = async (req, res) => {
-    const isManageRoute = req.originalUrl.includes("/manage");
-
-    if (!isManageRoute) {
-      req.query.is_public = true;
-    }
-
     const queryOptions = buildQueryOptions(req.query);
+
     new OK({
       message: "Products retrieved successfully",
       data: await ProductService.getProducts(queryOptions),

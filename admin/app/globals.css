@@ -33,11 +33,27 @@ body {
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 240 10% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    /* Chart Colors - Light Mode (Keep these as they are) */
+    --chart-1: 221.2 83.2% 53.3%; /* Blue */
+    --chart-2: 160.1 75.8% 44.1%; /* Teal */
+    --chart-3: 38.1 91.7% 56.5%; /* Orange */
+    --chart-4: 278.6 83.3% 58.4%; /* Purple */
+    --chart-5: 48 96.5% 53.3%; /* Yellow */
+    --chart-6: 110 70% 50%; /* Lime Green (Added for 6th chart) */
+    /* Add more if needed for Pie Chart slices beyond 5 */
+    --chart-7: 0 84.2% 60.2%; /* Red */
+    --chart-8: 330 85% 65%; /* Pink */
+
+    /* NEW: Chart Backgrounds - Light Mode (very light tints) */
+    --chart-bg-1: 221.2 83.2% 96%; /* Very Light Blue */
+    --chart-bg-2: 160.1 75.8% 96%; /* Very Light Teal */
+    --chart-bg-3: 38.1 91.7% 97%; /* Very Light Orange */
+    --chart-bg-4: 278.6 83.3% 97%; /* Very Light Purple */
+    --chart-bg-5: 48 96.5% 96%; /* Very Light Yellow */
+    --chart-bg-6: 110 70% 96%; /* Very Light Lime */
+
+    /* Shadcn UI Chart Component Variables (Link custom colors) */
+    --chart-primary: var(--chart-1);
     --radius: 0.5rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -95,11 +111,26 @@ body {
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* Chart Colors - Dark Mode (Keep these as they are) */
+    --chart-1: 217.2 91.2% 59.8%; /* Blue */
+    --chart-2: 162.1 70.8% 48.1%; /* Teal */
+    --chart-3: 40.1 95.7% 60.5%; /* Orange */
+    --chart-4: 280.6 80.3% 62.4%; /* Purple */
+    --chart-5: 50 98.5% 58.3%; /* Yellow */
+    --chart-6: 110 65% 55%; /* Lime Green */
+    --chart-7: 0 80.2% 65.2%; /* Red */
+    --chart-8: 330 80% 70%; /* Pink */
+
+    /* NEW: Chart Backgrounds - Dark Mode (subtle darker tints) */
+    --chart-bg-1: 221.2 70% 15%; /* Darker Blue tint */
+    --chart-bg-2: 160.1 65% 15%; /* Darker Teal tint */
+    --chart-bg-3: 38.1 75% 15%; /* Darker Orange tint */
+    --chart-bg-4: 278.6 70% 15%; /* Darker Purple tint */
+    --chart-bg-5: 48 80% 15%; /* Darker Yellow tint */
+    --chart-bg-6: 110 60% 15%; /* Darker Lime tint */
+
+    /* Shadcn UI Chart Component Variables (Link custom colors) */
+    --chart-primary: var(--chart-1);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
