@@ -19,6 +19,8 @@ router
 
   .get("/manage", checkRole(["owner"]), asyncHandler(ProductController.getProducts))
 
+  .get("/manage/basic", checkRole(["owner"]), asyncHandler(ProductController.getProductsBasic))
+
   .get("/for-shop-order", checkRole(["owner"]), asyncHandler(ProductController.getProductsForShopOrder))
 
   .get("/:productId(\\d+)", asyncHandler(ProductController.getProductById))

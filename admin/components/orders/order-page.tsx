@@ -110,9 +110,7 @@ export const OrdersPage = ({ queryRoute }: { queryRoute: string }) => {
   });
 
   const handleUpdateStatus = (orderId: number, newStatus: string) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) => (order._id === orderId ? { ...order, OrderStatus: { ...order.OrderStatus, name: newStatus } } : order))
-    );
+    setOrders((prevOrders) => prevOrders.filter((order) => order._id !== orderId));
   };
 
   if (loading) return <p className="text-center">Đang tải...</p>;

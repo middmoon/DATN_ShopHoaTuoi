@@ -32,10 +32,24 @@ class OrderController {
   };
 
   static changeOrderStatus = async (req, res) => {
+    const io = req.app.get("io");
+
+    const updatedOrder = await OrderService.changeOrderStatus(req.params._id, req.body);
+    const pendingOrdersCount = await OrderService.getPendingOrdersCount();
+    io.emit("orderCount", pendingOrdersCount);
+
     new OK({
       message: "Order status changed successfully",
-      data: await OrderService.changeOrderStatus(req.params._id, req.body),
+      data: updatedOrder,
     }).send(res);
+
+    // console.log(req.body);
+    // console.log(req.params._id);
+
+    // new OK({
+    //   message: "Order status changed successfully",
+    //   data: req.body,
+    // }).send(res);
   };
 
   static getAllOrders = async (req, res) => {

@@ -189,14 +189,39 @@ class OrderService {
     return { payment, paymentHistory };
   };
 
-  static updateOrderInfo = async (orderId, { paymentStatus, paymentInfo = {} }) => {
+  static changeOrderStatus = async (orderId, order) => {
     const t = await sequelize.transaction();
 
+    try {
+      const updatedOrder = await Order.update({ status_id: order.status_id }, { where: { _id: orderId }, transaction: t });
+
+      let updatedPayment = null;
+
+      switch (order.status_id) {
+        case 2:
+          break;
+        case 4:
+          const paymentData = {
+            paymentStatus: "Hoàn thành",
+          };
+          updatedPayment = await this.updateOrderInfo(orderId, paymentData, t);
+          break;
+      }
+
+      await t.commit();
+      return { updatedOrder, updatedPayment };
+    } catch (error) {
+      await t.rollback();
+      throw error;
+    }
+  };
+
+  static updateOrderInfo = async (orderId, { paymentStatus, paymentInfo = {} }, transaction) => {
     try {
       // Tìm Payment dựa trên orderId
       const payment = await Payment.findOne({
         where: { order_id: orderId },
-        transaction: t,
+        transaction,
       });
 
       if (!payment) {
@@ -207,27 +232,23 @@ class OrderService {
         {
           status: paymentStatus,
           info: {
-            ...payment.info,
             ...paymentInfo,
           },
         },
-        { transaction: t }
+        { transaction }
       );
 
-      // Tạo PaymentHistory
       await PaymentHistory.create(
         {
           payment_id: payment._id,
           order_id: orderId,
           status: paymentStatus,
         },
-        { transaction: t }
+        { transaction }
       );
 
-      await t.commit();
-      return payment; // Trả về Payment đã cập nhật
+      return payment;
     } catch (error) {
-      await t.rollback();
       throw error;
     }
   };
@@ -240,13 +261,6 @@ class OrderService {
     });
 
     return { pendingOrdersCount };
-  };
-
-  static changeOrderStatus = async (orderId, order) => {
-    const updatedOrder = await Order.update(order, {
-      where: { _id: orderId },
-    });
-    return updatedOrder;
   };
 
   static getAllOrders = async () => {

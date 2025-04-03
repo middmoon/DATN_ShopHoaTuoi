@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Command, SquareTerminal, Box, Bitcoin, NotebookPen } from "lucide-react";
+import { Command, SquareTerminal, Box, Bitcoin, NotebookPen, CalendarDays } from "lucide-react";
 import Link from "next/link";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { NavMain } from "@/components/nav-main";
@@ -37,6 +37,13 @@ const data = {
         { title: "Tất cả sản phẩm", url: "/dashboard/products" },
         { title: "Danh mục sản phẩm", url: "/dashboard/products/categories" },
       ],
+    },
+    {
+      title: "Sự kiện",
+      url: "/dashboard/events",
+      isActive: true,
+      icon: CalendarDays,
+      items: [{ title: "Tất cả sự kiện", url: "/dashboard/events" }],
     },
     {
       title: "Hoạt động kinh doanh",

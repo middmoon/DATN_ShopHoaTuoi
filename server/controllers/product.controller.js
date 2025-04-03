@@ -66,6 +66,13 @@ class ProductController {
     }).send(res);
   };
 
+  static getProductsBasic = async (req, res) => {
+    new OK({
+      message: "Products retrieved successfully",
+      data: await ProductService.getProductsBasic(),
+    }).send(res);
+  };
+
   // Product Image
 
   static addProductImage = async (req, res) => {

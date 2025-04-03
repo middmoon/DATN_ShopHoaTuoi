@@ -242,6 +242,19 @@ class ProductService {
     return products;
   };
 
+  static getProductsBasic = async () => {
+    const products = await Product.findAll({
+      where: { is_public: true },
+      attributes: ["_id", "name", "retail_price"],
+    });
+
+    if (!products) {
+      throw new NOTFOUND("Can not find products");
+    }
+
+    return products;
+  };
+
   static getProductById = async (productId) => {
     const product = await Product.findByPk(productId);
 
