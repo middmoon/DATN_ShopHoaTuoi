@@ -33,23 +33,27 @@ module.exports = (sequelize, DataTypes) => {
       },
       slug: {
         type: DataTypes.STRING,
-        allowNull: false,
+        unique: true,
       },
       discription: {
         type: DataTypes.TEXT,
       },
       start_date: {
         type: DataTypes.DATE,
+        allowNull: false,
       },
       end_date: {
         type: DataTypes.DATE,
+        allowNull: false,
       },
       discount_type: {
         type: DataTypes.ENUM("fixed", "percentage"),
         defaultValue: "fixed",
+        allowNull: false,
       },
       discount_value: {
         type: DataTypes.INTEGER,
+        allowNull: false,
       },
       is_active: {
         type: DataTypes.BOOLEAN,
@@ -57,7 +61,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       thumbnail: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
       },
     },
     {

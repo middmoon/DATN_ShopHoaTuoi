@@ -10,11 +10,11 @@ export default function CategoriesPage() {
       <PageHeader items={breadcrumbItems}></PageHeader>
 
       <div className="container mx-auto pb-0 pt-5 px-10">
-        <h1 className="text-2xl font-bold mb-5">Quản lý đơn hàng</h1>
+        <h1 className="text-2xl font-bold mb-5">Quản lý sự kiện</h1>
 
         <Link href="/dashboard/events/add-new-event">
           <Button className="mb-5" variant="create">
-            <Plus className="mr-2 h-4 w-4" /> Thêm đơn hàng trực tiếp
+            <Plus className="mr-2 h-4 w-4" /> Thêm sự kiện mới
           </Button>
         </Link>
       </div>

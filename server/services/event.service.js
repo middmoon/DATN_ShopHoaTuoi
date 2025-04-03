@@ -7,12 +7,25 @@ const cloudinary = require("../config/cloudinary.config");
 
 class EventService {
   static async createEvent(payload, imageFile) {
+    const { selected_products, ...eventInfo } = JSON.parse(payload);
+
     try {
       const result = await sequelize.transaction(async (t) => {
-        const newEvent = await Event.create(payload, { transaction: t });
+        const newEvent = await Event.create(eventInfo, { transaction: t });
         let count;
+
         if (!newEvent) {
           throw new BAD_REQUEST("Can not create event");
+        }
+
+        const eventProducts = selected_products.map((p) => {
+          return { product_id: p._id, event_id: newEvent._id };
+        });
+
+        count = await EventProduct.bulkCreate(eventProducts, { transaction: t });
+
+        if (!count || count.length !== selected_products.length) {
+          throw new BAD_REQUEST("Can not create event products");
         }
 
         if (imageFile) {

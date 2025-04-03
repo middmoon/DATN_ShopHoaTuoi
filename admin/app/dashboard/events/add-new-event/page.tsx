@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/page-header";
 export default function CategoriesPage() {
   const breadcrumbItems = [
     { label: "Dashboard", href: "/dashboard" },
-    { label: "Sự kiện", href: "/dashboard/orders" },
+    { label: "Sự kiện", href: "/dashboard/events" },
     { label: "Thêm mới sự kiện" },
   ];
   return (

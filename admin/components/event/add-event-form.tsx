@@ -19,6 +19,7 @@ import { api } from "@/utils/api";
 import { toast } from "sonner";
 import { ImageUpload } from "./image-upload";
 import ProductMultiSelect from "@/components/event/product-multi-select";
+import { set } from "lodash";
 
 function validDate(startDate: Date, endDate: Date) {
   return startDate <= endDate;
@@ -50,6 +51,8 @@ export function NewEventForm() {
 
   async function onSubmit(data: any) {
     try {
+      setIsSubmitting(true);
+
       if (!data.selected_products || data.selected_products.length === 0) {
         toast.warning("Vui lòng chọn ít nhất một sản phẩm", { duration: 2000 });
         throw new Error("Chưa có ảnh");
@@ -82,6 +85,7 @@ export function NewEventForm() {
         throw new Error("Failed to create event. Please try again.");
       }
       toast.success(`Sự kiện đã được tạo thành công! ${JSON.stringify(data)}`, { duration: 3000 });
+      setIsSubmitting(false);
     } catch (error) {
       console.log("Form data:", data);
       alert(error);

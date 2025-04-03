@@ -11,7 +11,7 @@ router.use("/inventory", require("./inventory.route"));
 router.use("/order", require("./order.route"));
 router.use("/payment", require("./payment"));
 router.use("/business", require("./business.route"));
-router.use("/evnet", require("./event.route"));
+router.use("/event", require("./event.route"));
 
 router.get("/", (req, res) => {
   res.send("TEST API V1");
