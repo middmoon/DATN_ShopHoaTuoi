@@ -83,6 +83,7 @@ export function NewEventForm() {
 
       if (response.status !== 200) {
         throw new Error("Failed to create event. Please try again.");
+        setIsSubmitting(false);
       }
       toast.success(`Sự kiện đã được tạo thành công! ${JSON.stringify(data)}`, { duration: 3000 });
       setIsSubmitting(false);
