@@ -1,53 +1,79 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm, useFieldArray, FormProvider, useWatch } from "react-hook-form";
-import { CalendarIcon, Loader2, Plus, Trash2, Check, ChevronsUpDown, Search } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useForm, FormProvider, useWatch } from "react-hook-form";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
-import { api } from "@/utils/api";
 import { toast } from "sonner";
 import { ImageUpload } from "./image-upload";
 import ProductMultiSelect from "@/components/event/product-multi-select";
-import { set } from "lodash";
+import { api } from "@/utils/api";
 
-function validDate(startDate: Date, endDate: Date) {
-  return startDate <= endDate;
+interface EventData {
+  _id: number;
+  name: string;
+  slug: string;
+  discription: string;
+  start_date: string;
+  end_date: string;
+  discount_type: "fixed" | "percentage";
+  discount_value: number;
+  is_active: boolean;
+  thumbnail: string;
+  Products: any[];
 }
 
-export function NewEventForm() {
+export function EditEventForm({ eventData }: { eventData: EventData }) {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [image, setImage] = useState<File | null>(null);
+  const [currentThumbnail, setCurrentThumbnail] = useState(eventData.thumbnail);
+
+  // Format dates for the form
+  const formatDateForForm = (dateString: string) => {
+    return new Date(dateString);
+  };
 
   const form = useForm<any>({
     mode: "onSubmit",
     defaultValues: {
-      is_active: false,
-      selected_products: [],
+      name: eventData.name,
+      discription: eventData.discription,
+      start_date: formatDateForForm(eventData.start_date),
+      end_date: formatDateForForm(eventData.end_date),
+      discount_type: eventData.discount_type,
+      discount_value: eventData.discount_value,
+      is_active: eventData.is_active,
+      selected_products: eventData.Products || [],
     },
   });
 
   const discountType = useWatch({
     control: form.control,
     name: "discount_type",
-    defaultValue: "fixed",
+    defaultValue: eventData.discount_type,
   });
 
   const discountValue = useWatch({
     control: form.control,
     name: "discount_value",
-    defaultValue: 0,
+    defaultValue: eventData.discount_value,
   });
+
+  function validDate(startDate: Date, endDate: Date) {
+    return startDate <= endDate;
+  }
 
   async function onSubmit(data: any) {
     try {
@@ -55,7 +81,7 @@ export function NewEventForm() {
 
       if (!data.selected_products || data.selected_products.length === 0) {
         toast.warning("Vui lòng chọn ít nhất một sản phẩm", { duration: 2000 });
-        throw new Error("Chưa có ảnh");
+        throw new Error("Chưa chọn sản phẩm");
       }
 
       if (!validDate(data.start_date, data.end_date)) {
@@ -65,9 +91,10 @@ export function NewEventForm() {
 
       const formData = new FormData();
       data.discount_value = Number(data.discount_value);
-      data.start_day = new Date(data.start_date);
+      data.start_date = new Date(data.start_date);
       data.end_date = new Date(data.end_date);
       data.is_active = Boolean(data.is_active);
+      data._id = eventData._id;
 
       formData.append("data", JSON.stringify(data));
 
@@ -75,19 +102,21 @@ export function NewEventForm() {
         formData.append("thumbnail", image);
       }
 
-      const response = await api.post("/event", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      // In a real app, replace with your actual API endpoint
+      const response = await api.put(`/event/${eventData._id}`, {
+        method: "PUT",
+        body: formData,
       });
 
-      if (response.status !== 201) {
-        throw new Error("Failed to create event. Please try again.");
+      if (response.status !== 200) {
+        throw new Error("Failed to update event. Please try again.");
       }
-      toast.success(`Sự kiện đã được tạo thành công!`, { duration: 3000 });
+
+      toast.success(`Sự kiện đã được cập nhật thành công!`, { duration: 3000 });
+      router.push(`/dashboard/events/${eventData.slug}`);
     } catch (error) {
-      console.log("Form data:", data);
-      alert(error);
+      console.error("Error updating event:", error);
+      toast.error("Đã xảy ra lỗi khi cập nhật sự kiện");
     } finally {
       setIsSubmitting(false);
     }
@@ -96,8 +125,8 @@ export function NewEventForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="flex flex-raw gap-5">
-          <div className="flex flex-col gap-5">
+        <div className="flex flex-col lg:flex-row gap-5">
+          <div className="flex flex-col gap-5 lg:w-1/2">
             <FormField
               control={form.control}
               name="name"
@@ -111,7 +140,7 @@ export function NewEventForm() {
               )}
             />
 
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <FormField
                 control={form.control}
                 name="start_date"
@@ -134,12 +163,12 @@ export function NewEventForm() {
                   },
                 }}
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex flex-col flex-1">
                     <FormLabel>Ngày bắt đầu sự kiện</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
-                          <Button variant={"outline"} className={cn("w-[240px] pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+                          <Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
                             {field.value ? format(field.value, "dd/MM/yyyy", { locale: vi }) : <span>Chọn ngày bắt đầu</span>}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -174,12 +203,12 @@ export function NewEventForm() {
                   },
                 }}
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex flex-col flex-1">
                     <FormLabel>Ngày kết thúc sự kiện</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
-                          <Button variant={"outline"} className={cn("w-[240px] pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
+                          <Button variant={"outline"} className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
                             {field.value ? format(field.value, "dd/MM/yyyy", { locale: vi }) : <span>Chọn ngày kết thúc</span>}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
@@ -194,14 +223,14 @@ export function NewEventForm() {
               />
             </div>
 
-            <div className="flex flex-row gap-2">
+            <div className="flex flex-col md:flex-row gap-2">
               <FormField
                 control={form.control}
                 name="discount_type"
                 render={({ field }) => (
                   <FormItem className="flex flex-col flex-1">
                     <FormLabel>Loại giảm giá</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={"fixed"}>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn loại giảm giá" />
@@ -286,49 +315,14 @@ export function NewEventForm() {
                 <FormItem>
                   <FormLabel>Mô tả sự kiện</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Mô tả sự kiện" className="" {...field} />
+                    <Textarea placeholder="Mô tả sự kiện" className="min-h-32" {...field} />
                   </FormControl>
                 </FormItem>
               )}
             />
-
-            {/* <FormField
-              control={form.control}
-              name="thumbnail"
-              rules={{ required: "Vui lòng chọn ảnh thumbnail" }}
-              render={({ field: { onChange, onBlur, name, ref } }) => (
-                <FormItem>
-                  <FormLabel>Ảnh Thumbnail</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept="image/png, image/jpeg, image/jpg, image/webp"
-                      name={name}
-                      ref={ref}
-                      onChange={(e) => {
-                        const files = e.target.files;
-                        if (files && files.length > 0) {
-                          const file = files[0];
-                          if (!file.type.startsWith("image/")) {
-                            toast.warning("Chỉ chấp nhận tệp ảnh.", { duration: 2000 });
-                            e.target.value = "";
-                            onChange(null);
-                            return;
-                          }
-                        }
-                        onChange(files);
-                      }}
-                      onBlur={onBlur}
-                    />
-                  </FormControl>
-                  <FormDescription>Ảnh đại diện cho sự kiện (PNG, JPG, JPEG, WEBP).</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
           </div>
 
-          <div className="flex flex-col gap-5 w-full">
+          <div className="flex flex-col gap-5 lg:w-1/2">
             <FormField
               control={form.control}
               name="selected_products"
@@ -351,18 +345,37 @@ export function NewEventForm() {
             />
           </div>
         </div>
-        <ImageUpload image={image} onImageChange={setImage} />
 
-        <Button type="submit" className="w-1/4" disabled={isSubmitting} variant={"create"}>
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Đang tạo sự kiện mới
-            </>
-          ) : (
-            "Tạo mới sự kiện"
+        <div>
+          <FormLabel className="block mb-2">Ảnh Thumbnail</FormLabel>
+          {currentThumbnail && !image && (
+            <div className="mb-4">
+              <p className="text-sm text-gray-500 mb-2">Ảnh hiện tại:</p>
+              <div className="relative w-full max-w-md h-48 rounded-md overflow-hidden">
+                <img src={currentThumbnail || "/placeholder.svg"} alt="Current thumbnail" className="w-full h-full object-cover" />
+              </div>
+            </div>
           )}
-        </Button>
+          <ImageUpload image={image} onImageChange={setImage} />
+          {!image && <p className="text-sm text-gray-500 mt-2">Để trống nếu bạn muốn giữ ảnh hiện tại.</p>}
+        </div>
+
+        <div className="flex gap-4">
+          <Button type="submit" className="w-full md:w-1/4" disabled={isSubmitting} variant={"actions"}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang cập nhật
+              </>
+            ) : (
+              "Cập nhật sự kiện"
+            )}
+          </Button>
+
+          <Button type="button" variant="outline" className="w-full md:w-1/4" onClick={() => router.push(`/dashboard/events/${eventData.slug}`)}>
+            Hủy
+          </Button>
+        </div>
       </form>
     </Form>
   );

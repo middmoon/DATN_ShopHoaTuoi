@@ -75,9 +75,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         unique: true,
       },
-      slug: {
-        type: DataTypes.STRING,
-      },
       is_feature: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,

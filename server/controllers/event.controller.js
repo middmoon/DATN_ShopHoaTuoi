@@ -28,10 +28,31 @@ class EventController {
     }).send(res);
   };
 
+  static getCurrentEvent = async (req, res) => {
+    new OK({
+      message: "Current event retrieved successfully",
+      data: await EventService.getCurrentEvent(),
+    }).send(res);
+  };
+
   static getEventBySlug = async (req, res) => {
     new OK({
       message: "Event retrieved successfully",
       data: await EventService.getEventBySlug(req.params.slug),
+    }).send(res);
+  };
+
+  static changeEventStatus = async (req, res) => {
+    new OK({
+      message: "Event status changed successfully",
+      data: await EventService.updateEventStatus(req.params.id, req.body),
+    }).send(res);
+  };
+
+  static updateEvent = async (req, res) => {
+    new OK({
+      message: "Event updated successfully",
+      data: await EventService.updateEvent(req.params.id, req.body),
     }).send(res);
   };
 }

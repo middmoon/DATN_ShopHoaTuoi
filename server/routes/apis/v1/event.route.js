@@ -9,7 +9,10 @@ const upload = require("../../../config/multer.config");
 
 router
   .get("/", asyncHandler(EventController.getEvents))
+  .get("/current", asyncHandler(EventController.getCurrentEvent))
   .post("/", upload.single("thumbnail"), asyncHandler(EventController.createEvent))
+  .patch("/:id/status", asyncHandler(EventController.changeEventStatus))
+  .put("/:id", upload.single("thumbnail"), asyncHandler(EventController.updateEvent))
   .get("/:slug", asyncHandler(EventController.getEventBySlug));
 
 module.exports = router;
