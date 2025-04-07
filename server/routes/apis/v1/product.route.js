@@ -15,7 +15,7 @@ const cacheProduct = require("../../../middlewares/cache-query.middleware");
 
 router
   //getResData, searchLogger, cacheMiddleware
-  .get("/", getResData, searchLogger, cacheProduct, asyncHandler(ProductController.getProducts))
+  .get("/", asyncHandler(ProductController.getProducts))
 
   .get("/manage", checkRole(["owner"]), asyncHandler(ProductController.getProducts))
 

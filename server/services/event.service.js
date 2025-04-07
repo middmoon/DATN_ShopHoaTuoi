@@ -64,11 +64,11 @@ class EventService {
 
   static async getCurrentEvent() {
     const currentEvent = await Event.findOne({
-      attributes: ["_id", "name"],
+      attributes: ["_id", "slug", "thumbnail"],
       where: { is_active: true },
     });
 
-    if (!currentEvent) {
+    if (!currentEvent && currentEvent !== null) {
       throw new NOTFOUND("Can not find current event");
     }
 
@@ -112,20 +112,21 @@ class EventService {
   }
 
   static async updateEventStatus(eventId, is_active, force = false) {
-    if (is_active && !force) {
+    if (is_active == true && !force) {
       const currentEvent = await Event.findOne({
         attributes: ["_id", "name"],
         where: { is_active: true },
       });
 
-      if (currentEvent && currentEvent._id !== eventId) {
+      if (currentEvent && currentEvent._id === eventId) {
+      } else if (currentEvent) {
         throw new CONFLICT("There is an active event, please deactivate first.");
       }
     }
 
     try {
       const result = await sequelize.transaction(async (t) => {
-        const foundEvent = await Event.findByPk(eventId, { transaction: t });
+        let foundEvent = await Event.findByPk(eventId, { transaction: t });
 
         if (!foundEvent) {
           throw new NOTFOUND("Can not find event");
@@ -147,7 +148,7 @@ class EventService {
           }
         }
 
-        const updatedEvent = await foundEvent.update({ is_active }, { transaction: t });
+        const updatedEvent = await foundEvent.update({ is_active: is_active }, { transaction: t });
 
         if (!updatedEvent) {
           throw new BAD_REQUEST("Can not update event");

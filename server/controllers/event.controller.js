@@ -45,7 +45,7 @@ class EventController {
   static changeEventStatus = async (req, res) => {
     new OK({
       message: "Event status changed successfully",
-      data: await EventService.updateEventStatus(req.params.id, req.body),
+      data: await EventService.updateEventStatus(req.params.id, req.body.is_active),
     }).send(res);
   };
 

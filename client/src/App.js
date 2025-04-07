@@ -19,23 +19,25 @@ const MasterShopWithLayout = WithLayout(MasterShop);
 const ProductDetailWithLayout = WithLayout(ProductDetail);
 const CartPageWithLayout = WithLayout(CartPage);
 const PaymentPageWithLayout = WithLayout(PaymentPage);
+// const EventDetailWithLayout = WithLayout(EventDetail);
 
 function App() {
   return (
     <CartProvider>
       <CategoryProvider>
-      <Routes>
-        <Route path="/" element={<HomeWithLayout />} />
-        <Route path="/test" element={<Test />} />
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="mastershop" element={<MasterShopWithLayout />} />
-        <Route path="productdetail/:slug" element={<ProductDetailWithLayout />} />
-        <Route path="cart" element={<CartPageWithLayout />} />
-        <Route path="payment" element={<PaymentPageWithLayout />} />
-        <Route path="/payment-success" element={<PaymentResult />} />
-        {/* <Route path="/payment-failure" element={<PaymentResult />} /> */}
-      </Routes>
+        <Routes>
+          <Route path="/" element={<HomeWithLayout />} />
+          <Route path="/test" element={<Test />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+          <Route path="mastershop" element={<MasterShopWithLayout />} />
+          <Route path="productdetail/:slug" element={<ProductDetailWithLayout />} />
+          <Route path="cart" element={<CartPageWithLayout />} />
+          <Route path="payment" element={<PaymentPageWithLayout />} />
+          <Route path="/payment-success" element={<PaymentResult />} />
+          <Route path="/payment-failure" element={<PaymentResult />} />
+          {/* <Route path="/events/:slug" element={<EventDetailWithLayout />} /> */}
+        </Routes>
       </CategoryProvider>
     </CartProvider>
   );

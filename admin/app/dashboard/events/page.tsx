@@ -71,12 +71,14 @@ export default function EventsPage() {
       if (response.status === 200) {
         setEvents(events.map((event) => (event._id === eventId ? { ...event, is_active: !currentStatus } : event)));
         toast.success(`Sự kiện đã được ${!currentStatus ? "kích hoạt" : "vô hiệu hóa"}`);
-      } else {
-        toast.error("Không thể cập nhật trạng thái sự kiện");
       }
-    } catch (error) {
-      console.error("Error toggling event status:", error);
-      toast.error("Đã xảy ra lỗi khi cập nhật trạng thái");
+    } catch (error: any) {
+      if (error.response && error.response.status === 409) {
+        toast.warning("Đang có một sự kiện đang hoạt động, vui lòng tắt trước khi thực hiện cập nhật.");
+      } else {
+        console.error("Error toggling event status:", error);
+        toast.error("Đã xảy ra lỗi khi cập nhật trạng thái");
+      }
     } finally {
       setActionLoading(null);
     }
@@ -135,25 +137,21 @@ export default function EventsPage() {
   return (
     <>
       <PageHeader items={breadcrumbItems}></PageHeader>
+      <div className="container mx-auto pb-0 pt-5 px-10">
+        <h1 className="text-2xl font-bold mb-5">Quản lý sự kiện</h1>
+
+        <Link href="/dashboard/events/add-new-event">
+          <Button className="mb-5" variant="create">
+            <Plus className="mr-2 h-4 w-4" /> Tạo sự kiện mới
+          </Button>
+        </Link>
+      </div>
 
       <div className="container mx-auto pb-10 pt-5 px-4 md:px-10">
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
-        ) : events.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center p-10">
-              <Calendar className="h-16 w-16 text-gray-400 mb-4" />
-              <h3 className="text-xl font-medium mb-2">Chưa có sự kiện nào</h3>
-              <p className="text-gray-500 mb-4 text-center">Bạn chưa tạo sự kiện nào. Hãy tạo sự kiện đầu tiên để bắt đầu.</p>
-              <Link href="/dashboard/events/add-new-event">
-                <Button variant="create">
-                  <Plus className="mr-2 h-4 w-4" /> Tạo sự kiện mới
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
