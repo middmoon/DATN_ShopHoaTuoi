@@ -3,11 +3,11 @@ import { Card, CardMedia, CardActions, Button, IconButton, Box, Backdrop } from 
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 
-function EventPopup({ thumbnail, slug, onClose }) {
+export default function EventPopup({ thumbnail, slug, onClose }) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/events/${slug}`);
+    navigate(`/event/${slug}`);
   };
 
   return (
@@ -46,14 +46,12 @@ function EventPopup({ thumbnail, slug, onClose }) {
           }}
         />
 
-        {/* <CardActions sx={{ justifyContent: "center", p: 2 }}>
+        <CardActions sx={{ justifyContent: "center", p: 2 }}>
           <Button variant="contained" color="primary" onClick={handleClick}>
             Xem khuyến mãi
           </Button>
-        </CardActions> */}
+        </CardActions>
       </Card>
     </Backdrop>
   );
 }
-
-export default EventPopup;

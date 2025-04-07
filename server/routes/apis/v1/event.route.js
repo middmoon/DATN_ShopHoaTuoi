@@ -14,5 +14,6 @@ router
   .patch("/:id/status", asyncHandler(EventController.changeEventStatus))
   .put("/:id", upload.single("thumbnail"), asyncHandler(EventController.updateEvent))
   .get("/:slug", asyncHandler(EventController.getEventBySlug));
+// .get("/:slug", asyncHandler(EventController.getEventBySlug));
 
 module.exports = router;

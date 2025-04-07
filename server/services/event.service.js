@@ -1,6 +1,6 @@
 "use strict";
 
-const { sequelize, Event, EventProduct, Product } = require("../models");
+const { sequelize, Event, EventProduct, Product, ProductImage } = require("../models");
 const { NOTFOUND, BAD_REQUEST, CONFLICT } = require("../utils/error.response");
 const cloudinary = require("../config/cloudinary.config");
 const { compressImage } = require("../utils/compress_iamge");
@@ -64,7 +64,7 @@ class EventService {
 
   static async getCurrentEvent() {
     const currentEvent = await Event.findOne({
-      attributes: ["_id", "slug", "thumbnail"],
+      attributes: ["slug", "name", "thumbnail"],
       where: { is_active: true },
     });
 
@@ -92,7 +92,14 @@ class EventService {
       include: [
         {
           model: Product,
-          attributes: ["_id", "name", "retail_price"],
+          attributes: ["_id", "name", "retail_price", "slug"],
+          include: [
+            {
+              model: ProductImage,
+              where: { is_avatar: true },
+              attributes: ["img_url"],
+            },
+          ],
           through: {
             attributes: [],
           },
