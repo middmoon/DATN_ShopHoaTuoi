@@ -49,26 +49,17 @@ const PLMastershop = () => {
   const getDirectImageURL = (url) => {
     if (!url) return "https://via.placeholder.com/150?text=No+Image";
     const match = url.match(/(?:id=|\/d\/)([^/&?]+)/);
-    return match
-      ? `https://lh3.googleusercontent.com/d/${match[1]}=s1000`
-      : url;
+    return match ? `https://lh3.googleusercontent.com/d/${match[1]}=s1000` : url;
   };
 
   const filteredProducts = products.filter((product) => {
-    const matchesCategory = selectedCategory
-      ? product.ProductCategories?.some((cat) => cat._id === selectedCategory)
-      : true;
-    const matchesSearch = searchQuery
-      ? product.name.toLowerCase().includes(searchQuery)
-      : true;
+    const matchesCategory = selectedCategory ? product.ProductCategories?.some((cat) => cat._id === selectedCategory) : true;
+    const matchesSearch = searchQuery ? product.name.toLowerCase().includes(searchQuery) : true;
     return matchesCategory && matchesSearch;
   });
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const displayedProducts = filteredProducts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const displayedProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="PlSale mx-auto relative">
@@ -79,8 +70,7 @@ const PLMastershop = () => {
           <div className="container mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-10 relative">
             {displayedProducts.map((product) => {
               const avatarImage = getDirectImageURL(
-                product.ProductImages?.find((img) => img.is_avatar)?.img_url ||
-                  product.ProductImages?.[0]?.img_url
+                product.ProductImages?.find((img) => img.is_avatar)?.img_url || product.ProductImages?.[0]?.img_url
               );
 
               return (
@@ -88,11 +78,9 @@ const PLMastershop = () => {
                   key={product._id}
                   image={avatarImage}
                   name={product.name}
-                  price={
-                    product.retail_price
-                      ? `${product.retail_price.toLocaleString("vi-VN")} VND`
-                      : "Liên hệ"
-                  }
+                  price={product.retail_price}
+                  isSale={product.Events.length > 0}
+                  sale_price={product.Events[0]?.discount_value}
                   link={`/productdetail/${product.slug}`}
                 />
               );
@@ -104,11 +92,7 @@ const PLMastershop = () => {
               {Array.from({ length: totalPages }, (_, index) => (
                 <button
                   key={index + 1}
-                  className={`px-4 py-2 rounded ${
-                    currentPage === index + 1
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200"
-                  }`}
+                  className={`px-4 py-2 rounded ${currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200"}`}
                   onClick={() => setCurrentPage(index + 1)}
                 >
                   {index + 1}

@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { ProductCategory, ProductImage } = require("../models");
+const { ProductCategory, ProductImage, Event } = require("../models");
 const slugify = require("slugify");
 
 function buildQueryOptions(query) {
@@ -52,6 +52,15 @@ function buildQueryOptions(query) {
       {
         model: ProductImage,
         attributes: ["is_avatar", "img_url"],
+      },
+      {
+        model: Event,
+        attributes: ["_id", "discount_type", "discount_value"],
+        where: { is_active: true },
+        through: {
+          attributes: [],
+        },
+        required: false,
       },
     ],
   };

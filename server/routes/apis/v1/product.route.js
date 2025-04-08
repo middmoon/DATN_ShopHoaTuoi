@@ -14,7 +14,7 @@ const { getResData } = require("../../../middlewares/cature-response.middleware"
 const cacheProduct = require("../../../middlewares/cache-query.middleware");
 
 router
-  //getResData, searchLogger, cacheMiddleware
+  // getResData, searchLogger, cacheProduct,
   .get("/", asyncHandler(ProductController.getProducts))
 
   .get("/manage", checkRole(["owner"]), asyncHandler(ProductController.getProducts))

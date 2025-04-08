@@ -24,7 +24,7 @@ export default function Home() {
       <Divider />
       <ReviewService></ReviewService>
       <IntroduceShop></IntroduceShop>
-      <ProductListNew />
+      {/* <ProductListNew /> */}
       <WhyChoiceMe />
       <Divider />
       <ProductList></ProductList>

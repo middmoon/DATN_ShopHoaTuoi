@@ -1,6 +1,6 @@
 "use strict";
 
-const { sequelize, Product, ProductImage, ProductCategory, ProductCategoryMapping } = require("../models");
+const { sequelize, Product, ProductImage, ProductCategory, ProductCategoryMapping, Event } = require("../models");
 const { Op, where } = require("sequelize");
 
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
@@ -280,6 +280,15 @@ class ProductService {
         {
           model: ProductImage,
           attributes: ["_id", "img_url", "is_avatar"],
+        },
+        {
+          model: Event,
+          attributes: ["_id", "discount_type", "discount_value"],
+          where: { is_active: true },
+          through: {
+            attributes: [],
+          },
+          required: false,
         },
       ],
     });
