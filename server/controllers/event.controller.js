@@ -46,6 +46,13 @@ class EventController {
       data: await EventService.updateEvent(req.params.id, req.body),
     }).send(res);
   };
+
+  static test = async (req, res) => {
+    new OK({
+      message: "Test",
+      data: await EventService.test([8, 3, 8]),
+    }).send(res);
+  };
 }
 
 module.exports = EventController;

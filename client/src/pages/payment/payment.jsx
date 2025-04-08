@@ -56,17 +56,16 @@ const PaymentPage = () => {
     getProvinces();
   }, []);
 
-  // Hàm tính giá sau khi giảm
   const calculateDiscountedPrice = (product) => {
     if (product.Events && product.Events.length > 0) {
-      const event = product.Events[0]; // Lấy sự kiện giảm giá đầu tiên
+      const event = product.Events[0];
       if (event.discount_type === "fixed") {
         return Math.max(product.retail_price - event.discount_value, 0);
       } else if (event.discount_type === "percentage") {
         return Math.max(product.retail_price - (product.retail_price * event.discount_value) / 100, 0);
       }
     }
-    return product.retail_price || 0; // Nếu không có giảm giá, trả về retail_price
+    return product.retail_price || 0;
   };
 
   const handleProvinceChange = async (event) => {
@@ -158,10 +157,16 @@ const PaymentPage = () => {
       district_code: customerInfo.district_code,
       ward_name: customerInfo.ward_name,
       ward_code: customerInfo.ward_code,
+      total_amount: amount,
       products: selectedProducts.map((product) => ({
         _id: product._id,
-        retail_price: calculateDiscountedPrice(product), // Sử dụng giá sau khi giảm
+        retail_price: product.retail_price,
+        sale_price: product.Events[0] ? calculateDiscountedPrice(product) : null,
+        event_id: product.Events[0] ? product.Events[0]._id : null,
+        discount_type: product.Events[0] ? product.Events[0].discount_type : null,
+        discount_value: product.Events[0] ? product.Events[0].discount_value : null,
         quantity: product.quantity,
+        expected_total_price: product.Events[0] ? calculateDiscountedPrice(product) * product.quantity : product.retail_price * product.quantity,
       })),
       payment_method_id: Number(paymentMethod),
     };

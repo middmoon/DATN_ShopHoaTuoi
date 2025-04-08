@@ -5,6 +5,7 @@ const { NOTFOUND, BAD_REQUEST, CONFLICT } = require("../utils/error.response");
 const cloudinary = require("../config/cloudinary.config");
 const { compressImage } = require("../utils/compress_iamge");
 const fs = require("fs");
+const { Op } = require("sequelize");
 
 class EventService {
   static async createEvent(payload, imageFile) {
@@ -228,6 +229,19 @@ class EventService {
       );
       stream.end(buffer);
     });
+  }
+
+  static async test(ids) {
+    const activeEvents = await Event.findAll({
+      where: {
+        _id: {
+          [Op.in]: ids,
+        },
+        is_active: true,
+      },
+    });
+
+    return activeEvents;
   }
 }
 
