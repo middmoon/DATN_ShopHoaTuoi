@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import { BookOpen, Box, Command, Frame, SquareTerminal, NotebookPen, Bitcoin } from "lucide-react";
+import { CalendarDays, BookOpen, Box, Command, Frame, SquareTerminal, NotebookPen, Bitcoin } from "lucide-react";
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavSecondary } from "@/components/nav-secondary";
@@ -72,6 +72,20 @@ const data = {
         },
       ],
     },
+    {
+      title: "Sự kiện",
+      url: "/dashboard/events",
+      isActive: true,
+      icon: CalendarDays,
+      items: [{ title: "Tất cả sự kiện", url: "/dashboard/events" }],
+    },
+    // {
+    //   title: "Bài viết",
+    //   url: "/dashboard/articles",
+    //   isActive: true,
+    //   icon: CalendarDays,
+    //   items: [{ title: "Tất cả bài viết", url: "/dashboard/articles" }],
+    // },
     {
       title: "Hoạt động kinh doanh",
       url: "/dashboard/business",
