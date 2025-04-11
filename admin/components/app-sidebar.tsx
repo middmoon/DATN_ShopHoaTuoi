@@ -45,6 +45,13 @@ const data = {
       icon: CalendarDays,
       items: [{ title: "Tất cả sự kiện", url: "/dashboard/events" }],
     },
+    // {
+    //   title: "Bài viết",
+    //   url: "/dashboard/articles",
+    //   isActive: true,
+    //   icon: CalendarDays,
+    //   items: [{ title: "Tất cả bài viết", url: "/dashboard/articles" }],
+    // },
     {
       title: "Hoạt động kinh doanh",
       url: "/dashboard/business",
