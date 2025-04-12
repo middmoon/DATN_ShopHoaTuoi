@@ -72,7 +72,7 @@ const CartPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-10 gap-4">
-            <div className="col-span-7 bg-color-custom-4 p-5 shadow-lg rounded-lg">
+            <div className="col-span-7 bg-color-custom-4 p-5 shadow-lg rounded-lg border">
               <ul className="space-y-4">
                 {mergedCart.map((item, index) => (
                   <React.Fragment key={index}>
@@ -111,7 +111,7 @@ const CartPage = () => {
                       <div className="w-2/12 flex items-center">
                         <button
                           onClick={() => decreaseQuantity(item.slug)}
-                          className="px-3 py-1 bg-color-custom-1 border text-black rounded-lg"
+                          className="px-3 py-1 bg-color-custom-2 border text-black rounded-lg"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -131,7 +131,7 @@ const CartPage = () => {
                         <span className="px-4">{item.quantity}</span>
                         <button
                           onClick={() => increaseQuantity(item.slug)}
-                          className="px-3 py-1 bg-color-custom-1 border text-black rounded-lgtext-black rounded-lg"
+                          className="px-3 py-1 bg-color-custom-2 border text-black rounded-lgtext-black rounded-lg"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -203,12 +203,17 @@ const CartPage = () => {
                   )
               )}
               <hr className="my-3" />
-              <h3 className="text-xl font-bold text-color-custom-2">
+              <h3 className="text-xl font-bold text-color-custom-1">
                 Tổng tiền: {selectedTotalAmount.toLocaleString()} VNĐ
               </h3>
               <button
                 onClick={handleCheckout}
-                className="w-full mt-10 px-5 py-2 bg-green-500 text-white rounded-lg"
+                disabled={selectedTotalAmount === 0}
+                className={`w-full mt-10 px-5 py-2 rounded-lg ${
+                  selectedTotalAmount === 0
+                    ? "hidden"
+                    : "bg-green-500 text-white hover:bg-green-600"
+                }`}
               >
                 Thanh toán ngay
               </button>

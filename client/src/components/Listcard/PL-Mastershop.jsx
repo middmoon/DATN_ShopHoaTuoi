@@ -64,8 +64,13 @@ const PLMastershop = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const shuffleArray = (array) => {
+    return array.sort(() => Math.random() - 0.5);
+  };
+
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const displayedProducts = filteredProducts.slice(
+  const shuffledProducts = shuffleArray([...filteredProducts]);
+  const displayedProducts = shuffledProducts.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -106,7 +111,7 @@ const PLMastershop = () => {
                   key={index + 1}
                   className={`px-4 py-2 rounded ${
                     currentPage === index + 1
-                      ? "bg-blue-500 text-white"
+                      ? "bg-color-custom-1 text-white"
                       : "bg-gray-200"
                   }`}
                   onClick={() => setCurrentPage(index + 1)}

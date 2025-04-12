@@ -49,7 +49,7 @@ export default function WhyChoiceMe() {
       <div className="w-full bg-color-custom-4">
         <div className="container mx-auto pb-10">
           <div className="container mx-auto">
-            <h2 className="text-xl pt-5 text-color-custom-2 font-bold text-center">
+            <h2 className="text-xl pt-5 text-color-custom-1 font-bold text-center">
               Tại sao chọn chúng tôi?
             </h2>
           </div>
@@ -63,10 +63,12 @@ export default function WhyChoiceMe() {
                     className="w-12 h-12"
                   />
                   <div>
-                    <p className="text-lg font-bold text-gray-800">
+                    <p className="text-lg font-bold text-gray-800 font-font2">
                       {benefit.title}
                     </p>
-                    <p className="text-sm text-gray-600">{benefit.desc}</p>
+                    <p className="text-sm text-gray-600 font-font2">
+                      {benefit.desc}
+                    </p>
                   </div>
                 </div>
               ))}

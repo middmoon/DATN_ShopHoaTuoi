@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Điều hướng sau khi đăng nhập
+import { useNavigate } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -7,7 +7,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 export default function Login() {
-  const navigate = useNavigate(); // Hook điều hướng
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -29,13 +29,11 @@ export default function Login() {
 
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || "Đăng nhập thất bại!");
+        throw new Error("Đăng nhập thất bại!");
       }
 
-      // Lưu token vào localStorage
       localStorage.setItem("token", data.token);
 
-      // Lưu email của user vào localStorage
       localStorage.setItem("userEmail", email);
 
       navigate("/");
@@ -48,7 +46,6 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen">
-      {/* Left Section */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center bg-white px-6">
         <div className="max-w-md w-full">
           <div className="flex justify-center mb-6">

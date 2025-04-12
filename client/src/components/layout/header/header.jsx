@@ -104,7 +104,7 @@ export default function Header() {
                     isTop ? "text-color-custom-1" : "text-color-custom-4"
                   }`}
                 >
-                  PETACILIOUS
+                  PETALCILIOUS
                 </a>
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function Header() {
                         </a>
                       </span>
                       {cartCount > 0 && (
-                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        <span className="absolute top-0 right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
                           {cartCount}
                         </span>
                       )}
@@ -270,12 +270,6 @@ export default function Header() {
                       {/* Dropdown Menu */}
                       {isDropdownOpen && userEmail && (
                         <div className="absolute right-0 mt-5 w-48 bg-white shadow-md rounded-lg py-2">
-                          <a
-                            href="/profile"
-                            className="px-4 py-2 text-gray-700"
-                          >
-                            Tra Cứu Đơn Hàng
-                          </a>
                           <button
                             onClick={handleLogout}
                             className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"

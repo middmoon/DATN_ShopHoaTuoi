@@ -13,6 +13,7 @@ import CartPage from "./pages/shoppingCart/shoppingCart";
 import PaymentPage from "./pages/payment/payment";
 import PaymentResult from "./components/PaymentResult/PaymentResult";
 import WithLayout from "./Layouts/WithLayout";
+import PageNotFound from "./pages/PageNotFound/PageNotFound";
 
 const HomeWithLayout = WithLayout(Home);
 const MasterShopWithLayout = WithLayout(MasterShop);
@@ -34,6 +35,7 @@ function App() {
         <Route path="cart" element={<CartPageWithLayout />} />
         <Route path="payment" element={<PaymentPageWithLayout />} />
         <Route path="/payment-success" element={<PaymentResult />} />
+        <Route path="*" element={<PageNotFound/>}/>
         {/* <Route path="/payment-failure" element={<PaymentResult />} /> */}
       </Routes>
       </CategoryProvider>
