@@ -1,5 +1,13 @@
 import React from "react";
-import { Card, CardMedia, CardActions, Button, IconButton, Box, Backdrop } from "@mui/material";
+import {
+  Card,
+  CardMedia,
+  CardActions,
+  Button,
+  IconButton,
+  Box,
+  Backdrop,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 
@@ -11,7 +19,14 @@ export default function EventPopup({ thumbnail, slug, onClose }) {
   };
 
   return (
-    <Backdrop open sx={{ zIndex: 1300, color: "#fff", backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+    <Backdrop
+      open
+      sx={{
+        zIndex: 1300,
+        color: "#fff",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+      }}
+    >
       <Card
         sx={{
           width: 600,
