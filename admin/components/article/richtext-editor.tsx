@@ -9,19 +9,7 @@ import Link from "@tiptap/extension-link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  Bold,
-  Italic,
-  List,
-  ListOrdered,
-  ImageIcon,
-  Code,
-  Heading1,
-  Heading2,
-  LinkIcon,
-  Unlink,
-  Loader2, // Thêm Unlink và Loader2
-} from "lucide-react";
+import { Bold, Italic, List, ListOrdered, ImageIcon, Code, Heading1, Heading2, LinkIcon, Unlink, Loader2 } from "lucide-react";
 import { api } from "@/utils/api";
 
 export function RichTextEditor() {
