@@ -1,15 +1,15 @@
 "use strict";
 
-const { sequelize, Order, OrderProduct, Product, Payment, PaymentHistory, OrderStatus, PaymentMethod, Event, EventProduct } = require("../models");
+const { sequelize, Order, OrderProduct, Product, Payment, PaymentHistory, OrderStatus, PaymentMethod } = require("../models");
 const payment = require("../models/payment");
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
 const moment = require("moment");
 
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 class OrderService {
   static createOrder = async (payload, customer_id = null) => {
-    const { products, payment_method_id, total_amount, ...order } = payload;
+    const { products, payment_method_id, ...order } = payload;
 
     const product_ids = products.map((product) => product._id);
 
@@ -32,54 +32,12 @@ class OrderService {
       }
     }
 
-    const eventIds = [...new Set(products.filter((product) => product.event_id).map((product) => product.event_id))];
+    const total_price = products.reduce((acc, product) => acc + product.retail_price * product.quantity, 0);
 
-    const activeEvents = await Event.findAll({
-      where: {
-        _id: {
-          [Op.in]: eventIds,
-        },
-        is_active: true,
-      },
-    });
-
-    if (!activeEvents || activeEvents.length === 0 || activeEventIds.length !== eventIds.length) {
-      throw new BAD_REQUEST("Sone active events can not be found");
-    }
-
-    const activeEventIds = activeEvents.map((event) => event.id);
-
-    const eventProducts = await EventProduct.findAll({
-      where: {
-        event_id: {
-          [Op.in]: activeEventIds,
-        },
-        product_id: {
-          [Op.in]: product_ids,
-        },
-      },
-    });
-
-    if (!eventProducts || eventProducts.length === 0) {
-      throw new BAD_REQUEST("No event products found for the active events");
-    }
-
-    const total_price = products.reduce((acc, product) => {
-      const unitPrice = this.calculateDiscount(product.discount_type, product.discount_value, product.retail_price);
-      const calculatedTotal = unitPrice * product.quantity;
-
-      if (product.expected_total_price !== undefined && calculatedTotal !== product.expected_total_price) {
-        throw new BAD_REQUEST(`Calculated price ${calculatedTotal} does not match provided price ${product.expected_total_price}`);
-      }
-
-      return acc + calculatedTotal;
-    }, 0);
-
-    if (total_price !== total_amount) {
-      throw new BAD_REQUEST(`Calculated total price ${total_price} does not match provided total_amount ${total_amount}`);
-    }
+    order.total_price = total_price;
 
     const delivery_address = order.address + " - " + order.ward_name + " - " + order.district_name + " - " + order.province_name;
+
     order.delivery_address = delivery_address;
 
     try {
@@ -107,27 +65,35 @@ class OrderService {
         }
 
         let newOrderProducts = [];
+
         if (products.length > 0) {
           newOrderProducts = await OrderProduct.bulkCreate(
-            products.map((product) => ({
-              order_id: newOrder._id,
-              product_id: product._id,
-              quantity: product.quantity,
-            })),
+            products.map((product) => {
+              return {
+                order_id: newOrder._id,
+                product_id: product._id,
+                quantity: product.quantity,
+              };
+            }),
             { transaction: t }
           );
-          if (!newOrderProducts || newOrderProducts.length !== products.length) {
+
+          if (!newOrderProducts || newOrderProducts.length === 0 || newOrderProducts.length != products.length) {
             throw new BAD_REQUEST("Can not create order product");
           }
         }
 
         let newPayment;
+
         if (payment_method_id) {
-          const { payment, paymentHistory } = this.initOrderInfo(payment_method_id, newOrder._id, total_price);
+          const { payment, paymentHistory } = this.initOrderInfo(payment_method_id, newOrder._id, order.total_price);
+
           newPayment = await Payment.create(payment, { transaction: t });
+
           if (!newPayment) {
             throw new BAD_REQUEST("Can not create payment, do not have payment method");
           }
+
           const newPaymentHistory = await PaymentHistory.create(
             {
               payment_id: newPayment._id,
@@ -136,6 +102,7 @@ class OrderService {
             },
             { transaction: t }
           );
+
           if (!newPaymentHistory) {
             throw new BAD_REQUEST("Can not create payment history");
           }
@@ -147,21 +114,6 @@ class OrderService {
       return result;
     } catch (error) {
       throw error;
-    }
-  };
-
-  static calculateDiscount = (discount_type, discount_value, product_retail_price) => {
-    if (!discount_type || discount_value === null || discount_value === undefined) {
-      return product_retail_price;
-    }
-
-    switch (discount_type) {
-      case "fixed":
-        return product_retail_price - discount_value;
-      case "percentage":
-        return product_retail_price * (1 - discount_value / 100);
-      default:
-        return product_retail_price;
     }
   };
 
@@ -237,39 +189,14 @@ class OrderService {
     return { payment, paymentHistory };
   };
 
-  static changeOrderStatus = async (orderId, order) => {
+  static updateOrderInfo = async (orderId, { paymentStatus, paymentInfo = {} }) => {
     const t = await sequelize.transaction();
 
-    try {
-      const updatedOrder = await Order.update({ status_id: order.status_id }, { where: { _id: orderId }, transaction: t });
-
-      let updatedPayment = null;
-
-      switch (order.status_id) {
-        case 2:
-          break;
-        case 4:
-          const paymentData = {
-            paymentStatus: "Hoàn thành",
-          };
-          updatedPayment = await this.updateOrderInfo(orderId, paymentData, t);
-          break;
-      }
-
-      await t.commit();
-      return { updatedOrder, updatedPayment };
-    } catch (error) {
-      await t.rollback();
-      throw error;
-    }
-  };
-
-  static updateOrderInfo = async (orderId, { paymentStatus, paymentInfo = {} }, transaction) => {
     try {
       // Tìm Payment dựa trên orderId
       const payment = await Payment.findOne({
         where: { order_id: orderId },
-        transaction,
+        transaction: t,
       });
 
       if (!payment) {
@@ -280,35 +207,46 @@ class OrderService {
         {
           status: paymentStatus,
           info: {
+            ...payment.info,
             ...paymentInfo,
           },
         },
-        { transaction }
+        { transaction: t }
       );
 
+      // Tạo PaymentHistory
       await PaymentHistory.create(
         {
           payment_id: payment._id,
           order_id: orderId,
           status: paymentStatus,
         },
-        { transaction }
+        { transaction: t }
       );
 
-      return payment;
+      await t.commit();
+      return payment; // Trả về Payment đã cập nhật
     } catch (error) {
+      await t.rollback();
       throw error;
     }
   };
 
   static getPendingOrdersCount = async () => {
-    const pendingOrdersCount = await Order.count({
+    const count = await Order.count({
       where: {
         status_id: 1,
       },
     });
 
-    return { pendingOrdersCount };
+    return { pending_orders_count: count };
+  };
+
+  static changeOrderStatus = async (orderId, order) => {
+    const updatedOrder = await Order.update(order, {
+      where: { _id: orderId },
+    });
+    return updatedOrder;
   };
 
   static getAllOrders = async () => {
@@ -418,16 +356,6 @@ class OrderService {
       where: { _id: orderId },
     });
     return updatedOrder;
-  };
-
-  static countOrders = async () => {
-    const count = await Order.count();
-
-    if (!count) {
-      throw new NOTFOUND("Can not get orders");
-    }
-
-    return count;
   };
 }
 

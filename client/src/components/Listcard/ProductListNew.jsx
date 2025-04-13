@@ -16,7 +16,9 @@ const ProductListNew = () => {
       try {
         const response = await getProduct();
         if (response.status === 200) {
-          const shuffledProducts = response.data.sort(() => Math.random() - 0.5);
+          const shuffledProducts = response.data.sort(
+            () => Math.random() - 0.5
+          );
           setProducts(shuffledProducts);
         }
       } catch (error) {
@@ -30,7 +32,9 @@ const ProductListNew = () => {
   const getDirectImageURL = (url) => {
     if (!url) return "/Img/Page/p3.webp";
     const match = url.match(/(?:id=|\/d\/)([^/&?]+)/);
-    return match ? `https://lh3.googleusercontent.com/d/${match[1]}=s1000` : url;
+    return match
+      ? `https://lh3.googleusercontent.com/d/${match[1]}=s1000`
+      : url;
   };
 
   return (
@@ -57,7 +61,8 @@ const ProductListNew = () => {
           >
             {products.slice(0, 9).map((product) => {
               const avatarImage = getDirectImageURL(
-                product.ProductImages?.find((img) => img.is_avatar)?.img_url || product.ProductImages?.[0]?.img_url
+                product.ProductImages?.find((img) => img.is_avatar)?.img_url ||
+                  product.ProductImages?.[0]?.img_url
               );
 
               return (
@@ -65,9 +70,11 @@ const ProductListNew = () => {
                   <ProductCard
                     image={avatarImage}
                     name={product.name}
-                    price={product.retail_price}
-                    isSale={product.Events.length > 0}
-                    sale_price={product.Events[0]?.discount_value}
+                    price={
+                      product.retail_price
+                        ? `${product.retail_price.toLocaleString("vi-VN")} VND`
+                        : "Liên hệ"
+                    }
                     link={`/productdetail/${product.slug}`}
                   />
                 </SwiperSlide>

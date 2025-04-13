@@ -24,7 +24,6 @@ router
   .get("/refund", asyncHandler(OrderController.getComfirmedOrders))
 
   // Lấy danh sách tất cả đơn hàng
-  .get("/count", asyncHandler(OrderController.countOrders))
   .get("/", asyncHandler(OrderController.getAllOrders))
 
   // Lấy đơn hàng theo ID

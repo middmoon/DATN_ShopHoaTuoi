@@ -24,7 +24,7 @@ export default function ReviewService() {
   return (
     <div className="ReviewService bg-color-custom-4">
       <div className="container mx-auto py-10 text-center">
-        <h1 className="text-2xl font-bold font-font4">Dịch Vụ Cung Cấp</h1>
+        <h1 className="text-2xl font-bold font-font2">Dịch Vụ Cung Cấp</h1>
       </div>
 
       <div className="container mx-auto pb-10">

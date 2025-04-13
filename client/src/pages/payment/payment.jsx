@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Sửa lỗi cú pháp: bỏ "data"
+import { data, useNavigate } from "react-router-dom";
 import { fetchProvinces, fetchDistricts, fetchWards } from "../../APIs/adress";
 import apiv1 from "../../utils/axiosClient";
 
 const PaymentPage = () => {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [amount, setAmount] = useState(0);
+
   const [customerInfo, setCustomerInfo] = useState({
     customer_name: "",
     customer_phone: "",
@@ -20,12 +21,26 @@ const PaymentPage = () => {
     payment_method: 1,
   });
   const [paymentMethod, setPaymentMethod] = useState(1);
+
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+
   const navigate = useNavigate();
 
-  // Load dữ liệu từ localStorage khi component khởi tạo
+  useEffect(() => {
+    const totalAmount = selectedProducts.reduce((total, product) => total + product.quantity * product.retail_price, 0);
+    setAmount(totalAmount);
+  }, [selectedProducts]);
+
+  useEffect(() => {
+    const getProvinces = async () => {
+      const data = await fetchProvinces();
+      setProvinces(data);
+    };
+    getProvinces();
+  }, []);
+
   useEffect(() => {
     const storedProducts = localStorage.getItem("selectedProducts");
     if (storedProducts) {
@@ -37,36 +52,6 @@ const PaymentPage = () => {
       setCustomerInfo(JSON.parse(storedCustomerInfo));
     }
   }, []);
-
-  // Tính tổng tiền dựa trên giá sau khi giảm
-  useEffect(() => {
-    const totalAmount = selectedProducts.reduce((total, product) => {
-      const price = calculateDiscountedPrice(product);
-      return total + product.quantity * price;
-    }, 0);
-    setAmount(totalAmount);
-  }, [selectedProducts]);
-
-  // Lấy danh sách tỉnh/thành
-  useEffect(() => {
-    const getProvinces = async () => {
-      const data = await fetchProvinces();
-      setProvinces(data);
-    };
-    getProvinces();
-  }, []);
-
-  const calculateDiscountedPrice = (product) => {
-    if (product.Events && product.Events.length > 0) {
-      const event = product.Events[0];
-      if (event.discount_type === "fixed") {
-        return Math.max(product.retail_price - event.discount_value, 0);
-      } else if (event.discount_type === "percentage") {
-        return Math.max(product.retail_price - (product.retail_price * event.discount_value) / 100, 0);
-      }
-    }
-    return product.retail_price || 0;
-  };
 
   const handleProvinceChange = async (event) => {
     const provinceCode = event.target.value;
@@ -157,16 +142,10 @@ const PaymentPage = () => {
       district_code: customerInfo.district_code,
       ward_name: customerInfo.ward_name,
       ward_code: customerInfo.ward_code,
-      total_amount: amount,
       products: selectedProducts.map((product) => ({
         _id: product._id,
         retail_price: product.retail_price,
-        sale_price: product.Events[0] ? calculateDiscountedPrice(product) : null,
-        event_id: product.Events[0] ? product.Events[0]._id : null,
-        discount_type: product.Events[0] ? product.Events[0].discount_type : null,
-        discount_value: product.Events[0] ? product.Events[0].discount_value : null,
         quantity: product.quantity,
-        expected_total_price: product.Events[0] ? calculateDiscountedPrice(product) * product.quantity : product.retail_price * product.quantity,
       })),
       payment_method_id: Number(paymentMethod),
     };
@@ -176,12 +155,16 @@ const PaymentPage = () => {
     switch (dataToSend.payment_method_id) {
       case 1:
         try {
+          // 1: Tạo đơn hàng
           const createOrderResponse = await apiv1.post("/order", dataToSend);
+
           if (createOrderResponse.status !== 201) {
             throw new Error("Không thể tạo đơn hàng");
           }
 
           const orderData = createOrderResponse.data.data;
+
+          // 2: Tạo URL thanh toán
           const paymentData = {
             orderId: orderData.order._id,
             amount: orderData.order.total_price,
@@ -192,11 +175,13 @@ const PaymentPage = () => {
           };
 
           const vnpayPaymentResponse = await apiv1.post("/payment/vnpay/create_payment_url", paymentData);
+
           if (vnpayPaymentResponse.status !== 200) {
             throw new Error("Không thể tạo URL thanh toán");
           }
 
           const data = vnpayPaymentResponse.data;
+
           window.location.href = data.paymentUrl;
         } catch (error) {
           console.error("Lỗi khi gửi dữ liệu:", error);
@@ -210,12 +195,16 @@ const PaymentPage = () => {
       case 7:
         try {
           const createOrderResponse = await apiv1.post("/order", dataToSend);
+
           if (createOrderResponse.status !== 201) {
             throw new Error("Không thể tạo đơn hàng");
           }
 
           alert("Cảm ơn bạn đã đặt hàng hãy chờ nhân viên liên hệ.");
+
           navigate("/");
+
+          // alert(JSON.stringify(dataToSend));
         } catch (error) {
           console.error("Lỗi khi gửi dữ liệu:", error);
           if (error.message === "Dữ liệu không hợp lệ") {
@@ -308,7 +297,6 @@ const PaymentPage = () => {
             ))}
           </select>
         </div>
-
         <div className="bg-white p-5 border shadow-lg rounded-lg mt-5">
           <h2 className="text-xl font-bold mb-3">Thanh toán</h2>
 
@@ -319,32 +307,21 @@ const PaymentPage = () => {
             <div className="border p-5 rounded-lg bg-gray-100 shadow-md">
               <h3 className="text-lg font-semibold text-gray-700 mb-3">Sản phẩm đã chọn</h3>
               <ul>
-                {selectedProducts.map((product, index) => {
-                  const price = calculateDiscountedPrice(product);
-                  const hasDiscount = product.Events && product.Events.length > 0;
-
-                  return (
-                    <li key={index} className="flex justify-between items-center py-3">
-                      <span className="font-medium text-gray-800">{product.name}</span>
-                      <span className="text-gray-600">
-                        {product.quantity} x{" "}
-                        {hasDiscount ? (
-                          <>
-                            <span className="line-through text-gray-500">{product.retail_price.toLocaleString()} VNĐ</span>
-                            <span className="text-red-500 ml-2">{price.toLocaleString()} VNĐ</span>
-                          </>
-                        ) : (
-                          <span className="text-blue-500">{product.retail_price.toLocaleString()} VNĐ</span>
-                        )}
-                      </span>
-                    </li>
-                  );
-                })}
+                {selectedProducts.map((product, index) => (
+                  <li key={index} className="flex justify-between items-center py-3">
+                    <span className="font-medium text-gray-800">{product.name}</span>
+                    <span className="text-gray-600">
+                      {product.quantity} x <span className="text-red-500 font-semibold">{product.retail_price.toLocaleString()} VNĐ</span>
+                    </span>
+                  </li>
+                ))}
               </ul>
 
               <div className="mt-4 pt-3 border-t border-gray-300 flex justify-between text-lg font-bold text-gray-800">
                 <span>Tổng tiền:</span>
-                <span className="text-red-500">{amount.toLocaleString()} VNĐ</span>
+                <span className="text-red-500">
+                  {selectedProducts.reduce((total, product) => total + product.quantity * product.retail_price, 0).toLocaleString()} VNĐ
+                </span>
               </div>
             </div>
           )}

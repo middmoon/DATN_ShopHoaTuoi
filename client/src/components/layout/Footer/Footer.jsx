@@ -12,10 +12,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg text-color-custom-4 font-semibold mb-2">
+            <h3 className="text-lg text-color-custom-4 font-semibold mb-2 font-font2">
               Dịch Vụ
             </h3>
-            <ul className="space-y-1 text-color-custom-4">
+            <ul className="space-y-1 text-color-custom-4 font-font2">
               <li>Trang Trí</li>
               <li>Cung Câp Hoa Tươi</li>
               <li>Đặt Hoa Theo Yêu Cầu</li>
@@ -23,10 +23,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-color-custom-4">
+            <h3 className="text-lg font-semibold mb-2 text-color-custom-4 font-font2">
               Các Loại Hoa
             </h3>
-            <ul className="space-y-1 text-color-custom-4">
+            <ul className="space-y-1 text-color-custom-4 font-font2">
               <li>Hoa Nhập Khẩu</li>
               <li>Hoa Tươi</li>
               <li>Hoa Khô</li>
@@ -34,10 +34,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-color-custom-4">
+            <h3 className="text-lg font-semibold mb-2 text-color-custom-4 font-font2">
               Hỗ Trợ
             </h3>
-            <ul className="space-y-1 text-color-custom-4">
+            <ul className="space-y-1 text-color-custom-4 font-font2">
               <li>Tư Vấn Chọn Hoa</li>
               <li>Hỗ Trợ Chăm Sóc</li>
               <li></li>
@@ -45,10 +45,10 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-color-custom-4">
+            <h3 className="text-lg font-semibold mb-2 text-color-custom-4 font-font2">
               Company
             </h3>
-            <ul className="space-y-1 text-color-custom-4">
+            <ul className="space-y-1 text-color-custom-4 font-font2">
               <li>Địa Chỉ: Số 1 Phù Đổng Thiên Vương</li>
               <li>Liên Hệ: 0123 456 789</li>
             </ul>
@@ -56,7 +56,9 @@ export default function Footer() {
         </div>
 
         <div className="mt-6 border-t border-text-color-custom-4 pt-4 flex justify-between items-center text-color-custom-4">
-          <p className="text-color-custom-2">PETACILIOUS Inc. © 2025</p>
+          <p className="text-color-custom-2 font-font2">
+            PETALCILIOUS Inc. © 2025
+          </p>
           <div className="flex space-x-4">
             <a
               href="#"

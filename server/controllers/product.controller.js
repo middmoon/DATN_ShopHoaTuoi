@@ -35,8 +35,13 @@ class ProductController {
   };
 
   static getProducts = async (req, res) => {
-    const queryOptions = buildQueryOptions(req.query);
+    const isManageRoute = req.originalUrl.includes("/manage");
 
+    if (!isManageRoute) {
+      req.query.is_public = true;
+    }
+
+    const queryOptions = buildQueryOptions(req.query);
     new OK({
       message: "Products retrieved successfully",
       data: await ProductService.getProducts(queryOptions),
@@ -63,13 +68,6 @@ class ProductController {
     new OK({
       message: "Product retrieved successfully",
       data: await ProductService.getProductBySlug(req.params.productSlug),
-    }).send(res);
-  };
-
-  static getProductsBasic = async (req, res) => {
-    new OK({
-      message: "Products retrieved successfully",
-      data: await ProductService.getProductsBasic(),
     }).send(res);
   };
 

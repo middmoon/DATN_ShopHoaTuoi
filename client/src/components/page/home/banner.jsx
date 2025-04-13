@@ -39,8 +39,15 @@ export default function MainBanner() {
               ></div>
 
               <div className="w-36 h-48 bg-white border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
-                <img src="/Img/Icon/fl3.png" alt="" className="w-12 h-12" />
+                <motion.img
+                  src="/Img/Icon/fl3.png"
+                  alt="icon"
+                  className="w-12 h-12"
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+                />
               </div>
+
               <div
                 className="w-36 h-64 rounded-full overflow-hidden bg-center bg-cover"
                 style={{
@@ -52,7 +59,13 @@ export default function MainBanner() {
             {/* Center Column */}
             <div className="flex flex-col items-center gap-4 h-full overflow-hidden">
               <div className="w-36 h-48 bg-white border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
-                <img src="/Img/Icon/fl2.png" alt="" className="w-12 h-12" />
+                <motion.img
+                  src="/Img/Icon/fl2.png"
+                  alt="icon"
+                  className="w-12 h-12"
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+                />
               </div>
               <div
                 className="w-36 h-[600px] bg-black rounded-full bg-center bg-cover"
@@ -72,7 +85,13 @@ export default function MainBanner() {
               ></div>
 
               <div className="w-36 h-48 bg-white border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
-                <img src="/Img/Icon/fl1.png" alt="" className="w-12 h-12" />
+                <motion.img
+                  src="/Img/Icon/fl1.png"
+                  alt="icon"
+                  className="w-12 h-12"
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+                />
               </div>
 
               <div
@@ -109,7 +128,7 @@ export default function MainBanner() {
           </div>
 
           {/* Subtitle */}
-          <p className="text-gray-600 mt-4 text-lg">
+          <p className="text-gray-600 mt-4 text-lg font-font2">
             {text.split("").map((char, index) => (
               <motion.span
                 key={index}
@@ -125,13 +144,13 @@ export default function MainBanner() {
           {/* Buttons */}
           <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-4">
             <button
-              className="bg-gray-200 text-gray-800 px-6 py-3 rounded-full font-semibold transition-transform duration-300 hover:scale-105"
+              className="bg-gray-200 text-gray-800 px-6 py-3 rounded-full font-semibold transition-transform duration-300 hover:scale-105 font-font2"
               onClick={() => smoothScrollTo(window.innerHeight * 0.9)}
             >
               Giới Thiệu
             </button>
 
-            <button className="bg-color-custom-1 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2">
+            <button className="bg-color-custom-1 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2 font-font2">
               <a href="/mastershop">
                 Mua Ngay <span className="text-xl">+</span>
               </a>
@@ -141,16 +160,22 @@ export default function MainBanner() {
           {/* Stats */}
           <div className="mt-10 flex flex-wrap justify-center md:justify-start gap-8">
             <div className="text-center md:text-left">
-              <span className="text-3xl font-bold text-gray-900">164</span>
-              <p className="text-gray-500 text-sm mt-1">Đánh Giá</p>
+              <span className="text-3xl font-bold text-gray-900 font-font2">
+                164
+              </span>
+              <p className="text-gray-500 text-sm mt-1 font-font2">Đánh Giá</p>
             </div>
             <div className="text-center md:text-left">
-              <span className="text-3xl font-bold text-gray-900">231</span>
-              <p className="text-gray-500 text-sm mt-1">Đơn Hàng</p>
+              <span className="text-3xl font-bold text-gray-900 font-font2">
+                231
+              </span>
+              <p className="text-gray-500 text-sm mt-1 font-font2">Đơn Hàng</p>
             </div>
             <div className="text-center md:text-left">
-              <span className="text-3xl font-bold text-gray-900">12+</span>
-              <p className="text-gray-500 text-sm mt-1">Phân Phối</p>
+              <span className="text-3xl font-bold text-gray-900 font-font2">
+                12+
+              </span>
+              <p className="text-gray-500 text-sm mt-1 font-font2">Phân Phối</p>
             </div>
           </div>
         </div>

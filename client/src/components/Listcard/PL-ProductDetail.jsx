@@ -47,7 +47,6 @@ const PLProductDetail = () => {
           modules={[Navigation, Pagination, Autoplay]}
           spaceBetween={20}
           slidesPerView={4}
-          navigation
           pagination={{ clickable: true }}
           autoplay={{ delay: 3000, disableOnInteraction: false }}
           breakpoints={{

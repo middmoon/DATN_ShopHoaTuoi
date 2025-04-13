@@ -1,7 +1,7 @@
 import { io, Socket } from "socket.io-client";
 
 interface OrderCountData {
-  pendingOrdersCount: number;
+  count: number;
 }
 
 let socket: Socket | undefined;
@@ -9,16 +9,16 @@ let socket: Socket | undefined;
 export const initSocket = (): Socket => {
   if (socket) return socket;
 
-  socket = io(`http://localhost:${process.env.NEXT_PUBLIC_ADMIN_PORT || 3000}`, {
+  socket = io("http://localhost:3000/auth", {
     withCredentials: true,
   });
 
   socket.on("connect", () => {
-    console.log("Connected to Socket.IO server");
+    console.log("Connected to Socket.IO server (auth namespace)");
   });
 
   socket.on("orderCount", (data: OrderCountData) => {
-    console.log("Order count updated:", data.pendingOrdersCount);
+    console.log("Order count updated:", data.count);
   });
 
   socket.on("connect_error", (err: Error) => {

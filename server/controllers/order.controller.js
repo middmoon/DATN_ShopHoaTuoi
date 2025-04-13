@@ -5,15 +5,14 @@ const { OK, CREATED } = require("../utils/success.response");
 
 class OrderController {
   static createOrder = async (req, res) => {
-    const io = req.app.get("io");
+    // const io = req.app.get("io");
 
-    const newOrder = await OrderService.createOrder(req.body, req._id);
-    const pendingOrdersCount = await OrderService.getPendingOrdersCount();
-    io.emit("orderCount", pendingOrdersCount);
+    // const orderCount = await OrderService.getPendingOrdersCount();
+    // io.emit("orderCount", { count: orderCount });
 
     new CREATED({
       message: "Order created successfully",
-      data: newOrder,
+      data: await OrderService.createOrder(req.body, req._id),
     }).send(res);
   };
 
@@ -32,24 +31,10 @@ class OrderController {
   };
 
   static changeOrderStatus = async (req, res) => {
-    const io = req.app.get("io");
-
-    const updatedOrder = await OrderService.changeOrderStatus(req.params._id, req.body);
-    const pendingOrdersCount = await OrderService.getPendingOrdersCount();
-    io.emit("orderCount", pendingOrdersCount);
-
     new OK({
       message: "Order status changed successfully",
-      data: updatedOrder,
+      data: await OrderService.changeOrderStatus(req.params._id, req.body),
     }).send(res);
-
-    // console.log(req.body);
-    // console.log(req.params._id);
-
-    // new OK({
-    //   message: "Order status changed successfully",
-    //   data: req.body,
-    // }).send(res);
   };
 
   static getAllOrders = async (req, res) => {
@@ -105,13 +90,6 @@ class OrderController {
     new OK({
       message: "get orders by id successfully",
       data: await OrderService.getOrdersById(req.params._id),
-    }).send(res);
-  };
-
-  static countOrders = async (req, res) => {
-    new OK({
-      message: "get orders count successfully",
-      data: await OrderService.countOrders(),
     }).send(res);
   };
 }

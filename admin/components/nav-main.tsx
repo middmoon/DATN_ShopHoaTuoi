@@ -16,11 +16,9 @@ import {
 } from "@/components/ui/sidebar";
 
 export function NavMain({
-  name,
   items,
   pendingOrdersCount,
 }: {
-  name: string;
   items: {
     title: string;
     url: string;
@@ -31,11 +29,11 @@ export function NavMain({
       url: string;
     }[];
   }[];
-  pendingOrdersCount: any;
+  pendingOrdersCount: number;
 }) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-md b">{name}</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-md b">Quản lý cửa hàng</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>

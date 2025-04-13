@@ -1,6 +1,6 @@
 "use strict";
 
-const { sequelize, Product, ProductImage, ProductCategory, ProductCategoryMapping, Event } = require("../models");
+const { sequelize, Product, ProductImage, ProductCategory, ProductCategoryMapping } = require("../models");
 const { Op, where } = require("sequelize");
 
 const { NOTFOUND, BAD_REQUEST } = require("../utils/error.response");
@@ -242,18 +242,26 @@ class ProductService {
     return products;
   };
 
-  static getProductsBasic = async () => {
-    const products = await Product.findAll({
-      where: { is_public: true },
-      attributes: ["_id", "name", "retail_price"],
-    });
+  // static getProducts = async (conditions = {}) => {
+  //   const products = await Product.findAll({
+  //     where: conditions,
+  //     include: [
+  //       {
+  //         model: ProductCategory,
+  //         attributes: ["_id", "name"],
+  //         through: {
+  //           attributes: [],
+  //         },
+  //       },
+  //       {
+  //         model: ProductImage,
+  //         attributes: ["is_avatar", "img_url"],
+  //       },
+  //     ],
+  //   });
 
-    if (!products) {
-      throw new NOTFOUND("Can not find products");
-    }
-
-    return products;
-  };
+  //   return products;
+  // };
 
   static getProductById = async (productId) => {
     const product = await Product.findByPk(productId);
@@ -280,15 +288,6 @@ class ProductService {
         {
           model: ProductImage,
           attributes: ["_id", "img_url", "is_avatar"],
-        },
-        {
-          model: Event,
-          attributes: ["_id", "discount_type", "discount_value"],
-          where: { is_active: true },
-          through: {
-            attributes: [],
-          },
-          required: false,
         },
       ],
     });
