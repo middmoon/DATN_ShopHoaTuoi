@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/page-header";
+import SearchAnalyticsCharts from "@/components/chart/search-logs-charts";
 
 export default function CategoriesPage() {
   const breadcrumbItems = [
@@ -9,6 +10,7 @@ export default function CategoriesPage() {
   return (
     <>
       <PageHeader items={breadcrumbItems}></PageHeader>
+      <SearchAnalyticsCharts />
     </>
   );
 }

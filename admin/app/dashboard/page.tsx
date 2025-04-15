@@ -1,3 +1,4 @@
+import DashboardOverview from "@/components/general/dashboad-overview";
 import { PageHeader } from "@/components/page-header";
 import { DynamicForm } from "@/components/products/add-new-product/dynamic-form";
 import DashboardCharts from "@/components/test/chart.test";
@@ -11,12 +12,10 @@ export default function Page() {
       <PageHeader items={breadcrumbItems}></PageHeader>
 
       {/* <DynamicForm /> */}
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-        <DashboardCharts />
+      {/* <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50"> */}
+      <DashboardOverview />
 
-        {/* <SearchLogChart /> */}
-        {/* <AuditLogChart /> */}
-      </div>
+      <DashboardCharts />
     </>
   );
 }
