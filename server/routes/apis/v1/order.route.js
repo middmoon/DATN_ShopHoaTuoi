@@ -19,11 +19,12 @@ router
   .get("/pending", asyncHandler(OrderController.getPendingOrders))
   .get("/comfirmed", asyncHandler(OrderController.getComfirmedOrders))
   .get("/finished", asyncHandler(OrderController.getFinishedOrders))
-  .get("/canceled", asyncHandler(OrderController.getPendingOrders))
+  .get("/cancel", asyncHandler(OrderController.getPendingOrders))
   .get("/shipping", asyncHandler(OrderController.getComfirmedOrders))
   .get("/refund", asyncHandler(OrderController.getComfirmedOrders))
 
   // Lấy danh sách tất cả đơn hàng
+  .get("/count", asyncHandler(OrderController.countOrders))
   .get("/", asyncHandler(OrderController.getAllOrders))
 
   // Lấy đơn hàng theo ID

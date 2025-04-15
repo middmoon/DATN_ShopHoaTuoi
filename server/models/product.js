@@ -40,21 +40,14 @@ module.exports = (sequelize, DataTypes) => {
         otherKey: "attribute_value_id",
       });
 
-      //Product Atribute 2
+      Product.belongsToMany(models.Event, {
+        through: models.EventProduct,
+        foreignKey: "product_id",
+        otherKey: "event_id",
+      });
     }
   }
 
-  //   const productInfo: {
-  //     _id: number;
-  //     name: string;
-  //     description: string;
-  //     retail_price: number;
-  //     status: string;
-  //     slug: string;
-  //     unit: string;
-  //     is_feature: boolean;
-  //     is_public: boolean;
-  // }
   Product.init(
     {
       _id: {
@@ -81,9 +74,6 @@ module.exports = (sequelize, DataTypes) => {
       slug: {
         type: DataTypes.STRING,
         unique: true,
-      },
-      slug: {
-        type: DataTypes.STRING,
       },
       is_feature: {
         type: DataTypes.BOOLEAN,

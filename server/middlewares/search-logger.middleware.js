@@ -20,6 +20,12 @@ const initializeRabbitMQ = async () => {
 initializeRabbitMQ();
 
 const searchLogger = async (req, res, next) => {
+  const isManageRoute = req.originalUrl.includes("/manage");
+
+  if (!isManageRoute) {
+    req.query.is_public = true;
+  }
+
   res.on("finish", async () => {
     let userId = null;
     const data = JSON.parse(req.resData).data;

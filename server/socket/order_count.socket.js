@@ -3,10 +3,10 @@
 const OrderService = require("../services/order.service");
 
 const countOrderEvent = (socket) => {
-  socket.on("countOrder", async (data) => {
+  socket.on("countOrder", async () => {
     try {
-      const orderCount = await OrderService.getPendingOrdersCount();
-      socket.emit("orderCount", { count: orderCount });
+      const pendingOrdersCount = await OrderService.getPendingOrdersCount();
+      socket.emit("orderCount", pendingOrdersCount);
     } catch (error) {
       console.error("Error counting orders:", error);
       socket.emit("orderCountError", { message: "Failed to count orders" });

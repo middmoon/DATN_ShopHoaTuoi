@@ -37,4 +37,11 @@ class NOTFOUND extends ErrorResponse {
   }
 }
 
-module.exports = { BAD_REQUEST, UNAUTHORIZED, FORBIDDEN, NOTFOUND };
+class CONFLICT extends ErrorResponse {
+  constructor(message = ReasonPhrases.CONFLICT) {
+    super(message);
+    this.status = StatusCodes.CONFLICT;
+  }
+}
+
+module.exports = { BAD_REQUEST, UNAUTHORIZED, FORBIDDEN, NOTFOUND, CONFLICT };
