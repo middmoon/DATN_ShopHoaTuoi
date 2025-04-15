@@ -64,5 +64,5 @@ if __name__ == "__main__":
     import uvicorn
     host = "localhost"
     port = 7000
-    print(f"🚀 Server is running at: http://localhost:{port}")
+    print(f"Server is running at: http://localhost:{port}")
     uvicorn.run(app, host=host, port=port)

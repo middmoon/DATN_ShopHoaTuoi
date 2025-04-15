@@ -1,4 +1,4 @@
-import { RichTextEditor } from "@/components/article/richtext-editor";
+// import { RichTextEditor } from "@/components/article/richtext-editor";
 import { PageHeader } from "@/components/page-header";
 
 export default function CategoriesPage() {
@@ -6,9 +6,7 @@ export default function CategoriesPage() {
   return (
     <>
       <PageHeader items={breadcrumbItems}></PageHeader>
-      <div className="container mx-auto p-10">
-        <RichTextEditor />
-      </div>
+      <div className="container mx-auto p-10">{/* <RichTextEditor /> */}</div>
     </>
   );
 }

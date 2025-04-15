@@ -143,7 +143,11 @@ dist
 .pnp.*
 /vnpay_nodejs/config
 /server/config/default.json
+<<<<<<< HEAD
 /reusable/t.js
 /server/structure3.txt
 /server/structure2.txt
 /server/structure.txt
+=======
+/reusable/t.js
+>>>>>>> parent of a45bb50 (update)
