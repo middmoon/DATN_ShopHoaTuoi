@@ -1,3 +1,7 @@
+"use strict";
+
+require("dotenv").config();
+
 const amqp = require("amqplib");
 const db = require("./models"); // Sequelize instance
 const { AuditLog, SearchLog } = require("./models");
@@ -14,7 +18,7 @@ let searchLogsBuffer = [];
 async function connectRabbitMQ() {
   try {
     // env MQ_HOST
-    const connection = await amqp.connect("amqp://localhost");
+    const connection = await amqp.connect(process.env.MQ_HOST_CLOUD);
     channel = await connection.createChannel();
 
     // Assert queues

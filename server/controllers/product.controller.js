@@ -4,7 +4,7 @@ const { OK, CREATED } = require("../utils/success.response");
 
 const ProductService = require("../services/product.service");
 
-const { buildQueryOptions, buildQueryOptionsForShopOrder } = require("../utils/query_option_builder");
+const { buildQueryOptions, buildQueryOptions2, buildQueryOptionsForShopOrder } = require("../utils/query_option_builder");
 
 const redis = require("../config/redis.config");
 
@@ -35,7 +35,9 @@ class ProductController {
   };
 
   static getProducts = async (req, res) => {
-    const queryOptions = buildQueryOptions(req.query);
+    const queryOptions = await buildQueryOptions(req.query);
+
+    console.log(queryOptions);
 
     new OK({
       message: "Products retrieved successfully",

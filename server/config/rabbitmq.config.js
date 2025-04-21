@@ -11,7 +11,7 @@ const channels = {};
 
 const connectRabbitMQ = async function () {
   try {
-    const connection = await amqp.connect(process.env.MQ_HOST);
+    const connection = await amqp.connect(process.env.MQ_HOST_CLOUD);
 
     for (const queueName of Object.values(QUEUE_NAMES)) {
       const channel = await connection.createChannel();

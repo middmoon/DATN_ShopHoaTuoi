@@ -1,8 +1,8 @@
-const { Op } = require("sequelize");
-const { ProductCategory, ProductImage, Event } = require("../models");
+const { Op, Sequelize } = require("sequelize");
+const { ProductCategory, ProductImage, Event, ProductCategoryMapping } = require("../models");
 const slugify = require("slugify");
 
-function buildQueryOptions(query) {
+async function buildQueryOptions(query) {
   const { search, q, is_public } = query;
 
   const whereProductConditions = {};
@@ -30,7 +30,7 @@ function buildQueryOptions(query) {
         [Op.or]: [
           { name: { [Op.like]: `%${keyword}%` } },
           { description: { [Op.like]: `%${keyword}%` } },
-          { slug: { [Op.like]: `%${keyword_slug}%` } },
+          // { slug: { [Op.like]: `%${keyword_slug}%` } },
         ],
       },
     ];
@@ -72,61 +72,56 @@ async function buildQueryOptions2(query) {
   const { search, q, is_public } = query;
 
   const whereProductConditions = {};
-  let categoryIds = [];
+  const whereCategoryConditions = {};
+  const replacements = {};
 
-  // --- Tìm kiếm sản phẩm bằng FULLTEXT ---
   const keyword = q || search;
-  if (keyword) {
-    const keyword_slug = slugify(keyword, { lower: true, strict: true });
 
-    whereProductConditions[Op.and] = [
-      Sequelize.literal(`
-        MATCH(name, description) AGAINST ('${keyword}*' IN BOOLEAN MODE)
-      `),
-    ];
+  if (keyword) {
+    whereProductConditions[Op.and] = [Sequelize.literal(`MATCH(Product.name, Product.description) AGAINST (:keyword IN BOOLEAN MODE)`)];
+    replacements.keyword = keyword;
 
     if (is_public !== undefined) {
       whereProductConditions[Op.and].push({ is_public });
     }
 
-    categoryIds = await Category.findAll({
-      attributes: ["id"],
-      where: {},
-      raw: true,
-    }).then((categories) => categories.map((c) => c.id));
-
-    if (categoryIds.length === 0) {
-      return { where: whereProductConditions };
+    whereCategoryConditions[Op.or] = [{ name: { [Op.like]: `%${keyword}%` } }];
+  } else {
+    if (is_public !== undefined) {
+      whereProductConditions.is_public = is_public;
     }
   }
 
-  const productIds = await ProductCategory.findAll({
-    attributes: ["product_id"],
-    where: { category_id: { [Op.in]: categoryIds } },
-    raw: true,
-  }).then((products) => products.map((p) => p.product_id));
-
-  if (productIds.length === 0) {
-    return { where: whereProductConditions };
-  }
-
-  // 🔥 Truy vấn sản phẩm
-  return {
-    where: {
-      ...whereProductConditions,
-      id: { [Op.in]: productIds },
-    },
+  const queryOptions = {
+    where: whereProductConditions,
     include: [
       {
         model: ProductCategory,
         attributes: ["_id", "name"],
+        through: {
+          attributes: [],
+        },
+        where: whereCategoryConditions,
+        required: false,
       },
       {
         model: ProductImage,
         attributes: ["is_avatar", "img_url"],
       },
+      {
+        model: Event,
+        attributes: ["_id", "discount_type", "discount_value"],
+        where: { is_active: true },
+        through: {
+          attributes: [],
+        },
+        required: false,
+      },
     ],
+    replacements,
   };
+
+  return queryOptions;
 }
 
 function buildQueryOptionsForShopOrder(query) {

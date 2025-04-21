@@ -91,6 +91,13 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
       charset: "utf8",
       collate: "utf8_general_ci",
+      indexes: [
+        {
+          type: "FULLTEXT",
+          name: "fulltext_idx_name_description",
+          fields: ["name", "description"],
+        },
+      ],
     }
   );
 

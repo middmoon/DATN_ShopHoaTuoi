@@ -71,6 +71,12 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
       charset: "utf8",
       collate: "utf8_general_ci",
+      indexes: [
+        {
+          name: "idx_events_is_active",
+          fields: ["is_active"],
+        },
+      ],
     }
   );
 
