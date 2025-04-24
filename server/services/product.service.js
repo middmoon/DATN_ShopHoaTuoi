@@ -124,12 +124,12 @@ class ProductService {
         }
 
         if (imageChanges.removedImageIds.length > 0) {
-          console.log("imageChanges.removedImageIds.length");
+          // console.log("imageChanges.removedImageIds.length");
 
-          console.log(imageChanges.removedImageIds.length);
-          console.log("imageChanges.removedImageIds");
+          // console.log(imageChanges.removedImageIds.length);
+          // console.log("imageChanges.removedImageIds");
 
-          console.log(imageChanges.removedImageIds);
+          // console.log(imageChanges.removedImageIds);
 
           const deletedImageCount = await ProductImage.destroy({
             where: {

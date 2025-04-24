@@ -12,12 +12,14 @@ router.use("/order", require("./order.route"));
 router.use("/payment", require("./payment"));
 router.use("/business", require("./business.route"));
 router.use("/event", require("./event.route"));
+router.use("/customer", require("./customer.route"));
 
 router.get("/", (req, res) => {
   res.send("TEST API V1");
 });
 
 const upload = require("../../../config/multer.config");
+const { route } = require("./customer.route");
 
 router.post("/test", upload.single("thumbnail"), function (req, res, next) {
   const { selected_products, ...newOrder } = JSON.parse(req.body.data);

@@ -4,6 +4,7 @@ import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import apiv1 from "../../utils/axiosClient";
 
 export default function Register() {
   const EyeClosedIcon = () => (
@@ -64,8 +65,7 @@ export default function Register() {
     switch (name) {
       case "username":
         if (!/^[A-Za-z]{5,}$/.test(value)) {
-          newErrors.username =
-            "Tên đăng nhập phải có ít nhất 5 ký tự và không chứa số.";
+          newErrors.username = "Tên đăng nhập phải có ít nhất 5 ký tự và không chứa số.";
           hasError = true;
         } else {
           delete newErrors.username;
@@ -81,8 +81,7 @@ export default function Register() {
         break;
       case "password":
         if (!/^(?=.*[A-Z])(?=.*\d).{5,}$/.test(value)) {
-          newErrors.password =
-            "Mật khẩu phải có ít nhất 5 ký tự, gồm chữ in hoa và số.";
+          newErrors.password = "Mật khẩu phải có ít nhất 5 ký tự, gồm chữ in hoa và số.";
           hasError = true;
         } else {
           delete newErrors.password;
@@ -135,28 +134,18 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3000/api/v1/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          // username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
+      const response = await apiv1.post("/auth/register", {
+        // Nếu cần gửi username thì bật dòng này lên:
+        // username: formData.username,
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(`Đăng ký thất bại: ${data.message || "Có lỗi xảy ra."}`);
-      } else {
-        alert("Đăng ký thành công!");
-        window.location.href = "/login";
-      }
+      alert("Đăng ký thành công!");
+      window.location.href = "/login";
     } catch (error) {
-      alert("Lỗi kết nối đến máy chủ.");
+      const msg = error?.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.";
+      alert(msg);
       console.error("Đăng ký lỗi:", error);
     } finally {
       setLoading(false);
@@ -172,15 +161,11 @@ export default function Register() {
               <a href="/">PETACILIOUS</a>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-center mb-4">
-            Chào mừng trở lại Petacilious
-          </h1>
-          <p className="text-gray-600 text-center mb-6">
-            Nhập thông tin để đăng ký tài khoản.
-          </p>
+          <h1 className="text-2xl font-bold text-center mb-4">Chào mừng trở lại Petacilious</h1>
+          <p className="text-gray-600 text-center mb-6">Nhập thông tin để đăng ký tài khoản.</p>
 
           <form onSubmit={handleSubmit}>
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <label className="block text-gray-700 mb-2">Tên Đăng Nhập</label>
               <input
                 name="username"
@@ -190,10 +175,8 @@ export default function Register() {
                 className="w-full px-3 py-2 border rounded"
                 placeholder="Nhập tên đăng nhập"
               />
-              {errors.username && (
-                <p className="text-red-500 text-sm">{errors.username}</p>
-              )}
-            </div>
+              {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
+            </div> */}
 
             <div className="mb-4">
               <label className="block text-gray-700 mb-2">Email</label>
@@ -206,9 +189,7 @@ export default function Register() {
                 className="w-full px-3 py-2 border rounded"
                 placeholder="Nhập email"
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
             </div>
 
             <div className="mb-4">
@@ -231,15 +212,11 @@ export default function Register() {
                   {showPassword ? <EyeIcon /> : <EyeClosedIcon />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
             </div>
 
             <div className="mb-4">
-              <label className="block text-gray-700 mb-2">
-                Nhập Lại Mật khẩu
-              </label>
+              <label className="block text-gray-700 mb-2">Nhập Lại Mật khẩu</label>
               <div className="relative">
                 <input
                   name="confirmPassword"
@@ -258,11 +235,7 @@ export default function Register() {
                   {showConfirmPassword ? <EyeIcon /> : <EyeClosedIcon />}
                 </button>
               </div>
-              {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.confirmPassword}
-                </p>
-              )}
+              {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
 
             <div className="flex justify-between items-center mb-4">
@@ -272,15 +245,9 @@ export default function Register() {
                   Nhớ Tài Khoản
                 </label>
               </div>
-              <button className="text-color-custom-1 hover:underline">
-                Quên Mật Khẩu?
-              </button>
+              <button className="text-color-custom-1 hover:underline">Quên Mật Khẩu?</button>
             </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
+            <button type="submit" disabled={loading} className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
               {loading ? "Đang đăng ký..." : "Đăng Ký"}
             </button>
           </form>
@@ -305,11 +272,7 @@ export default function Register() {
           {[1, 2, 3].map((_, index) => (
             <SwiperSlide key={index}>
               <div className="h-full w-full">
-                <img
-                  src="/Img/Page/p7.webp"
-                  alt={`Slide ${index + 1}`}
-                  className="h-full w-full object-cover"
-                />
+                <img src="/Img/Page/p7.webp" alt={`Slide ${index + 1}`} className="h-full w-full object-cover" />
               </div>
             </SwiperSlide>
           ))}

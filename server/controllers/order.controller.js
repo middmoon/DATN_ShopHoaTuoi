@@ -7,12 +7,13 @@ class OrderController {
   static createOrder = async (req, res) => {
     const io = req.app.get("io");
 
-    const newOrder = await OrderService.createOrder(req.body, req._id);
+    const newOrder = await OrderService.createOrder(req.body, req._id || null);
     const pendingOrdersCount = await OrderService.getPendingOrdersCount();
     io.emit("orderCount", pendingOrdersCount);
 
     new CREATED({
       message: "Order created successfully",
+      // data: "newOrder",
       data: newOrder,
     }).send(res);
   };

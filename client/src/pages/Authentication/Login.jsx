@@ -5,6 +5,7 @@ import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import apiv1 from "../../utils/axiosClient";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,20 +20,16 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/v1/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ option: email, password }),
+      const response = await apiv1.post("/auth/login", {
+        option: email,
+        password,
       });
 
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error("Đăng nhập thất bại!");
+      if (response.status !== 200) {
+        throw new Error(response.data.message);
       }
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", response.data.token);
 
       localStorage.setItem("userEmail", email);
 
@@ -53,12 +50,8 @@ export default function Login() {
               <a href="/">PETACILIOUS</a>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-center mb-4 text-color-custom-3">
-            Chào mừng trở lại Petacilious
-          </h1>
-          <p className="text-gray-600 text-center mb-6">
-            Nhập thông tin để đăng nhập tài khoản.
-          </p>
+          <h1 className="text-2xl font-bold text-center mb-4 text-color-custom-3">Chào mừng trở lại Petacilious</h1>
+          <p className="text-gray-600 text-center mb-6">Nhập thông tin để đăng nhập tài khoản.</p>
 
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
@@ -87,11 +80,7 @@ export default function Login() {
                 />
               </div>
             </div>
-            <button
-              type="submit"
-              className="w-full bg-color-custom-3 text-color-custom-4 py-2 rounded hover:bg-color-custom-1"
-              disabled={loading}
-            >
+            <button type="submit" className="w-full bg-color-custom-3 text-color-custom-4 py-2 rounded hover:bg-color-custom-1" disabled={loading}>
               {loading ? "Đang đăng nhập..." : "Đăng Nhập"}
             </button>
           </form>
@@ -114,25 +103,13 @@ export default function Login() {
           className="h-screen w-full"
         >
           <SwiperSlide>
-            <img
-              src="/Img/Page/p7.webp"
-              alt="Slide 1"
-              className="h-full w-full object-cover"
-            />
+            <img src="/Img/Page/p7.webp" alt="Slide 1" className="h-full w-full object-cover" />
           </SwiperSlide>
           <SwiperSlide>
-            <img
-              src="/Img/Page/p7.webp"
-              alt="Slide 2"
-              className="h-full w-full object-cover"
-            />
+            <img src="/Img/Page/p7.webp" alt="Slide 2" className="h-full w-full object-cover" />
           </SwiperSlide>
           <SwiperSlide>
-            <img
-              src="/Img/Page/p7.webp"
-              alt="Slide 3"
-              className="h-full w-full object-cover"
-            />
+            <img src="/Img/Page/p7.webp" alt="Slide 3" className="h-full w-full object-cover" />
           </SwiperSlide>
         </Swiper>
       </div>

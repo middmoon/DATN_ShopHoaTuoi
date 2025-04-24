@@ -66,6 +66,7 @@ const checkRole = (allowedRoles) => {
     const hasRole = allowedRoles.some((role) => userRoles.includes(role));
 
     if (hasRole) {
+      req._id = decoded.user._id;
       return next();
     } else {
       return next(new UNAUTHORIZED("Insufficient privileges"));
@@ -95,7 +96,7 @@ const flexVerifyToken = async (req, res, next) => {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return next(new UNAUTHORIZED("Invalid token"));
-    req._id = decoded._id;
+    req._id = decoded.user._id;
     next();
   });
 };

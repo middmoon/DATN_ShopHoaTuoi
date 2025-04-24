@@ -43,25 +43,27 @@ class OrderService {
       },
     });
 
-    if (!activeEvents || activeEvents.length === 0 || activeEventIds.length !== eventIds.length) {
-      throw new BAD_REQUEST("Sone active events can not be found");
+    const activeEventIds = activeEvents.map((event) => event._id);
+
+    if (!activeEvents || activeEventIds.length !== eventIds.length) {
+      throw new BAD_REQUEST("Some active events can not be found");
     }
 
-    const activeEventIds = activeEvents.map((event) => event.id);
-
-    const eventProducts = await EventProduct.findAll({
-      where: {
-        event_id: {
-          [Op.in]: activeEventIds,
+    if (activeEvents.length > 0) {
+      const eventProducts = await EventProduct.findAll({
+        where: {
+          event_id: {
+            [Op.in]: activeEventIds,
+          },
+          product_id: {
+            [Op.in]: product_ids,
+          },
         },
-        product_id: {
-          [Op.in]: product_ids,
-        },
-      },
-    });
+      });
 
-    if (!eventProducts || eventProducts.length === 0) {
-      throw new BAD_REQUEST("No event products found for the active events");
+      if (!eventProducts || eventProducts.length === 0) {
+        throw new BAD_REQUEST("No event products found for the active events");
+      }
     }
 
     const total_price = products.reduce((acc, product) => {

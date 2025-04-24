@@ -38,6 +38,7 @@ function App() {
             <Route path="productdetail/:slug" element={<ProductDetailWithLayout />} />
             <Route path="cart" element={<CartPageWithLayout />} />
             <Route path="payment" element={<PaymentPageWithLayout />} />
+            <Route path="my-orders" element={<PageNotFound />} />
             <Route path="/payment-success" element={<PaymentResult />} />
             <Route path="/payment-failure" element={<PaymentResult />} />
             <Route path="/event/:slug" element={<EventDetailWithLayout />} />

@@ -37,7 +37,7 @@ class ProductController {
   static getProducts = async (req, res) => {
     const queryOptions = await buildQueryOptions(req.query);
 
-    console.log(queryOptions);
+    // console.log(queryOptions);
 
     new OK({
       message: "Products retrieved successfully",

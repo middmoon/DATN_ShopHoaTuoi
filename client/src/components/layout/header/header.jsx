@@ -66,15 +66,9 @@ export default function Header() {
   }, {});
 
   const mainCategories = ["Đối Tượng", "Kiểu Dáng", "Hoa Tươi"];
-  const filteredCategories =
-    groupedCategories[null]?.filter((category) =>
-      mainCategories.includes(category.name)
-    ) || [];
+  const filteredCategories = groupedCategories[null]?.filter((category) => mainCategories.includes(category.name)) || [];
 
-  const otherCategories =
-    groupedCategories[null]?.filter(
-      (category) => !mainCategories.includes(category.name)
-    ) || [];
+  const otherCategories = groupedCategories[null]?.filter((category) => !mainCategories.includes(category.name)) || [];
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategory(categoryId);
@@ -100,9 +94,7 @@ export default function Header() {
               <div className="flex-1 font-font2 text-center font-bold whitespace-nowrap">
                 <a
                   href="/"
-                  className={`text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl ${
-                    isTop ? "text-color-custom-1" : "text-color-custom-4"
-                  }`}
+                  className={`text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl ${isTop ? "text-color-custom-1" : "text-color-custom-4"}`}
                 >
                   PETALCILIOUS
                 </a>
@@ -114,14 +106,9 @@ export default function Header() {
               <div className="flex justify-between w-full">
                 <ul className="flex font-font2 items-center justify-between w-1/2 mr-10 relative z-50 ">
                   {filteredCategories.map((parent) => (
-                    <li
-                      key={parent._id}
-                      className="relative group py-6 text-color-custom-4"
-                    >
+                    <li key={parent._id} className="relative group py-6 text-color-custom-4">
                       <button
-                        className={`cursor-pointer flex items-center text-base ${
-                          isTop ? "text-color-custom-1" : "text-color-custom-4"
-                        }`}
+                        className={`cursor-pointer flex items-center text-base ${isTop ? "text-color-custom-1" : "text-color-custom-4"}`}
                         onClick={() => handleCategoryClick(parent._id)}
                       >
                         {parent.name}
@@ -129,15 +116,8 @@ export default function Header() {
                       {groupedCategories[parent._id] && (
                         <ul className="absolute text-base text-color-custom-3 left-0 mt-2 w-48 bg-white shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 transform translate-y-2 grid">
                           {groupedCategories[parent._id].map((child) => (
-                            <li
-                              key={child._id}
-                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition rounded-lg"
-                            >
-                              <button
-                                onClick={() => handleCategoryClick(child._id)}
-                              >
-                                {child.name}
-                              </button>
+                            <li key={child._id} className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition rounded-lg">
+                              <button onClick={() => handleCategoryClick(child._id)}>{child.name}</button>
                             </li>
                           ))}
                         </ul>
@@ -148,23 +128,14 @@ export default function Header() {
                   {otherCategories.length > 0 && (
                     <li className="relative group">
                       <button
-                        className={`px-4 py-2  font-font2 text-base transition-colors ${
-                          isTop ? "text-color-custom-1" : "text-color-custom-4"
-                        }`}
+                        className={`px-4 py-2  font-font2 text-base transition-colors ${isTop ? "text-color-custom-1" : "text-color-custom-4"}`}
                       >
                         Xem Thêm
                       </button>
                       <ul className="absolute left-0 mt-2 w-48 bg-white text-color-custom-3 shadow-lg rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 transition-all duration-300 transform translate-y-2 grid">
                         {otherCategories.map((category) => (
-                          <li
-                            key={category._id}
-                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition rounded-lg"
-                          >
-                            <button
-                              onClick={() => handleCategoryClick(category._id)}
-                            >
-                              {category.name}
-                            </button>
+                          <li key={category._id} className="px-4 py-2 hover:bg-gray-100 cursor-pointer transition rounded-lg">
+                            <button onClick={() => handleCategoryClick(category._id)}>{category.name}</button>
                           </li>
                         ))}
                       </ul>
@@ -197,23 +168,14 @@ export default function Header() {
                         strokeWidth="1.5"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        className={`lucide lucide-shopping-cart ${
-                          isTop ? "text-color-custom-1" : "text-color-custom-4"
-                        }`}
+                        className={`lucide lucide-shopping-cart ${isTop ? "text-color-custom-1" : "text-color-custom-4"}`}
                       >
                         <circle cx="8" cy="21" r="1" />
                         <circle cx="19" cy="21" r="1" />
                         <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
                       </svg>
                       <span className="ml-2 font-font2 text-color-custom-4 text-base">
-                        <a
-                          className={`${
-                            isTop
-                              ? "text-color-custom-1"
-                              : "text-color-custom-4"
-                          }`}
-                          href="/cart"
-                        >
+                        <a className={`${isTop ? "text-color-custom-1" : "text-color-custom-4"}`} href="/cart">
                           Giỏ Hàng
                         </a>
                       </span>
@@ -225,10 +187,7 @@ export default function Header() {
                     </div>
 
                     <div className="relative">
-                      <div
-                        className="flex items-center cursor-pointer text-color-custom-4"
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      >
+                      <div className="flex items-center cursor-pointer text-color-custom-4" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -239,11 +198,7 @@ export default function Header() {
                           strokeWidth="1.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className={`lucide lucide-user-round ${
-                            isTop
-                              ? "text-color-custom-1"
-                              : "text-color-custom-4"
-                          }`}
+                          className={`lucide lucide-user-round ${isTop ? "text-color-custom-1" : "text-color-custom-4"}`}
                         >
                           <circle cx="12" cy="8" r="5" />
                           <path d="M20 21a8 8 0 0 0-16 0" />
@@ -255,13 +210,7 @@ export default function Header() {
                             if (!userEmail) navigate("/login");
                           }}
                         >
-                          <div
-                            className={`text-base ${
-                              isTop
-                                ? "text-color-custom-1"
-                                : "text-color-custom-4"
-                            }`}
-                          >
+                          <div className={`text-base ${isTop ? "text-color-custom-1" : "text-color-custom-4"}`}>
                             {userEmail ? userEmail : "Đăng Nhập"}
                           </div>
                         </span>
@@ -270,10 +219,10 @@ export default function Header() {
                       {/* Dropdown Menu */}
                       {isDropdownOpen && userEmail && (
                         <div className="absolute right-0 mt-5 w-48 bg-white shadow-md rounded-lg py-2">
-                          <button
-                            onClick={handleLogout}
-                            className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
-                          >
+                          <button onClick={() => navigate("/my-orders")} className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100">
+                            Đơn hàng của tôi
+                          </button>
+                          <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100">
                             Đăng Xuất
                           </button>
                         </div>
