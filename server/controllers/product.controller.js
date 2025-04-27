@@ -27,13 +27,23 @@ class ProductController {
   static updateProduct = async (req, res) => {
     const { data } = req.body;
     const parsedData = JSON.parse(data);
-    // console.log(parsedData);
-    new OK({
-      message: "Product updated successfully",
-      data: await ProductService.updateProduct(req.params.productId, parsedData, req.files),
-    }).send(res);
-  };
 
+    try {
+      const keys = await redis.keys("product:search*");
+      if (keys.length > 0) {
+        await redis.del(keys);
+        console.log("🗑️ Cleared cache keys:", keys);
+      }
+
+      new OK({
+        message: "Product updated successfully",
+        data: await ProductService.updateProduct(req.params.productId, parsedData, req.files),
+      }).send(res);
+    } catch (error) {
+      console.error("❌ Error updating product:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  };
   static getProducts = async (req, res) => {
     const queryOptions = await buildQueryOptions2(req.query);
 
