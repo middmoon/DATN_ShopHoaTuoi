@@ -17,6 +17,8 @@ import WithLayout from "./Layouts/WithLayout";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
 import EventDetail from "./components/Event/EventDetail";
 
+import { NotificationProvider } from "./context/NotificationContext";
+
 const HomeWithLayout = WithLayout(Home);
 const MasterShopWithLayout = WithLayout(MasterShop);
 const ProductDetailWithLayout = WithLayout(ProductDetail);
@@ -27,24 +29,29 @@ const EventDetailWithLayout = WithLayout(EventDetail);
 function App() {
   return (
     <EventProvider>
-      <CartProvider>
-        <CategoryProvider>
-          <Routes>
-            <Route path="/" element={<HomeWithLayout />} />
-            <Route path="/test" element={<Test />} />
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-            <Route path="mastershop" element={<MasterShopWithLayout />} />
-            <Route path="productdetail/:slug" element={<ProductDetailWithLayout />} />
-            <Route path="cart" element={<CartPageWithLayout />} />
-            <Route path="payment" element={<PaymentPageWithLayout />} />
-            <Route path="my-orders" element={<PageNotFound />} />
-            <Route path="/payment-success" element={<PaymentResult />} />
-            <Route path="/payment-failure" element={<PaymentResult />} />
-            <Route path="/event/:slug" element={<EventDetailWithLayout />} />
-          </Routes>
-        </CategoryProvider>
-      </CartProvider>
+      <NotificationProvider>
+        <CartProvider>
+          <CategoryProvider>
+            <Routes>
+              <Route path="/" element={<HomeWithLayout />} />
+              <Route path="/test" element={<Test />} />
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
+              <Route path="mastershop" element={<MasterShopWithLayout />} />
+              <Route
+                path="productdetail/:slug"
+                element={<ProductDetailWithLayout />}
+              />
+              <Route path="cart" element={<CartPageWithLayout />} />
+              <Route path="payment" element={<PaymentPageWithLayout />} />
+              <Route path="my-orders" element={<PageNotFound />} />
+              <Route path="/payment-success" element={<PaymentResult />} />
+              <Route path="/payment-failure" element={<PaymentResult />} />
+              <Route path="/event/:slug" element={<EventDetailWithLayout />} />
+            </Routes>
+          </CategoryProvider>
+        </CartProvider>
+      </NotificationProvider>
     </EventProvider>
   );
 }

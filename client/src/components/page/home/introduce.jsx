@@ -2,7 +2,7 @@ import React from "react";
 
 const IntroduceShop = () => {
   return (
-    <div className="introduce min-h-50vh flex items-center justify-center py-20 bg-cover bg-center relative">
+    <div className="introduce min-h-50vh flex items-center justify-center py-20 relative">
       <div className="absolute top-0 left-0 w-full h-full"></div>
 
       <div className="container mx-auto flex flex-col md:flex-row items-center gap-8 relative">

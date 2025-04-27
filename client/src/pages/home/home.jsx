@@ -5,7 +5,6 @@ import ProductList from "../../components/Listcard/ProductList";
 import ProductListNew from "../../components/Listcard/ProductListNew";
 import MainBanner from "../../components/page/home/banner";
 import GoogleMapEmbed from "../../components/page/home/ggMap";
-import Meaning from "../../components/page/home/meaning";
 import WhyChoiceMe from "../../components/WCM/whychoiceme";
 import Divider from "../../components/common/Divider/Divider";
 import hotspots from "../../constant/common/hotspots.json";
@@ -21,13 +20,18 @@ export default function Home() {
   return (
     <>
       <div>
-        {currentEvent && showPopup && <EventPopup thumbnail={currentEvent.thumbnail} slug={currentEvent.slug} onClose={() => setShowPopup(false)} />}
+        {currentEvent && showPopup && (
+          <EventPopup
+            thumbnail={currentEvent.thumbnail}
+            slug={currentEvent.slug}
+            onClose={() => setShowPopup(false)}
+          />
+        )}
       </div>
       <MainBanner />
       <Divider />
       <ReviewService></ReviewService>
       <IntroduceShop></IntroduceShop>
-      {/* <ProductListNew /> */}
       <ProductListNew />
       <WhyChoiceMe />
       <Divider />
