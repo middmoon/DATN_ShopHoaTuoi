@@ -4,68 +4,66 @@ import { useNavigate } from "react-router-dom";
 const ImageWithHotspot = ({ imageSrc, hotspots }) => {
   const [hoveredHotspot, setHoveredHotspot] = useState(null);
   const navigate = useNavigate();
+  const [selectedFlower, setSelectedFlower] = useState(null);
 
   return (
-    <div className="w-full h-auto flex flex-col items-center py-10 bg-gray-100">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        Khám phá các loại hoa
-      </h2>
-      <p className="text-gray-600 mb-8 text-center max-w-2xl">
-        Di chuột vào từng bó hoa để biết thêm thông tin chi tiết. Nhấn vào để
-        xem thêm về từng loại hoa.
-      </p>
-      <div className="container mx-auto flex justify-center">
-        <div className="relative inline-block w-full max-w-3xl">
-          <img
-            src={imageSrc}
-            alt="Bó hoa"
-            className="w-full h-auto max-w-3xl mx-auto rounded-lg shadow-md"
-          />
-          {hotspots.map((hotspot, index) => (
-            <div
-              key={index}
-              className="absolute cursor-pointer"
-              style={{
-                top: hotspot.top,
-                left: hotspot.left,
-                width: hotspot.width,
-                height: hotspot.height,
-              }}
-              onMouseEnter={() => setHoveredHotspot(hotspot)}
-              onMouseLeave={() => setHoveredHotspot(null)}
-              onClick={() => navigate(hotspot.href)}
-            >
-              {hoveredHotspot === hotspot && (
+    <div className="w-full flex justify-center">
+      <div className="container w-full bg-color-custom-4 border rounded-lg h-auto flex items-center py-10">
+        <div className="w-full bg-white p-6">
+          <div className="flex">
+            <div className="space-y-4 md:w-1/4 max-h-[43.5rem] overflow-y-auto pr-2  rounded-lg shadow-md">
+              {hotspots.map((hotspots, index) => (
                 <div
-                  className="bg-white shadow-lg rounded-lg p-4 flex flex-col items-center transition-transform duration-200"
-                  style={{
-                    transform: `translateY(10px)`,
-                    left: "50%",
-                    top: "100%",
-                    minWidth: "150px",
-                    maxWidth: "calc(100% - 20px)",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textAlign: "center",
-                    position: "absolute",
-                    zIndex: 10,
-                  }}
+                  key={index}
+                  className={`p-3 rounded-md cursor-pointer transition-all duration-200 ${
+                    selectedFlower === hotspots ? "bg-blue-100 border-l-4 border-blue-500" : "hover:bg-gray-100"
+                  }`}
+                  onClick={() => setSelectedFlower(hotspots)}
                 >
-                  <img
-                    src={hotspot.image}
-                    alt={hotspot.name}
-                    className="w-28 h-28 object-cover rounded-md"
-                  />
-                  <p className="text-md font-semibold mt-2 text-center text-gray-800">
-                    {hotspot.name}
-                  </p>
-                  <p className="text-sm text-gray-600 mt-1 text-center">
-                    {hotspot.description}
-                  </p>
+                  <div className="flex items-center gap-3">
+                    <img src={hotspots.image} alt={hotspots.name} className="w-12 h-12 rounded-full object-cover" />
+                    <div>
+                      <h3 className="font-medium text-gray-800">{hotspots.name}</h3>
+                      <p className="text-sm text-gray-600 line-clamp-1">{hotspots.meaning}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col mx-auto hostpot">
+              <div className="relative bg-color-custom-1">
+                <img src={imageSrc} alt="Bó hoa" className="w-full max-h-[32rem]" />
+                {hotspots.map((hotspot, index) => (
+                  <div
+                    key={index}
+                    className="absolute cursor-pointer"
+                    style={{
+                      top: hotspot.top,
+                      left: hotspot.left,
+                      width: hotspot.width,
+                      height: hotspot.height,
+                    }}
+                    onMouseEnter={() => setHoveredHotspot(hotspot)}
+                    onMouseLeave={() => setHoveredHotspot(null)}
+                    onClick={() => {
+                      setSelectedFlower(hotspot);
+                    }}
+                  ></div>
+                ))}
+              </div>
+              {selectedFlower && (
+                <div className="max-w-3xl mt-6 p-4 bg-color-custom-1 rounded-lg">
+                  <div className="flex items-center gap-3 mb-3">
+                    <img src={selectedFlower.image} alt={selectedFlower.name} className="w-16 h-16 rounded-md object-cover" />
+                    <h3 className="text-lg font-semibold text-color-custom-4">{selectedFlower.name}</h3>
+                  </div>
+                  <p className="text-color-custom-4">{selectedFlower.meaning}</p>
+                  {selectedFlower.description && <p className="mt-2 text-sm text-color-custom-4">{selectedFlower.description}</p>}
                 </div>
               )}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>

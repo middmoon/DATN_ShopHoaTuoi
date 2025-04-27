@@ -6,7 +6,8 @@
     "width": "10%",
     "height": "10%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Cẩm Tú Cầu tượng trưng cho sự biết ơn, lòng chân thành và những cảm xúc sâu sắc."
   },
   {
     "name": "Hoa Solidago",
@@ -15,7 +16,8 @@
     "width": "25%",
     "height": "25%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Solidago mang ý nghĩa của sự khích lệ, thành công và là biểu tượng của sự đoàn kết."
   },
   {
     "name": "Hoa Cẩm Chướng",
@@ -24,7 +26,8 @@
     "width": "12%",
     "height": "10%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Cẩm Chướng thể hiện sự ngưỡng mộ, tình yêu trong sáng và sự quyến rũ nhẹ nhàng."
   },
   {
     "name": "Hoa Hồng",
@@ -33,7 +36,8 @@
     "width": "12%",
     "height": "10%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Hồng là biểu tượng của tình yêu, niềm đam mê và vẻ đẹp vĩnh cửu."
   },
   {
     "name": "Hoa Hồng",
@@ -42,7 +46,8 @@
     "width": "12%",
     "height": "15%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Hồng là biểu tượng của tình yêu, niềm đam mê và vẻ đẹp vĩnh cửu."
   },
   {
     "name": "Hoa Hồng",
@@ -51,7 +56,8 @@
     "width": "12%",
     "height": "15%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Hồng là biểu tượng của tình yêu, niềm đam mê và vẻ đẹp vĩnh cửu."
   },
   {
     "name": "Hoa Hồng",
@@ -60,7 +66,8 @@
     "width": "12%",
     "height": "10%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Hồng là biểu tượng của tình yêu, niềm đam mê và vẻ đẹp vĩnh cửu."
   },
   {
     "name": "Hoa Chibi",
@@ -69,7 +76,8 @@
     "width": "20%",
     "height": "20%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Chibi là loài hoa sáng tạo, mang phong cách dễ thương, thường dùng trong trang trí nghệ thuật hiện đại."
   },
   {
     "name": "Hoa Cẩm Chướng",
@@ -78,7 +86,8 @@
     "width": "15%",
     "height": "10%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Cẩm Chướng thể hiện sự ngưỡng mộ, tình yêu trong sáng và sự quyến rũ nhẹ nhàng."
   },
   {
     "name": "Hoa Cẩm Chướng",
@@ -87,7 +96,8 @@
     "width": "15%",
     "height": "20%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Cẩm Chướng thể hiện sự ngưỡng mộ, tình yêu trong sáng và sự quyến rũ nhẹ nhàng."
   },
   {
     "name": "Lá Trầu Bà",
@@ -96,7 +106,8 @@
     "width": "8%",
     "height": "10%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Lá Trầu Bà thường tượng trưng cho tài lộc, bình an và sức sống mãnh liệt."
   },
   {
     "name": "Hoa Oải Hương",
@@ -105,7 +116,8 @@
     "width": "8%",
     "height": "10%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Hoa Oải Hương có hương thơm dịu nhẹ, tượng trưng cho sự thư giãn, thanh thản và tình yêu thuần khiết."
   },
   {
     "name": "Lá bạc",
@@ -114,6 +126,7 @@
     "width": "8%",
     "height": "10%",
     "href": "/mastershop",
-    "image": "/Img/Page/p4.webp"
+    "image": "/Img/Page/p4.webp",
+    "description": "Lá bạc thường được dùng trong trang trí, tượng trưng cho sự quý phái và sang trọng."
   }
 ]
