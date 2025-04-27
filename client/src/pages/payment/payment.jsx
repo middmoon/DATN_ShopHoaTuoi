@@ -64,11 +64,7 @@ const PaymentPage = () => {
       if (event.discount_type === "fixed") {
         return Math.max(product.retail_price - event.discount_value, 0);
       } else if (event.discount_type === "percentage") {
-        return Math.max(
-          product.retail_price -
-            (product.retail_price * event.discount_value) / 100,
-          0
-        );
+        return Math.max(product.retail_price - (product.retail_price * event.discount_value) / 100, 0);
       }
     }
     return product.retail_price || 0;
@@ -148,9 +144,7 @@ const PaymentPage = () => {
       !customerInfo.province_code ||
       selectedProducts.length === 0
     ) {
-      showNotification(
-        "Vui lòng nhập đầy đủ thông tin và chọn ít nhất một sản phẩm!"
-      );
+      showNotification("Vui lòng nhập đầy đủ thông tin và chọn ít nhất một sản phẩm!");
       return;
     }
 
@@ -169,20 +163,12 @@ const PaymentPage = () => {
       products: selectedProducts.map((product) => ({
         _id: product._id,
         retail_price: product.retail_price,
-        sale_price: product.Events[0]
-          ? calculateDiscountedPrice(product)
-          : null,
+        sale_price: product.Events[0] ? calculateDiscountedPrice(product) : null,
         event_id: product.Events[0] ? product.Events[0]._id : null,
-        discount_type: product.Events[0]
-          ? product.Events[0].discount_type
-          : null,
-        discount_value: product.Events[0]
-          ? product.Events[0].discount_value
-          : null,
+        discount_type: product.Events[0] ? product.Events[0].discount_type : null,
+        discount_value: product.Events[0] ? product.Events[0].discount_value : null,
         quantity: product.quantity,
-        expected_total_price: product.Events[0]
-          ? calculateDiscountedPrice(product) * product.quantity
-          : product.retail_price * product.quantity,
+        expected_total_price: product.Events[0] ? calculateDiscountedPrice(product) * product.quantity : product.retail_price * product.quantity,
       })),
       payment_method_id: Number(paymentMethod),
     };
@@ -207,10 +193,7 @@ const PaymentPage = () => {
             orderInfo: orderData.payment.info.vnp_OrderInfo,
           };
 
-          const vnpayPaymentResponse = await apiv1.post(
-            "/payment/vnpay/create_payment_url",
-            paymentData
-          );
+          const vnpayPaymentResponse = await apiv1.post("/payment/vnpay/create_payment_url", paymentData);
           if (vnpayPaymentResponse.status !== 200) {
             throw new Error("Không thể tạo URL thanh toán");
           }
@@ -220,9 +203,9 @@ const PaymentPage = () => {
         } catch (error) {
           console.error("Lỗi khi gửi dữ liệu:", error);
           if (error.message === "Dữ liệu không hợp lệ") {
-            showNotification("Vui lòng kiểm tra lại thông tin đơn hàng.");
+            showNotification("Vui lòng kiểm tra lại thông tin đơn hàng.", "error");
           } else {
-            showNotification("Có lỗi xảy ra. Vui lòng thử lại sau.");
+            showNotification("Có lỗi xảy ra. Vui lòng thử lại sau.", "error");
           }
         }
         break;
@@ -233,8 +216,11 @@ const PaymentPage = () => {
             throw new Error("Không thể tạo đơn hàng");
           }
 
-          showNotification("Cảm ơn bạn đã đặt hàng hãy chờ nhân viên liên hệ.");
-          navigate("/");
+          showNotification("Cảm ơn bạn đã đặt hàng! Nhân viên sẽ liên hệ với bạn.", "success");
+
+          setTimeout(() => {
+            navigate("/");
+          }, 5000);
         } catch (error) {
           console.error("Lỗi khi gửi dữ liệu:", error);
           if (error.message === "Dữ liệu không hợp lệ") {
@@ -289,20 +275,10 @@ const PaymentPage = () => {
         </div>
 
         <label>Địa chỉ cụ thể</label>
-        <input
-          type="text"
-          name="address"
-          value={customerInfo.address}
-          onChange={handleInputChange}
-          className="w-full p-2 border rounded mb-4"
-        />
+        <input type="text" name="address" value={customerInfo.address} onChange={handleInputChange} className="w-full p-2 border rounded mb-4" />
 
         <div className="grid grid-cols-3 gap-4">
-          <select
-            value={customerInfo.province_code}
-            onChange={handleProvinceChange}
-            className="w-full p-2 border rounded"
-          >
+          <select value={customerInfo.province_code} onChange={handleProvinceChange} className="w-full p-2 border rounded">
             <option value="">Chọn tỉnh/thành</option>
             {provinces.map((p) => (
               <option key={p.code} value={p.code}>
@@ -341,47 +317,29 @@ const PaymentPage = () => {
         <div className="bg-white p-5 border shadow-lg rounded-lg mt-5">
           <h2 className="text-xl font-bold mb-3">Thanh toán</h2>
 
-          <h3 className="text-lg font-semibold mt-5 pb-5">
-            Danh sách sản phẩm
-          </h3>
+          <h3 className="text-lg font-semibold mt-5 pb-5">Danh sách sản phẩm</h3>
           {selectedProducts.length === 0 ? (
-            <p className="text-gray-500 text-center py-4 text-lg">
-              Không có sản phẩm để thanh toán
-            </p>
+            <p className="text-gray-500 text-center py-4 text-lg">Không có sản phẩm để thanh toán</p>
           ) : (
             <div className="border p-5 rounded-lg bg-gray-100 shadow-md">
-              <h3 className="text-lg font-semibold text-gray-700 mb-3">
-                Sản phẩm đã chọn
-              </h3>
+              <h3 className="text-lg font-semibold text-gray-700 mb-3">Sản phẩm đã chọn</h3>
               <ul>
                 {selectedProducts.map((product, index) => {
                   const price = calculateDiscountedPrice(product);
-                  const hasDiscount =
-                    product.Events && product.Events.length > 0;
+                  const hasDiscount = product.Events && product.Events.length > 0;
 
                   return (
-                    <li
-                      key={index}
-                      className="flex justify-between items-center py-3"
-                    >
-                      <span className="font-medium text-gray-800">
-                        {product.name}
-                      </span>
+                    <li key={index} className="flex justify-between items-center py-3">
+                      <span className="font-medium text-gray-800">{product.name}</span>
                       <span className="text-gray-600">
                         {product.quantity} x{" "}
                         {hasDiscount ? (
                           <>
-                            <span className="line-through text-gray-500">
-                              {product.retail_price.toLocaleString()} VNĐ
-                            </span>
-                            <span className="text-red-500 ml-2">
-                              {price.toLocaleString()} VNĐ
-                            </span>
+                            <span className="line-through text-gray-500">{product.retail_price.toLocaleString()} VNĐ</span>
+                            <span className="text-red-500 ml-2">{price.toLocaleString()} VNĐ</span>
                           </>
                         ) : (
-                          <span className="text-blue-500">
-                            {product.retail_price.toLocaleString()} VNĐ
-                          </span>
+                          <span className="text-blue-500">{product.retail_price.toLocaleString()} VNĐ</span>
                         )}
                       </span>
                     </li>
@@ -391,31 +349,20 @@ const PaymentPage = () => {
 
               <div className="mt-4 pt-3 border-t border-gray-300 flex justify-between text-lg font-bold text-gray-800">
                 <span>Tổng tiền:</span>
-                <span className="text-red-500">
-                  {amount.toLocaleString()} VNĐ
-                </span>
+                <span className="text-red-500">{amount.toLocaleString()} VNĐ</span>
               </div>
             </div>
           )}
 
           <div className="mb-4 pt-10">
-            <label className="block text-gray-700 font-semibold mb-2">
-              Phương thức thanh toán
-            </label>
-            <select
-              value={paymentMethod}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-              className="w-full p-2 border rounded"
-            >
+            <label className="block text-gray-700 font-semibold mb-2">Phương thức thanh toán</label>
+            <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)} className="w-full p-2 border rounded">
               <option value="7">Thanh toán khi nhận hàng (COD)</option>
               <option value="1">Thanh toán qua VNPay</option>
             </select>
           </div>
 
-          <button
-            onClick={handleSubmit}
-            className="w-full mt-5 px-5 py-2 bg-blue-500 text-white rounded-lg"
-          >
+          <button onClick={handleSubmit} className="w-full mt-5 px-5 py-2 bg-blue-500 text-white rounded-lg">
             Xác nhận đặt hàng
           </button>
         </div>
