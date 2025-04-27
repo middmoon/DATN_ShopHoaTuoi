@@ -10,7 +10,12 @@ const getDirectImageURL = (url) => {
 };
 
 const CartPage = () => {
-  const { cart = [], increaseQuantity, decreaseQuantity, removeFromCart } = useCart();
+  const {
+    cart = [],
+    increaseQuantity,
+    decreaseQuantity,
+    removeFromCart,
+  } = useCart();
   const navigate = useNavigate();
   const [selectedItems, setSelectedItems] = useState({});
 
@@ -22,7 +27,9 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
-    const selectedProducts = mergedCart.filter((item) => selectedItems[item.slug]);
+    const selectedProducts = mergedCart.filter(
+      (item) => selectedItems[item.slug]
+    );
     localStorage.setItem("selectedProducts", JSON.stringify(selectedProducts));
     selectedProducts.forEach((item) => {
       removeFromCart(item.slug);
@@ -49,7 +56,10 @@ const CartPage = () => {
       if (event.discount_type === "fixed") {
         return Math.max(item.retail_price - event.discount_value, 0);
       } else if (event.discount_type === "percentage") {
-        return Math.max(item.retail_price - (item.retail_price * event.discount_value) / 100, 0);
+        return Math.max(
+          item.retail_price - (item.retail_price * event.discount_value) / 100,
+          0
+        );
       }
     }
     return item.retail_price || 0;
@@ -99,7 +109,8 @@ const CartPage = () => {
                         <div className="w-2/12 flex justify-center">
                           <img
                             src={getDirectImageURL(
-                              item.ProductImages?.find((img) => img.is_avatar)?.img_url ||
+                              item.ProductImages?.find((img) => img.is_avatar)
+                                ?.img_url ||
                                 item.ProductImages?.[0]?.img_url ||
                                 "https://via.placeholder.com/150?text=No+Image"
                             )}
@@ -108,21 +119,34 @@ const CartPage = () => {
                           />
                         </div>
                         <div className="w-3/12">
-                          <h3 className="text-lg font-semibold">{item.name || "Không có tên"}</h3>
+                          <h3 className="text-lg font-semibold">
+                            {item.name || "Không có tên"}
+                          </h3>
                           <p className="text-gray-600">
                             Giá:{" "}
                             {hasDiscount ? (
                               <>
-                                <span className="line-through text-gray-500">{item.retail_price.toLocaleString()} VNĐ</span>
-                                <span className="text-red-500 ml-2">{price.toLocaleString()} VNĐ</span>
+                                <span className="line-through text-color-custom-1">
+                                  {item.retail_price.toLocaleString()} VNĐ
+                                </span>
+                                <span className="text-color-custom-1 ml-2">
+                                  {price.toLocaleString()} VNĐ
+                                </span>
                               </>
                             ) : (
-                              <span className="text-blue-500">{item.retail_price ? `${item.retail_price.toLocaleString()} VNĐ` : "Chưa có giá"}</span>
+                              <span className="text-color-custom-1">
+                                {item.retail_price
+                                  ? `${item.retail_price.toLocaleString()} VNĐ`
+                                  : "Chưa có giá"}
+                              </span>
                             )}
                           </p>
                         </div>
                         <div className="w-2/12 flex items-center">
-                          <button onClick={() => decreaseQuantity(item.slug)} className="px-3 py-1 bg-color-custom-1 border text-black rounded-lg">
+                          <button
+                            onClick={() => decreaseQuantity(item.slug)}
+                            className="px-3 py-1 bg-color-custom-4 border text-black rounded-lg"
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="20"
@@ -139,7 +163,10 @@ const CartPage = () => {
                             </svg>
                           </button>
                           <span className="px-4">{item.quantity}</span>
-                          <button onClick={() => increaseQuantity(item.slug)} className="px-3 py-1 bg-color-custom-1 border text-black rounded-lg">
+                          <button
+                            onClick={() => increaseQuantity(item.slug)}
+                            className="px-3 py-1 bg-color-custom-4 border rounded-lg"
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="20"
@@ -157,9 +184,14 @@ const CartPage = () => {
                             </svg>
                           </button>
                         </div>
-                        <div className="w-2/12 text-red-500 font-semibold">{(item.quantity * price).toLocaleString()} VNĐ</div>
+                        <div className="w-2/12 text-red-500 font-semibold">
+                          {(item.quantity * price).toLocaleString()} VNĐ
+                        </div>
                         <div className="w-2/12 flex justify-center">
-                          <button onClick={() => removeFromCart(item.slug)} className="px-3 py-1 bg-red-500 text-white rounded">
+                          <button
+                            onClick={() => removeFromCart(item.slug)}
+                            className="px-3 py-1 bg-red-500 text-white rounded"
+                          >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               width="24"
@@ -190,14 +222,26 @@ const CartPage = () => {
               {mergedCart.map(
                 (item, index) =>
                   selectedItems[item.slug] && (
-                    <p key={index} className="text-color-custom-7 font-semibold py-2">
-                      {item.quantity} {item.name} : {(item.quantity * calculateDiscountedPrice(item)).toLocaleString()} VNĐ
+                    <p
+                      key={index}
+                      className="text-color-custom-7 font-semibold py-2"
+                    >
+                      {item.quantity} {item.name} :{" "}
+                      {(
+                        item.quantity * calculateDiscountedPrice(item)
+                      ).toLocaleString()}{" "}
+                      VNĐ
                     </p>
                   )
               )}
               <hr className="my-3" />
-              <h3 className="text-xl font-bold text-color-custom-1">Tổng tiền: {selectedTotalAmount.toLocaleString()} VNĐ</h3>
-              <button onClick={handleCheckout} className="w-full mt-10 px-5 py-2 bg-green-500 text-white rounded-lg">
+              <h3 className="text-xl font-bold text-color-custom-1">
+                Tổng tiền: {selectedTotalAmount.toLocaleString()} VNĐ
+              </h3>
+              <button
+                onClick={handleCheckout}
+                className="w-full mt-10 px-5 py-2 bg-green-500 text-white rounded-lg"
+              >
                 Thanh toán ngay
               </button>
             </div>
