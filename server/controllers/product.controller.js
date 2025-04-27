@@ -35,7 +35,7 @@ class ProductController {
   };
 
   static getProducts = async (req, res) => {
-    const queryOptions = await buildQueryOptions(req.query);
+    const queryOptions = await buildQueryOptions2(req.query);
 
     // console.log(queryOptions);
 
@@ -46,7 +46,8 @@ class ProductController {
   };
 
   static getProductsForShopOrder = async (req, res) => {
-    const queryOptions = buildQueryOptionsForShopOrder(req.query);
+    const queryOptions = await buildQueryOptionsForShopOrder(req.query);
+    // const queryOptions = await buildQueryOptions2(req.query);
 
     new OK({
       message: "Products retrieved successfully",

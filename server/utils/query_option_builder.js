@@ -124,38 +124,44 @@ async function buildQueryOptions2(query) {
   return queryOptions;
 }
 
-function buildQueryOptionsForShopOrder(query) {
-  const { search, q } = query;
+async function buildQueryOptionsForShopOrder(query) {
+  const { search, q, is_public } = query;
 
   const whereProductConditions = {};
+  const whereCategoryConditions = {};
+  const replacements = {};
 
   const keyword = q || search;
 
   if (keyword) {
-    const keyword_slug = slugify(keyword, {
-      replacement: "-",
-      remove: undefined,
-      lower: true,
-      strict: false,
-      locale: "vi",
-      trim: true,
-    });
+    whereProductConditions[Op.and] = [Sequelize.literal(`MATCH(Product.name, Product.description) AGAINST (:keyword IN BOOLEAN MODE)`)];
+    replacements.keyword = keyword;
 
-    whereProductConditions[Op.and] = [
-      {
-        [Op.or]: [
-          { name: { [Op.like]: `%${keyword}%` } },
-          { description: { [Op.like]: `%${keyword}%` } },
-          { slug: { [Op.like]: `%${keyword_slug}%` } },
-        ],
-      },
-    ];
+    if (is_public !== undefined) {
+      whereProductConditions[Op.and].push({ is_public });
+    }
+
+    whereCategoryConditions[Op.or] = [{ name: { [Op.like]: `%${keyword}%` } }];
+  } else {
+    if (is_public !== undefined) {
+      whereProductConditions.is_public = is_public;
+    }
   }
 
   const queryOptions = {
     where: whereProductConditions,
-    attributes: ["_id", "name", "retail_price"],
-    include: [],
+    include: [
+      {
+        model: Event,
+        attributes: ["_id", "discount_type", "discount_value"],
+        where: { is_active: true },
+        through: {
+          attributes: [],
+        },
+        required: false,
+      },
+    ],
+    replacements,
   };
 
   return queryOptions;

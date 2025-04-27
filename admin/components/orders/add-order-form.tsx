@@ -22,9 +22,9 @@ import { api } from "@/utils/api";
 // Define the form values type
 interface FormValues {
   type: "Đơn online" | "Đơn cửa hàng" | "Đơn bán sĩ";
-  total_price: number;
+  total_amount: number;
   note: string;
-  status_id: number; // Changed from string to number
+  status_id: number;
   delivery_day: Date;
   address: string;
   customer_id: number;
@@ -37,6 +37,11 @@ interface FormValues {
     _id: number;
     quantity: number;
     retail_price: number;
+    sale_price: number | null;
+    event_id: number | null;
+    discount_type: string | null;
+    discount_value: number | null;
+    expected_total_price: number;
   }[];
   payment_method_id: number;
 }
@@ -63,6 +68,11 @@ interface Product {
   _id: number;
   name: string;
   retail_price: number;
+  Events: {
+    id: number;
+    discount_type: string;
+    discount_value: number;
+  }[];
 }
 
 // Add this interface after the Product interface
@@ -193,13 +203,24 @@ export function NewOrderForm() {
   const form = useForm<FormValues>({
     defaultValues: {
       type: "Đơn cửa hàng",
-      total_price: 0,
+      total_amount: 0,
       note: "",
-      status_id: 4, // Changed from "4" to 4
+      status_id: 4,
       address: "",
       customer_name: "",
       customer_phone: "",
-      products: [{ _id: 0, quantity: 1, retail_price: 0 }],
+      products: [
+        {
+          _id: 0,
+          quantity: 1,
+          retail_price: 0,
+          sale_price: null,
+          event_id: null,
+          discount_type: null,
+          discount_value: null,
+          expected_total_price: 0,
+        },
+      ],
       payment_method_id: 4,
     },
     mode: "onSubmit",
@@ -284,9 +305,32 @@ export function NewOrderForm() {
         [index]: product,
       }));
 
+      // Check if product has an active event/discount
+      const hasEvent = product.Events !== undefined && product.Events.length > 0;
+      const event = hasEvent ? product.Events[0] : null;
+
+      // Calculate sale price if there's an event
+      let salePrice = null;
+      if (event) {
+        if (event.discount_type === "percentage") {
+          salePrice = product.retail_price * (1 - event.discount_value / 100);
+        } else if (event.discount_type === "fixed") {
+          salePrice = product.retail_price - event.discount_value;
+        }
+      }
+
       // Update form values
       form.setValue(`products.${index}._id`, product._id);
       form.setValue(`products.${index}.retail_price`, product.retail_price);
+      form.setValue(`products.${index}.sale_price`, salePrice);
+      form.setValue(`products.${index}.event_id`, event ? event.id : null);
+      form.setValue(`products.${index}.discount_type`, event ? event.discount_type : null);
+      form.setValue(`products.${index}.discount_value`, event ? event.discount_value : null);
+
+      // Calculate expected total price
+      const quantity = form.getValues(`products.${index}.quantity`) || 1;
+      const expectedPrice = (salePrice !== null ? salePrice : product.retail_price) * quantity;
+      form.setValue(`products.${index}.expected_total_price`, expectedPrice);
 
       // Recalculate total price
       calculateTotalPrice();
@@ -311,8 +355,16 @@ export function NewOrderForm() {
   // Calculate total price based on products
   const calculateTotalPrice = () => {
     const products = form.getValues("products");
-    const total = products.reduce((sum, product) => sum + (product.retail_price * product.quantity || 0), 0);
-    form.setValue("total_price", total);
+    const total = products.reduce((sum, product) => {
+      // Use expected_total_price if available, otherwise calculate from retail_price and quantity
+      if (product.expected_total_price) {
+        return sum + product.expected_total_price;
+      } else {
+        const price = product.sale_price !== null ? product.sale_price : product.retail_price;
+        return sum + (price * product.quantity || 0);
+      }
+    }, 0);
+    form.setValue("total_amount", total);
   };
 
   // Handle form submission
@@ -384,15 +436,26 @@ export function NewOrderForm() {
       const district = districts.find((d) => d.code === data.district_code);
       const ward = wards.find((w) => w.code === data.ward_code);
 
+      // Format products data
+      const formattedProducts = data.products.map((product) => ({
+        _id: product._id,
+        retail_price: product.retail_price,
+        sale_price: product.sale_price,
+        event_id: product.event_id,
+        discount_type: product.discount_type,
+        discount_value: product.discount_value,
+        quantity: Number(product.quantity),
+        expected_total_price:
+          product.expected_total_price ||
+          (product.sale_price !== null ? product.sale_price * product.quantity : product.retail_price * product.quantity),
+      }));
+
       const formattedData = {
         ...data,
         province_name: province?.full_name || "",
         district_name: district?.full_name || "",
         ward_name: ward?.full_name || "",
-        products: data.products.map((product) => ({
-          ...product,
-          quantity: Number(product.quantity),
-        })),
+        products: formattedProducts,
       };
 
       console.log("Form data:", formattedData);
@@ -412,6 +475,18 @@ export function NewOrderForm() {
       setIsSubmitting(false);
     }
   }
+
+  const updateExpectedTotalPrice = (index: number) => {
+    const quantity = form.getValues(`products.${index}.quantity`) || 1;
+    const retailPrice = form.getValues(`products.${index}.retail_price`) || 0;
+    const salePrice = form.getValues(`products.${index}.sale_price`);
+
+    const price = salePrice !== null ? salePrice : retailPrice;
+    const expectedPrice = price * quantity;
+
+    form.setValue(`products.${index}.expected_total_price`, expectedPrice);
+    calculateTotalPrice();
+  };
 
   return (
     <Form {...form}>
@@ -495,7 +570,7 @@ export function NewOrderForm() {
           {/* Total Price */}
           <FormField
             control={form.control}
-            name="total_price"
+            name="total_amount"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Tổng đơn hàng</FormLabel>
@@ -724,7 +799,23 @@ export function NewOrderForm() {
         <div className="bg-muted/50 p-6 rounded-lg">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Danh sách mua sản phẩm</h2>
-            <Button type="button" variant="outline" size="sm" onClick={() => append({ _id: 0, quantity: 1, retail_price: 0 })}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                append({
+                  _id: 0,
+                  quantity: 1,
+                  retail_price: 0,
+                  sale_price: null,
+                  event_id: null,
+                  discount_type: null,
+                  discount_value: null,
+                  expected_total_price: 0,
+                })
+              }
+            >
               <Plus className="h-4 w-4 mr-2" />
               Thêm sản phẩm
             </Button>
@@ -751,9 +842,16 @@ export function NewOrderForm() {
                               >
                                 <span className="flex-1 text-left break-words whitespace-normal m-1">
                                   {field.value && selectedProducts[index]
-                                    ? selectedProducts[index].name + " - " + selectedProducts[index].retail_price.toLocaleString()
+                                    ? `${selectedProducts[index].name}${
+                                        form.getValues(`products.${index}.sale_price`) != null
+                                          ? ` - ${(form.getValues(`products.${index}.retail_price`) ?? 0).toLocaleString()} → ${(
+                                              form.getValues(`products.${index}.sale_price`) ?? 0
+                                            ).toLocaleString()}`
+                                          : ` - ${(selectedProducts[index].retail_price ?? 0).toLocaleString()}`
+                                      }`
                                     : "Chọn sản phẩm"}
                                 </span>
+
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
                             </FormControl>
@@ -784,7 +882,20 @@ export function NewOrderForm() {
                                     <CommandItem key={product._id} value={product.name} onSelect={() => handleProductSelect(index, product._id)}>
                                       <Check className={cn("mr-2 h-4 w-4", field.value === product._id ? "opacity-100" : "opacity-0")} />
                                       <span className="flex-1">{product.name}</span>
-                                      <span className="text-muted-foreground">{product.retail_price.toLocaleString()} VND</span>
+                                      <span className="text-muted-foreground">
+                                        {product.Events && product.Events.length > 0 ? (
+                                          <>
+                                            <span className="line-through">{product.retail_price.toLocaleString()}</span>
+                                            {" → "}
+                                            {product.Events[0].discount_type === "percentage"
+                                              ? (product.retail_price * (1 - product.Events[0].discount_value / 100)).toLocaleString()
+                                              : (product.retail_price - product.Events[0].discount_value).toLocaleString()}{" "}
+                                            VND
+                                          </>
+                                        ) : (
+                                          `${product.retail_price.toLocaleString()} VND`
+                                        )}
+                                      </span>
                                     </CommandItem>
                                   ))}
                                 </CommandGroup>
@@ -796,72 +907,94 @@ export function NewOrderForm() {
                       </FormItem>
                     )}
                   />
+                </div>
 
-                  {/* Quantity - Narrower (2 columns) */}
-                  <FormField
-                    control={form.control}
-                    name={`products.${index}.quantity`}
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-1">
-                        <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">SL</FormLabel>
+                {/* Quantity - Narrower (2 columns) */}
+                <FormField
+                  control={form.control}
+                  name={`products.${index}.quantity`}
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-1">
+                      <FormLabel className="after:content-['*'] after:ml-0.5 after:text-red-500">Số lượng</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1"
+                          {...field}
+                          value={field.value}
+                          onChange={(e) => {
+                            // Convert string value to number
+                            const value = Number.parseInt(e.target.value, 10);
+                            field.onChange(isNaN(value) ? 1 : value);
+                            updateExpectedTotalPrice(index);
+                          }}
+                          required
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Price - Remaining space (4 columns) */}
+                <FormField
+                  control={form.control}
+                  name={`products.${index}.retail_price`}
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-4">
+                      <FormLabel>Giá</FormLabel>
+                      <div className="flex items-center gap-2">
                         <FormControl>
                           <Input
                             type="number"
-                            min="1"
+                            min="0"
                             {...field}
-                            value={field.value}
                             onChange={(e) => {
-                              // Convert string value to number
-                              const value = Number.parseInt(e.target.value, 10);
-                              field.onChange(isNaN(value) ? 1 : value);
+                              field.onChange(e);
                               calculateTotalPrice();
                             }}
                             required
                           />
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                        {index > 0 && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => {
+                              remove(index);
+                              calculateTotalPrice();
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                  {/* Price - Remaining space (4 columns) */}
-                  <FormField
-                    control={form.control}
-                    name={`products.${index}.retail_price`}
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-4">
-                        <FormLabel>Giá</FormLabel>
-                        <div className="flex items-center gap-2">
-                          <FormControl>
-                            <Input
-                              type="number"
-                              min="0"
-                              {...field}
-                              onChange={(e) => {
-                                field.onChange(e);
-                                calculateTotalPrice();
-                              }}
-                              required
-                            />
-                          </FormControl>
-                          {index > 0 && (
-                            <Button
-                              type="button"
-                              variant="destructive"
-                              size="icon"
-                              onClick={() => {
-                                remove(index);
-                                calculateTotalPrice();
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                {/* Expected Total Price */}
+                <div className="md:col-span-12 mt-2">
+                  <div className="flex justify-end">
+                    <div className="text-sm text-muted-foreground">
+                      Thành tiền:{" "}
+                      <span className="font-medium">{form.getValues(`products.${index}.expected_total_price`)?.toLocaleString() || "0"} VND</span>
+                      {form.getValues(`products.${index}.sale_price`) && (
+                        <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                          Giảm giá{" "}
+                          {form.getValues(`products.${index}.discount_type`) === "percentage"
+                            ? `${form.getValues(`products.${index}.discount_value`) || 0}%`
+                            : `${
+                                form.getValues(`products.${index}.discount_value`) !== null
+                                  ? Number(form.getValues(`products.${index}.discount_value`)).toLocaleString()
+                                  : "0"
+                              } VND`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
