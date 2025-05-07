@@ -70,8 +70,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// audit logger
-app.use(auditLogger);
+// // audit logger
+// app.use(auditLogger);
 
 app.use("/", require("./routes"));
 
